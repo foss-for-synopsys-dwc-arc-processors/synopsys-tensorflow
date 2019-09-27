@@ -13098,6 +13098,14 @@ op {
     name: "max"
     type: DT_FLOAT
   }
+  input_arg {
+    name: "w_min"
+    type: "DT_FLOAT"
+  }
+  input_arg {
+    name: "w_max"
+    type: "DT_FLOAT"
+  }
   output_arg {
     name: "outputs"
     type: DT_FLOAT
@@ -13114,6 +13122,13 @@ op {
     type: "bool"
     default_value {
       b: false
+    }
+  }
+  attr {
+    name: "tensor_type"
+    type: "int"
+    default_value {
+      i: 0
     }
   }
 }
@@ -13135,6 +13150,14 @@ op {
     name: "max"
     type: DT_FLOAT
   }
+  input_arg {
+    name: "w_min"
+    type: "DT_FLOAT"
+  }
+  input_arg {
+    name: "w_max"
+    type: "DT_FLOAT"
+  }
   output_arg {
     name: "backprops_wrt_input"
     type: DT_FLOAT
@@ -13145,6 +13168,14 @@ op {
   }
   output_arg {
     name: "backprop_wrt_max"
+    type: DT_FLOAT
+  }
+  output_arg {
+    name: "backprop_wrt_w_min"
+    type: DT_FLOAT
+  }
+  output_arg {
+    name: "backprop_wrt_w_max"
     type: DT_FLOAT
   }
   attr {
@@ -13159,6 +13190,13 @@ op {
     type: "bool"
     default_value {
       b: false
+    }
+  }
+  attr {
+    name: "tensor_type"
+    type: "int"
+    default_value {
+      i: 0
     }
   }
 }

@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import re
+import tensorflow as tf
 from tensorflow.contrib.quantize.python import common
 from tensorflow.contrib.quantize.python import graph_matcher
 from tensorflow.contrib.quantize.python import input_to_ops
@@ -82,17 +83,25 @@ def Quantize(graph,
   """
   if scope and not scope.endswith('/'):
     scope += '/'
+  #Variables to track the min and max weight values
+  #Values needed to calculate the output scale in activation node
+  w_min = tf.Variable(tf.convert_to_tensor(0.0))
+  w_max = tf.Variable(tf.convert_to_tensor(0.0))
 
   input_to_ops_map = input_to_ops.InputToOps(graph)
   quantized_ops = set()
   for layer_match in _FindLayersToQuantize(graph):
     # Quantize the weights.
+
     context = _GetContextFromOp(layer_match.layer_op)
 
     # If `scope` is given, only quantize it if the consumer of weights
     # (the layer op) is in the right scope.
     if layer_match.weight_tensor is not None:
-      _InsertQuantOp(
+
+      w_min, w_max = _InsertQuantOp(
+          w_min,
+          w_max,
           context,
           'weights_quant',
           layer_match.weight_tensor.op,
@@ -121,6 +130,8 @@ def Quantize(graph,
       # If `scope` is given, only quantize it if the producer of weights
       # (usually it's the layer op) is in the right scope.
       _InsertQuantOp(
+          w_min,
+          w_max,
           add_context,
           'act_quant',
           layer_match.activation_op,
@@ -142,6 +153,8 @@ def Quantize(graph,
       # If `scope` is given, only quantize it if the both the producer and the
       # consumer are in the right scope.
       _InsertQuantOp(
+          w_min,
+          w_max,
           context,
           'conv_quant',
           layer_match.bias_add_op,
@@ -165,6 +178,8 @@ def Quantize(graph,
                      layer_match.bypass_op.name)
       else:
         _InsertQuantOp(
+            w_min,
+            w_max,
             add_context,
             'add_quant',
             layer_match.bypass_op,
@@ -200,6 +215,8 @@ def Quantize(graph,
                      layer_match.post_activation_bypass_op.name)
       else:
         _InsertQuantOp(
+            w_min,
+            w_max,
             post_activation_bypass_context,
             'post_activation_bypass_quant',
             layer_match.post_activation_bypass_op,
@@ -213,7 +230,6 @@ def Quantize(graph,
             symmetric=symmetric,
             producer_scope=scope)
         quantized_ops.add(layer_match.post_activation_bypass_op)
-
   _QuantizeActivationLayers(
       quantized_ops,
       graph,
@@ -641,7 +657,9 @@ def _FollowedByFakeQuant(tensor):
   return False
 
 
-def _InsertQuantOp(context,
+def _InsertQuantOp(w_min,
+                   w_max,
+                   context,
                    name,
                    producer,
                    consumers,
@@ -726,11 +744,12 @@ def _InsertQuantOp(context,
   # add duplicate FakeQuant operations.
   if _FollowedByFakeQuant(inputs):
     return
-
   if moving_avg:
     quant = (
         quant_ops.MovingAvgQuantize(
             inputs,
+            w_min,
+            w_max,
             init_min=init_min,
             init_max=init_max,
             ema_decay=ema_decay,
@@ -741,9 +760,11 @@ def _InsertQuantOp(context,
             vars_collection=vars_collection,
             name_prefix=name_prefix))
   else:
-    quant = (
+    quant,w_min,w_max = (
         quant_ops.LastValueQuantize(
             inputs,
+            w_min,
+            w_max,
             init_min=init_min,
             init_max=init_max,
             is_training=is_training,
@@ -774,7 +795,7 @@ def _InsertQuantOp(context,
     if tensors_modified_count < len(consumers):
       raise ValueError('No inputs quantized for ops: [%s]' % ', '.join(
           [consumer.name for consumer in consumers]))
-
+  return w_min, w_max
 
 def _GetContextFromOp(op):
   """Gets the root context name from the op name."""

@@ -60,6 +60,8 @@ def _ModelVariable(name,
 
 
 def LastValueQuantize(inputs,
+                      w_min,
+                      w_max,
                       per_channel=False,
                       init_min=-6.0,
                       init_max=6.0,
@@ -121,14 +123,32 @@ def LastValueQuantize(inputs,
         initializer=init_ops.constant_initializer(init_max),
         collections=vars_collections,
         trainable=False)
+
+    w_min_var = _ModelVariable(
+        'w_min',
+        shape=min_max_shape,
+        initializer=init_ops.constant_initializer(init_min),
+        collections=vars_collections,
+        trainable=False)
+
+    w_max_var = _ModelVariable(
+        'w_max',
+        shape=min_max_shape,
+        initializer=init_ops.constant_initializer(init_max),
+        collections=vars_collections,
+        trainable=False)
+
+    #Used tensor_type as '0' for weights
     if not is_training:
       return _FakeQuantWithMinMaxVars(
           inputs,
           min_var,
           max_var,
+          w_min_var,
+          w_max_var,
           per_channel=per_channel,
           num_bits=num_bits,
-          narrow_range=narrow_range)
+          narrow_range=narrow_range, tensor_type=0), w_min_var, w_max_var
 
     if per_channel:
       if input_dim == 2:
@@ -174,16 +194,27 @@ def LastValueQuantize(inputs,
     assign_min = state_ops.assign(min_var, range_min, name='AssignMinLast')
     assign_max = state_ops.assign(max_var, range_max, name='AssignMaxLast')
 
+    #Assign min and max of weights to w_min and w_max which is used in \
+    #activation scale calculation
+    w_min = state_ops.assign(w_min_var, assign_min, name='w_min')
+    w_max = state_ops.assign(w_max_var, assign_max, name='w_max')
+
+    #Used tensor_type as '0' for weights
+    #Returns w_min and w_max which will be passed to fakequant activation node
     return _FakeQuantWithMinMaxVars(
         inputs,
         assign_min,
         assign_max,
+        w_min,
+        w_max,
         per_channel=per_channel,
         num_bits=num_bits,
-        narrow_range=narrow_range)
-
+        narrow_range=narrow_range,
+        tensor_type=0), w_min, w_max
 
 def MovingAvgQuantize(inputs,
+                      w_min,
+                      w_max,
                       per_channel=False,
                       init_min=-6.0,
                       init_max=6.0,
@@ -247,14 +278,20 @@ def MovingAvgQuantize(inputs,
         initializer=init_ops.constant_initializer(init_max),
         collections=vars_collections,
         trainable=False)
+
+    #Used tensor_type as '1' for activations
     if not is_training:
       return _FakeQuantWithMinMaxVars(
           inputs,
           min_var,
           max_var,
+          w_min,
+          w_max,
           per_channel=per_channel,
           num_bits=num_bits,
-          narrow_range=narrow_range)
+          narrow_range=narrow_range,
+          tensor_type=1)
+
     if per_channel:
       if input_dim == 2:
         reduce_dims = [0]
@@ -297,21 +334,25 @@ def MovingAvgQuantize(inputs,
       range_max = math_ops.maximum(batch_max, 0.0)
 
     assign_min = moving_averages.assign_moving_average(
-        min_var, range_min, ema_decay, name='AssignMinEma')
+        min_var, range_min, ema_decay, name='AssignM+          narrow_range=narrow_range, tensor_type=0),inEma')
     assign_max = moving_averages.assign_moving_average(
         max_var, range_max, ema_decay, name='AssignMaxEma')
 
+    #Used tensor_type as '1' for activations
     return _FakeQuantWithMinMaxVars(
         inputs,
         assign_min,
         assign_max,
+        w_min,
+        w_max,
         per_channel=per_channel,
         num_bits=num_bits,
-        narrow_range=narrow_range)
+        narrow_range=narrow_range,
+        tensor_type=1)
 
 
-def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, per_channel, num_bits,
-                             narrow_range):
+def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, w_min, w_max, per_channel, num_bits,
+                             narrow_range,tensor_type):
   """Adds a fake quantization operation.
 
   Depending on value of per_channel, this operation may do global quantization
@@ -339,4 +380,4 @@ def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, per_channel, num_bits,
     assert min_var.get_shape() == []  # pylint: disable=g-explicit-bool-comparison
     assert max_var.get_shape() == []  # pylint: disable=g-explicit-bool-comparison
     return array_ops.fake_quant_with_min_max_vars(
-        inputs, min_var, max_var, num_bits=num_bits, narrow_range=narrow_range)
+        inputs, min_var, max_var, w_min, w_max, tensor_type, num_bits=num_bits, narrow_range=narrow_range)

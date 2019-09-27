@@ -3049,41 +3049,55 @@ REGISTER_OP("FakeQuantWithMinMaxArgsGradient")
 REGISTER_OP("FakeQuantWithMinMaxVars")
     .Attr("num_bits: int = 8")
     .Attr("narrow_range: bool = false")
+    .Attr("tensor_type: int")
     .Input("inputs: float")
     .Input("min: float")
     .Input("max: float")
+    .Input("w_min: float")
+    .Input("w_max: float")
     .Output("outputs: float")
     .SetShapeFn([](InferenceContext* c) {
       TF_RETURN_IF_ERROR(shape_inference::UnchangedShape(c));
       ShapeHandle unused;
       TF_RETURN_IF_ERROR(c->WithRank(c->input(1), 0, &unused));
       TF_RETURN_IF_ERROR(c->WithRank(c->input(2), 0, &unused));
+      TF_RETURN_IF_ERROR(c->WithRank(c->input(3), 0, &unused));
+      TF_RETURN_IF_ERROR(c->WithRank(c->input(4), 0, &unused));
       return Status::OK();
     });
 
 REGISTER_OP("FakeQuantWithMinMaxVarsGradient")
     .Attr("num_bits: int = 8")
     .Attr("narrow_range: bool = false")
+    .Attr("tensor_type: int")
     .Input("gradients: float")
     .Input("inputs: float")
     .Input("min: float")
     .Input("max: float")
+    .Input("w_min: float")
+    .Input("w_max: float")
     .Output("backprops_wrt_input: float")
     .Output("backprop_wrt_min: float")
     .Output("backprop_wrt_max: float")
+    .Output("backprop_wrt_w_min: float")
+    .Output("backprop_wrt_w_max: float")
     .SetShapeFn([](InferenceContext* c) {
       // gradients and inputs are same size.
       ShapeHandle inputs;
       TF_RETURN_IF_ERROR(c->Merge(c->input(0), c->input(1), &inputs));
 
       // min and max are scalars
-      ShapeHandle min_max;
+      ShapeHandle min_max, w_min_max;
       TF_RETURN_IF_ERROR(c->WithRank(c->input(2), 0, &min_max));
       TF_RETURN_IF_ERROR(c->Merge(min_max, c->input(3), &min_max));
+      TF_RETURN_IF_ERROR(c->WithRank(c->input(4), 0, &w_min_max));
+      TF_RETURN_IF_ERROR(c->Merge(w_min_max, c->input(5), &w_min_max));
 
       c->set_output(0, inputs);
       c->set_output(1, min_max);
       c->set_output(2, min_max);
+      c->set_output(3, w_min_max);
+      c->set_output(4, w_min_max);
       return Status::OK();
     });
 

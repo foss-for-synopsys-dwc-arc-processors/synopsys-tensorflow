@@ -118,6 +118,7 @@ def create_training_graph(input_graph=None, quant_delay=0):
   _create_graph(
       input_graph=input_graph,
       is_training=True,
+      symmetric=True,
       quant_delay=quant_delay,
       freeze_bn_delay=freeze_bn_delay)
 
@@ -140,7 +141,7 @@ def create_eval_graph(input_graph=None):
     ValueError: If elements contains an element that isn't a tf.Tensor or
       tf.Operation.
   """
-  _create_graph(input_graph=input_graph, is_training=False)
+  _create_graph(input_graph=input_graph, symmetric=True, is_training=False)
 
 
 def experimental_create_training_graph(input_graph=None,

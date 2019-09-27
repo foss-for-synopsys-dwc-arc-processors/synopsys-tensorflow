@@ -21,7 +21,6 @@ limitations under the License.
 #endif  // GOOGLE_CUDA || TENSORFLOW_USE_ROCM
 
 #include "tensorflow/core/kernels/fake_quant_ops_functor.h"
-
 #include "tensorflow/core/framework/numeric_op.h"
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/lib/core/errors.h"
@@ -72,6 +71,7 @@ class FakeQuantWithMinMaxArgsOp
         InvalidArgument("num_bits must be between 2 and 16, inclusive"));
     bool narrow_range;
     OP_REQUIRES_OK(context, context->GetAttr("narrow_range", &narrow_range));
+    OP_REQUIRES_OK(context, context->GetAttr("tensor_type", &tensor_type_));
     quant_min_ = narrow_range ? 1 : 0;
     quant_max_ = (1 << num_bits) - 1;
   }
@@ -79,7 +79,7 @@ class FakeQuantWithMinMaxArgsOp
   void Operate(OpKernelContext* context, const Tensor& input, Tensor* output) {
     FakeQuantWithMinMaxArgsFunctor<Device> functor;
     functor(context->eigen_device<Device>(), input.flat<float>(), min_, max_,
-            quant_min_, quant_max_, output->flat<float>());
+            quant_min_, quant_max_, tensor_type_, output->flat<float>());
   }
 
  private:
@@ -87,6 +87,7 @@ class FakeQuantWithMinMaxArgsOp
   float max_;
   int quant_min_;
   int quant_max_;
+  int tensor_type_;
 };
 
 // Implementation of FakeQuantWithMinMaxArgsGradientOp, see its documentation in
@@ -112,6 +113,7 @@ class FakeQuantWithMinMaxArgsGradientOp
         InvalidArgument("num_bits must be between 2 and 16, inclusive"));
     bool narrow_range;
     OP_REQUIRES_OK(context, context->GetAttr("narrow_range", &narrow_range));
+    OP_REQUIRES_OK(context, context->GetAttr("tensor_type", &tensor_type_));
     quant_min_ = narrow_range ? 1 : 0;
     quant_max_ = (1 << num_bits) - 1;
   }
@@ -129,7 +131,7 @@ class FakeQuantWithMinMaxArgsGradientOp
     FakeQuantWithMinMaxArgsGradientFunctor<Device> functor;
     functor(context->eigen_device<Device>(), gradient.flat<float>(),
             input.flat<float>(), min_, max_, quant_min_, quant_max_,
-            output->flat<float>());
+            tensor_type_, output->flat<float>());
   }
 
  private:
@@ -137,6 +139,7 @@ class FakeQuantWithMinMaxArgsGradientOp
   float max_;
   int quant_min_;
   int quant_max_;
+  int tensor_type_;
 };
 
 REGISTER_KERNEL_BUILDER(Name("FakeQuantWithMinMaxArgs").Device(DEVICE_CPU),
@@ -153,7 +156,8 @@ typedef Eigen::GpuDevice GPUDevice;
 template <>
 void FakeQuantWithMinMaxArgsFunctor<GPUDevice>::operator()(
     const GPUDevice& d, typename TTypes<float>::ConstFlat inputs,
-    const float min, const float max, const int quant_min, const int quant_max,
+    const float min, const float max, const int quant_min,
+    const int quant_max, const int tensor_type_,
     typename TTypes<float>::Flat outputs);
 extern template struct FakeQuantWithMinMaxArgsFunctor<GPUDevice>;
 REGISTER_KERNEL_BUILDER(Name("FakeQuantWithMinMaxArgs").Device(DEVICE_GPU),
@@ -163,12 +167,13 @@ template <>
 void FakeQuantWithMinMaxArgsGradientFunctor<GPUDevice>::operator()(
     const GPUDevice& d, typename TTypes<float>::ConstFlat gradients,
     typename TTypes<float>::ConstFlat inputs, const float min, const float max,
-    const int quant_min, const int quant_max,
+    const int quant_min, const int quant_max, const int tensor_type_,
     typename TTypes<float>::Flat backprops);
 REGISTER_KERNEL_BUILDER(
     Name("FakeQuantWithMinMaxArgsGradient").Device(DEVICE_GPU),
     FakeQuantWithMinMaxArgsGradientOp<GPUDevice>);
 #endif  // GOOGLE_CUDA || TENSORFLOW_USE_ROCM
+
 
 // -----------------------------------------------------------------------------
 // Implementation of FakeQuantWithMinMaxVarsOp, see its documentation in
@@ -184,16 +189,20 @@ class FakeQuantWithMinMaxVarsOp : public OpKernel {
         context, IsNumBitsValid(num_bits),
         InvalidArgument("num_bits must be between 2 and 16, inclusive"));
     bool narrow_range;
+
     OP_REQUIRES_OK(context, context->GetAttr("narrow_range", &narrow_range));
+    OP_REQUIRES_OK(context, context->GetAttr("tensor_type", &tensor_type_));
     quant_min_ = narrow_range ? 1 : 0;
     quant_max_ = (1 << num_bits) - 1;
   }
 
   void Compute(OpKernelContext* context) override {
-    CHECK_EQ(3, context->num_inputs());
+    CHECK_EQ(5, context->num_inputs());
     const Tensor& input = context->input(0);
     const Tensor& min = context->input(1);
     const Tensor& max = context->input(2);
+    const Tensor& w_min = context->input(3);
+    const Tensor& w_max = context->input(4);
 
     Tensor* output;
     OP_REQUIRES_OK(context,
@@ -202,12 +211,14 @@ class FakeQuantWithMinMaxVarsOp : public OpKernel {
     FakeQuantWithMinMaxVarsFunctor<Device> functor;
     functor(context->eigen_device<Device>(), input.flat<float>(),
             min.scalar<float>(), max.scalar<float>(), quant_min_, quant_max_,
+            tensor_type_, w_min.scalar<float>(), w_max.scalar<float>(),
             output->flat<float>());
   }
 
  private:
   int quant_min_;
   int quant_max_;
+  int tensor_type_;
 };
 
 // Implementation of FakeQuantWithMinMaxVarsGradientOp, see its documentation in
@@ -224,18 +235,21 @@ class FakeQuantWithMinMaxVarsGradientOp : public OpKernel {
         InvalidArgument("num_bits must be between 2 and 16, inclusive"));
     bool narrow_range;
     OP_REQUIRES_OK(context, context->GetAttr("narrow_range", &narrow_range));
+    OP_REQUIRES_OK(context, context->GetAttr("tensor_type", &tensor_type_));
     quant_min_ = narrow_range ? 1 : 0;
     quant_max_ = (1 << num_bits) - 1;
   }
 
   void Compute(OpKernelContext* context) override {
-    CHECK_EQ(4, context->num_inputs());
+    CHECK_EQ(6, context->num_inputs());
     const Tensor& gradient = context->input(0);
     const Tensor& input = context->input(1);
     OP_REQUIRES(context, input.IsSameSize(gradient),
                 InvalidArgument("gradient and input must be the same size"));
     const Tensor& min = context->input(2);
     const Tensor& max = context->input(3);
+    const Tensor& w_min = context->input(4);
+    const Tensor& w_max = context->input(5);
 
     Tensor* grad_wrt_input;
     OP_REQUIRES_OK(context,
@@ -250,16 +264,27 @@ class FakeQuantWithMinMaxVarsGradientOp : public OpKernel {
     OP_REQUIRES_OK(context,
                    context->allocate_output(2, scalar_shape, &grad_wrt_max));
 
+    Tensor* grad_wrt_w_min;
+    OP_REQUIRES_OK(context,
+                   context->allocate_output(3, scalar_shape, &grad_wrt_w_min));
+
+    Tensor* grad_wrt_w_max;
+    OP_REQUIRES_OK(context,
+                   context->allocate_output(4, scalar_shape, &grad_wrt_w_max));
+
     FakeQuantWithMinMaxVarsGradientFunctor<Device> functor;
     functor(context->eigen_device<Device>(), gradient.flat<float>(),
             input.flat<float>(), min.scalar<float>(), max.scalar<float>(),
-            quant_min_, quant_max_, grad_wrt_input->flat<float>(),
-            grad_wrt_min->scalar<float>(), grad_wrt_max->scalar<float>());
+            quant_min_, quant_max_, tensor_type_, w_min.scalar<float>(),
+            w_max.scalar<float>(), grad_wrt_input->flat<float>(),
+            grad_wrt_min->scalar<float>(), grad_wrt_max->scalar<float>(),
+            grad_wrt_w_min->scalar<float>(), grad_wrt_w_max->scalar<float>());
   }
 
  private:
   int quant_min_;
   int quant_max_;
+  int tensor_type_;
 };
 
 REGISTER_KERNEL_BUILDER(Name("FakeQuantWithMinMaxVars").Device(DEVICE_CPU),
@@ -275,7 +300,10 @@ void FakeQuantWithMinMaxVarsFunctor<GPUDevice>::operator()(
     const GPUDevice& d, typename TTypes<float>::ConstFlat inputs,
     typename TTypes<float>::ConstScalar min,
     typename TTypes<float>::ConstScalar max, const int quant_min,
-    const int quant_max, typename TTypes<float>::Flat output);
+    const int quant_max, const int tensor_type_,
+    typename TTypes<float>::ConstScalar w_min,
+    typename TTypes<float>::ConstScalar w_max,
+    typename TTypes<float>::Flat output);
 extern template struct FakeQuantWithMinMaxVarsFunctor<GPUDevice>;
 REGISTER_KERNEL_BUILDER(Name("FakeQuantWithMinMaxVars")
                             .Device(DEVICE_GPU)
@@ -289,9 +317,14 @@ void FakeQuantWithMinMaxVarsGradientFunctor<GPUDevice>::operator()(
     typename TTypes<float>::ConstFlat inputs,
     typename TTypes<float>::ConstScalar min,
     typename TTypes<float>::ConstScalar max, const int quant_min,
-    const int quant_max, typename TTypes<float>::Flat backprops_wrt_input,
+    const int quant_max, const int tensor_type_,
+    typename TTypes<float>::ConstScalar w_min,
+    typename TTypes<float>::ConstScalar w_max,
+    typename TTypes<float>::Flat backprops_wrt_input,
     typename TTypes<float>::Scalar backprop_wrt_min,
-    typename TTypes<float>::Scalar backprop_wrt_max);
+    typename TTypes<float>::Scalar backprop_wrt_max,
+    typename TTypes<float>::Scalar backprop_wrt_w_min,
+    typename TTypes<float>::Scalar backprop_wrt_w_max);
 extern template struct FakeQuantWithMinMaxVarsGradientFunctor<GPUDevice>;
 REGISTER_KERNEL_BUILDER(Name("FakeQuantWithMinMaxVarsGradient")
                             .Device(DEVICE_GPU)
@@ -315,6 +348,7 @@ class FakeQuantWithMinMaxVarsPerChannelOp : public OpKernel {
         InvalidArgument("num_bits must be between 2 and 16, inclusive"));
     bool narrow_range;
     OP_REQUIRES_OK(context, context->GetAttr("narrow_range", &narrow_range));
+    OP_REQUIRES_OK(context, context->GetAttr("tensor_type", &tensor_type_));
     quant_min_ = narrow_range ? 1 : 0;
     quant_max_ = (1 << num_bits) - 1;
   }
@@ -338,13 +372,14 @@ class FakeQuantWithMinMaxVarsPerChannelOp : public OpKernel {
 
     FakeQuantWithMinMaxVarsPerChannelFunctor<Device> functor;
     functor(context->eigen_device<Device>(), input.flat_inner_dims<float, 2>(),
-            min.vec<float>(), max.vec<float>(), quant_min_, quant_max_,
+            min.vec<float>(), max.vec<float>(), quant_min_, quant_max_, tensor_type_,
             output->flat_inner_dims<float, 2>());
   }
 
  private:
   int quant_min_;
   int quant_max_;
+  int tensor_type_;
 };
 
 // Implementation of FakeQuantWithMinMaxVarsPerChannelGradientOp, see its
@@ -364,6 +399,7 @@ class FakeQuantWithMinMaxVarsPerChannelGradientOp : public OpKernel {
     OP_REQUIRES_OK(context, context->GetAttr("narrow_range", &narrow_range));
     quant_min_ = narrow_range ? 1 : 0;
     quant_max_ = (1 << num_bits) - 1;
+    OP_REQUIRES_OK(context, context->GetAttr("tensor_type", &tensor_type_));
   }
 
   void Compute(OpKernelContext* context) override {
@@ -399,11 +435,12 @@ class FakeQuantWithMinMaxVarsPerChannelGradientOp : public OpKernel {
     functor(
         context->eigen_device<Device>(), gradient.flat_inner_dims<float, 2>(),
         input.flat_inner_dims<float, 2>(), min.vec<float>(), max.vec<float>(),
-        quant_min_, quant_max_, grad_wrt_input->flat_inner_dims<float, 2>(),
+        quant_min_, quant_max_, tensor_type_, grad_wrt_input->flat_inner_dims<float, 2>(),
         grad_wrt_min->vec<float>(), grad_wrt_max->vec<float>());
   }
 
  private:
+  int tensor_type_;
   int quant_min_;
   int quant_max_;
 };
@@ -422,7 +459,7 @@ void FakeQuantWithMinMaxVarsPerChannelFunctor<GPUDevice>::operator()(
     const GPUDevice& d, typename TTypes<float>::ConstMatrix inputs,
     typename TTypes<float>::ConstFlat min,
     typename TTypes<float>::ConstFlat max, const int quant_min,
-    const int quant_max, typename TTypes<float>::Matrix outputs);
+    const int quant_max,const int tensor_type_, typename TTypes<float>::Matrix outputs);
 extern template struct FakeQuantWithMinMaxVarsPerChannelFunctor<GPUDevice>;
 
 REGISTER_KERNEL_BUILDER(Name("FakeQuantWithMinMaxVarsPerChannel")
@@ -436,7 +473,7 @@ void FakeQuantWithMinMaxVarsPerChannelGradientFunctor<GPUDevice>::operator()(
     const GPUDevice& d, typename TTypes<float>::ConstMatrix gradients,
     typename TTypes<float>::ConstMatrix inputs,
     typename TTypes<float>::ConstVec min, typename TTypes<float>::ConstVec max,
-    const int quant_min, const int quant_max,
+    const int quant_min, const int quant_max, const int tensor_type_,
     typename TTypes<float>::Matrix backprops_wrt_input,
     typename TTypes<float>::Vec backprop_wrt_min,
     typename TTypes<float>::Vec backprop_wrt_max);

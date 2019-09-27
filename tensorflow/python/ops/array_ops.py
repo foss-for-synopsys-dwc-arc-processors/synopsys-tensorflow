@@ -2631,8 +2631,11 @@ def _FakeQuantWithMinMaxVarsGradient(op, grad):
       op.inputs[0],
       op.inputs[1],
       op.inputs[2],
+      w_min=op.inputs[3],
+      w_max=op.inputs[4],
       num_bits=op.get_attr("num_bits"),
-      narrow_range=op.get_attr("narrow_range"))
+      narrow_range=op.get_attr("narrow_range"),
+      tensor_type=op.get_attr("tensor_type"))
 
 
 @ops.RegisterGradient("FakeQuantWithMinMaxVarsPerChannel")
