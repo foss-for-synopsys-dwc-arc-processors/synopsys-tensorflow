@@ -334,7 +334,7 @@ def MovingAvgQuantize(inputs,
       range_max = math_ops.maximum(batch_max, 0.0)
 
     assign_min = moving_averages.assign_moving_average(
-        min_var, range_min, ema_decay, name='AssignM+          narrow_range=narrow_range, tensor_type=0),inEma')
+        min_var, range_min, ema_decay, name='AssignMinEma')
     assign_max = moving_averages.assign_moving_average(
         max_var, range_max, ema_decay, name='AssignMaxEma')
 

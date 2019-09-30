@@ -308,7 +308,9 @@ extern template struct FakeQuantWithMinMaxVarsFunctor<GPUDevice>;
 REGISTER_KERNEL_BUILDER(Name("FakeQuantWithMinMaxVars")
                             .Device(DEVICE_GPU)
                             .HostMemory("min")
-                            .HostMemory("max"),
+                            .HostMemory("max")
+                            .HostMemory("w_min")
+                            .HostMemory("w_max"),
                         FakeQuantWithMinMaxVarsOp<GPUDevice>);
 
 template <>
@@ -329,7 +331,9 @@ extern template struct FakeQuantWithMinMaxVarsGradientFunctor<GPUDevice>;
 REGISTER_KERNEL_BUILDER(Name("FakeQuantWithMinMaxVarsGradient")
                             .Device(DEVICE_GPU)
                             .HostMemory("min")
-                            .HostMemory("max"),
+                            .HostMemory("max")
+                            .HostMemory("w_min")
+                            .HostMemory("w_max"),
                         FakeQuantWithMinMaxVarsGradientOp<GPUDevice>);
 #endif  // GOOGLE_CUDA || TENSORFLOW_USE_ROCM
 
