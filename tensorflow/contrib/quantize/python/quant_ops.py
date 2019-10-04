@@ -71,7 +71,8 @@ def LastValueQuantize(inputs,
                       is_training=True,
                       num_bits=8,
                       narrow_range=False,
-                      symmetric=False):
+                      symmetric=False,
+                      ev_quant=False):
   """Adds a layer that collects quantization ranges as last input ranges.
 
   LastValueQuantize creates variables called 'min' and 'max', representing the
@@ -148,7 +149,9 @@ def LastValueQuantize(inputs,
           w_max_var,
           per_channel=per_channel,
           num_bits=num_bits,
-          narrow_range=narrow_range, tensor_type=0), w_min_var, w_max_var
+          narrow_range=narrow_range,
+          ev_quant=ev_quant,
+          tensor_type=0), w_min_var, w_max_var
 
     if per_channel:
       if input_dim == 2:
@@ -210,6 +213,7 @@ def LastValueQuantize(inputs,
         per_channel=per_channel,
         num_bits=num_bits,
         narrow_range=narrow_range,
+        ev_quant=ev_quant,
         tensor_type=0), w_min, w_max
 
 def MovingAvgQuantize(inputs,
@@ -225,7 +229,8 @@ def MovingAvgQuantize(inputs,
                       is_training=True,
                       num_bits=8,
                       narrow_range=False,
-                      symmetric=False):
+                      symmetric=False,
+                      ev_quant=False):
   """Adds a layer that collects quantization ranges as EMAs of input ranges.
 
   MovingAvgQuantize creates variables called 'min' and 'max', representing the
@@ -290,6 +295,7 @@ def MovingAvgQuantize(inputs,
           per_channel=per_channel,
           num_bits=num_bits,
           narrow_range=narrow_range,
+          ev_quant=ev_quant,
           tensor_type=1)
 
     if per_channel:
@@ -348,11 +354,12 @@ def MovingAvgQuantize(inputs,
         per_channel=per_channel,
         num_bits=num_bits,
         narrow_range=narrow_range,
+        ev_quant=ev_quant,
         tensor_type=1)
 
 
 def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, w_min, w_max, per_channel, num_bits,
-                             narrow_range,tensor_type):
+                             narrow_range, ev_quant, tensor_type):
   """Adds a fake quantization operation.
 
   Depending on value of per_channel, this operation may do global quantization
@@ -380,4 +387,4 @@ def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, w_min, w_max, per_channel
     assert min_var.get_shape() == []  # pylint: disable=g-explicit-bool-comparison
     assert max_var.get_shape() == []  # pylint: disable=g-explicit-bool-comparison
     return array_ops.fake_quant_with_min_max_vars(
-        inputs, min_var, max_var, w_min, w_max, tensor_type, num_bits=num_bits, narrow_range=narrow_range)
+        inputs, min_var, max_var, w_min, w_max, tensor_type, ev_quant=ev_quant, num_bits=num_bits, narrow_range=narrow_range)

@@ -2635,6 +2635,7 @@ def _FakeQuantWithMinMaxVarsGradient(op, grad):
       w_max=op.inputs[4],
       num_bits=op.get_attr("num_bits"),
       narrow_range=op.get_attr("narrow_range"),
+      ev_quant=op.get_attr("ev_quant"),
       tensor_type=op.get_attr("tensor_type"))
 
 

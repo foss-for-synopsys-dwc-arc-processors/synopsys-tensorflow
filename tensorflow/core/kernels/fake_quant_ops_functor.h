@@ -41,28 +41,28 @@ namespace tensorflow {
 // Outputs nudged_min, nudged_max, nudged_scale.
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void Nudge(
     const float min, const float max, const int quant_min, const int quant_max,
-    float* nudged_min, float* nudged_max, float* scale, const int tensor_type_,
-    const float weights_min, const float weights_max) {
-
+    float* nudged_min, float* nudged_max, float* scale, const int tensor_type,
+    const bool ev_quant, const float weights_min, const float weights_max) {
   const float quant_min_float = static_cast<float>(quant_min);
   const float quant_max_float = static_cast<float>(quant_max);
+  if(ev_quant) { //EVQuantization Logic
   const int weight_max_value = 127;//Signed max or (256/2 - 1)
   const int num_bits = 8;//8 bits for unsigned / (8-1)bits for signed
-  //EVQuant formula to calculate Weight Scale
-  if(tensor_type_ == 0){
-    const float abs_max = std::max(-min, max);
-   *scale = weight_max_value / abs_max;
-    }
-  //EVQuant formula to calculate Activation Scale
-  else if(tensor_type_ == 1){
-    const float input_scale = 127.5;
-    const float abs_weights_max = std::max(-weights_min, weights_max);
-    const float abs_act_max = std::max(-min, max);
-    const float value = input_scale * (weight_max_value / abs_weights_max);
-    const float multiplier = value * abs_act_max;
-    const int bits_to_shift = (std::ceil(log2(multiplier))) - num_bits;
-    *scale = value / pow(2, bits_to_shift);
-    }
+     //EVQuant formula to calculate Weight Scale
+      if(tensor_type == 0){
+        const float abs_max = std::max(-min, max);
+       *scale = weight_max_value / abs_max;
+        }
+      //EVQuant formula to calculate Activation Scale
+      else if(tensor_type == 1){
+        const float input_scale = 127.5;
+        const float abs_weights_max = std::max(-weights_min, weights_max);
+        const float abs_act_max = std::max(-min, max);
+        const float value = input_scale * (weight_max_value / abs_weights_max);
+        const float multiplier = value * abs_act_max;
+        const int bits_to_shift = (std::ceil(log2(multiplier))) - num_bits;
+        *scale = value / pow(2, bits_to_shift);
+        }
   const float zero_point_from_max = quant_max_float - (max * (*scale));
   const uint16 nudged_zero_point = [zero_point_from_max, quant_min,
                                     quant_min_float, quant_max,
@@ -77,6 +77,26 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void Nudge(
   }();
   *nudged_min = (quant_min_float - nudged_zero_point) / (*scale);
   *nudged_max = (quant_max_float - nudged_zero_point) / (*scale);
+  }
+
+  else {  //TFLogic
+  *scale = (max - min) / (quant_max_float - quant_min_float);
+  const float zero_point_from_min = quant_min_float - min / *scale;
+  const uint16 nudged_zero_point = [zero_point_from_min, quant_min,
+                                    quant_min_float, quant_max,
+                                    quant_max_float] {
+    if (zero_point_from_min < quant_min_float) {
+      return static_cast<uint16>(quant_min);
+    }
+    if (zero_point_from_min > quant_max_float) {
+      return static_cast<uint16>(quant_max);
+    }
+    return static_cast<uint16>(StdRound(zero_point_from_min));
+  }();
+  *nudged_min = (quant_min_float - nudged_zero_point) * (*scale);
+  *nudged_max = (quant_max_float - nudged_zero_point) * (*scale);
+  }
+
 }
 
 template <typename T>
@@ -98,7 +118,7 @@ template <typename Device>
 struct FakeQuantWithMinMaxArgsFunctor {
   void operator()(const Device& d, ConstFlat<float> inputs, const float min,
                   const float max, const int quant_min, const int quant_max,
-                  const int tensor_type_, Flat<float> outputs) {
+                  const int tensor_type, const bool ev_quant, Flat<float> outputs) {
     eigen_assert(min <= 0.0f && "min should be <= 0.0");
     eigen_assert(max >= 0.0f && "max should be >= 0.0");
     eigen_assert(min < max && "min should be < max");
@@ -106,7 +126,7 @@ struct FakeQuantWithMinMaxArgsFunctor {
     float nudged_min, nudged_max, nudged_scale;
     float weights_min = 0, weights_max = 0;
     Nudge(min, max, quant_min, quant_max, &nudged_min, &nudged_max,
-          &nudged_scale, tensor_type_, weights_min, weights_max);
+          &nudged_scale, tensor_type, ev_quant, weights_min, weights_max);
     const float inv_nudged_scale = 1.0f / nudged_scale;
 
     auto clamped = inputs.cwiseMin(nudged_max).cwiseMax(nudged_min);
@@ -124,7 +144,7 @@ struct FakeQuantWithMinMaxArgsGradientFunctor {
   void operator()(const Device& d, ConstFlat<float> gradients,
                   ConstFlat<float> inputs, const float min, const float max,
                   const int quant_min, const int quant_max,
-                  const int tensor_type_, Flat<float> backprops) {
+                  const int tensor_type, const bool ev_quant, Flat<float> backprops) {
     eigen_assert(min <= 0.0f && "min should be <= 0.0");
     eigen_assert(max >= 0.0f && "max should be >= 0.0");
     eigen_assert(min < max && "min should be < max");
@@ -132,7 +152,7 @@ struct FakeQuantWithMinMaxArgsGradientFunctor {
     float nudged_min, nudged_max, nudged_scale;
     float weights_min = 0, weights_max = 0;
     Nudge(min, max, quant_min, quant_max, &nudged_min, &nudged_max,
-          &nudged_scale, tensor_type_, weights_min, weights_max);
+          &nudged_scale, tensor_type, ev_quant, weights_min, weights_max);
 
     auto between_nudged_min_max =
         (inputs >= nudged_min && inputs <= nudged_max)
@@ -148,7 +168,8 @@ struct FakeQuantWithMinMaxVarsFunctor {
   void operator()(const Device& d, ConstFlat<float> inputs,
                   ConstScalar<float> min, ConstScalar<float> max,
                   const int quant_min, const int quant_max,
-                  const int tensor_type_, ConstScalar<float> w_min,
+                  const int tensor_type, const bool ev_quant,
+                  ConstScalar<float> w_min,
                   ConstScalar<float> w_max, Flat<float> outputs) {
     const float min_val = min();
     const float max_val = max();
@@ -161,14 +182,21 @@ struct FakeQuantWithMinMaxVarsFunctor {
     }
     float nudged_min, nudged_max, nudged_scale;
     Nudge(min_val, max_val, quant_min, quant_max, &nudged_min, &nudged_max,
-          &nudged_scale, tensor_type_, weights_min, weights_max);
+          &nudged_scale, tensor_type, ev_quant, weights_min, weights_max);
     const auto nudged_scale_repl = inputs.constant(nudged_scale);
 
     const auto clamped = inputs.cwiseMin(nudged_max).cwiseMax(nudged_min);
     const auto clamped_shifted = clamped - nudged_min;
+    if(ev_quant){
     outputs.device(d) = (clamped_shifted * nudged_scale_repl + 0.5f).floor() /
                             nudged_scale_repl +
                         nudged_min;
+        }
+    else {
+    outputs.device(d) = (clamped_shifted / nudged_scale_repl + 0.5f).floor() *
+                             nudged_scale_repl +
+                         nudged_min;
+        }
   }
 };
 
@@ -179,7 +207,8 @@ struct FakeQuantWithMinMaxVarsGradientFunctor {
   void operator()(const Device& d, ConstFlat<float> gradients,
                   ConstFlat<float> inputs, ConstScalar<float> min,
                   ConstScalar<float> max, const int quant_min,
-                  const int quant_max,  const int tensor_type_,
+                  const int quant_max,  const int tensor_type,
+                  const bool ev_quant,
                   ConstScalar<float> w_min, ConstScalar<float> w_max,
                   Flat<float> backprops_wrt_input,
                   Scalar<float> backprop_wrt_min,
@@ -199,7 +228,7 @@ struct FakeQuantWithMinMaxVarsGradientFunctor {
     }
     float nudged_min, nudged_max, nudged_scale;
     Nudge(min_val, max_val, quant_min, quant_max, &nudged_min, &nudged_max,
-          &nudged_scale,tensor_type_,weights_min,weights_max);
+          &nudged_scale, tensor_type, ev_quant, weights_min, weights_max);
 
     const auto between_min_max =
         (inputs >= nudged_min && inputs <= nudged_max)
@@ -231,8 +260,8 @@ template <typename Device>
 struct FakeQuantWithMinMaxVarsPerChannelFunctor {
   void operator()(const Device& d, TTypes<float>::ConstMatrix inputs,
                   ConstVec<float> min, ConstVec<float> max, const int quant_min,
-                  const int quant_max, const int tensor_type_,
-                  TTypes<float>::Matrix outputs) {
+                  const int quant_max, const int tensor_type,
+                  const bool ev_quant, TTypes<float>::Matrix outputs) {
     for (Index i = 0; i < min.size(); ++i) {
       const float min_val = min(i);
       const float max_val = max(i);
@@ -245,7 +274,7 @@ struct FakeQuantWithMinMaxVarsPerChannelFunctor {
       float nudged_min, nudged_max, nudged_scale;
       float weights_min = 0, weights_max = 0;
       Nudge(min_val, max_val, quant_min, quant_max, &nudged_min, &nudged_max,
-            &nudged_scale, tensor_type_,weights_min,weights_max);
+            &nudged_scale, tensor_type, ev_quant, weights_min, weights_max);
       const auto clamped =
           inputs.chip<1>(i).cwiseMin(nudged_max).cwiseMax(nudged_min);
       const auto clamped_shifted = clamped - nudged_min;
@@ -267,7 +296,7 @@ struct FakeQuantWithMinMaxVarsPerChannelGradientFunctor {
   void operator()(const Device& d, TTypes<float>::ConstMatrix gradients,
                   TTypes<float>::ConstMatrix inputs, ConstVec<float> min,
                   ConstVec<float> max, const int quant_min, const int quant_max,
-                  const int tensor_type_,
+                  const int tensor_type, const bool ev_quant,
                   TTypes<float>::Matrix backprops_wrt_input,
                   Vec<float> backprop_wrt_min, Vec<float> backprop_wrt_max) {
     for (Index i = 0; i < min.size(); ++i) {
@@ -287,7 +316,7 @@ struct FakeQuantWithMinMaxVarsPerChannelGradientFunctor {
       float nudged_min, nudged_max, nudged_scale;
       float weights_min = 0, weights_max = 0;
       Nudge(min_val, max_val, quant_min, quant_max, &nudged_min, &nudged_max,
-            &nudged_scale, tensor_type_,weights_min,weights_max);
+            &nudged_scale, tensor_type, ev_quant, weights_min, weights_max);
 
       const auto between_min_max =
           (inputs_chip >= nudged_min && inputs_chip <= nudged_max)

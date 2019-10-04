@@ -28,6 +28,7 @@ def _create_graph(input_graph=None,
                   weight_bits=8,
                   activation_bits=8,
                   symmetric=False,
+                  ev_quant=False,
                   quant_delay=None,
                   freeze_bn_delay=None,
                   scope=None):
@@ -78,10 +79,11 @@ def _create_graph(input_graph=None,
         weight_bits=weight_bits,
         activation_bits=activation_bits,
         symmetric=symmetric,
+        ev_quant=ev_quant,
         scope=scope)
 
 
-def create_training_graph(input_graph=None, quant_delay=0):
+def create_training_graph(input_graph=None, ev_quant=False, quant_delay=0):
   """Rewrites a training input_graph in place for simulated quantization.
 
   Variables added by the rewrite get added to the global variables collection.
@@ -119,11 +121,12 @@ def create_training_graph(input_graph=None, quant_delay=0):
       input_graph=input_graph,
       is_training=True,
       symmetric=True,
+      ev_quant=ev_quant,
       quant_delay=quant_delay,
       freeze_bn_delay=freeze_bn_delay)
 
 
-def create_eval_graph(input_graph=None):
+def create_eval_graph(input_graph=None, ev_quant=False):
   """Rewrites an eval input_graph in place for simulated quantization.
 
   Variables added by the rewrite get added to the global variables collection.
@@ -141,7 +144,7 @@ def create_eval_graph(input_graph=None):
     ValueError: If elements contains an element that isn't a tf.Tensor or
       tf.Operation.
   """
-  _create_graph(input_graph=input_graph, symmetric=True, is_training=False)
+  _create_graph(input_graph=input_graph, symmetric=True, ev_quant=ev_quant, is_training=False)
 
 
 def experimental_create_training_graph(input_graph=None,

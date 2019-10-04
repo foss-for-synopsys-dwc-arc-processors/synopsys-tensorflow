@@ -49,6 +49,7 @@ def Quantize(graph,
              weight_bits=8,
              activation_bits=8,
              symmetric=False,
+             ev_quant=False,
              ema_decay=0.999,
              quant_delay=None,
              vars_collection=ops.GraphKeys.GLOBAL_VARIABLES,
@@ -114,6 +115,7 @@ def Quantize(graph,
           vars_collection=vars_collection,
           bits=weight_bits,
           symmetric=symmetric,
+          ev_quant=ev_quant,
           consumer_scope=scope)
 
     # Quantize the activations.
@@ -143,6 +145,7 @@ def Quantize(graph,
           vars_collection=vars_collection,
           bits=activation_bits,
           symmetric=symmetric,
+          ev_quant=ev_quant,
           init_min=0.0,
           producer_scope=scope)
       quantized_ops.add(layer_match.activation_op)
@@ -166,6 +169,7 @@ def Quantize(graph,
           vars_collection=vars_collection,
           bits=activation_bits,
           symmetric=symmetric,
+          ev_quant=ev_quant,
           producer_scope=scope,
           consumer_scope=scope)
       quantized_ops.add(layer_match.bias_add_op)
@@ -191,6 +195,7 @@ def Quantize(graph,
             vars_collection=vars_collection,
             bits=activation_bits,
             symmetric=symmetric,
+            ev_quant=ev_quant,
             producer_scope=scope,
             consumer_scope=scope)
         quantized_ops.add(layer_match.bypass_op)
@@ -228,6 +233,7 @@ def Quantize(graph,
             vars_collection=vars_collection,
             bits=activation_bits,
             symmetric=symmetric,
+            ev_quant=ev_quant,
             producer_scope=scope)
         quantized_ops.add(layer_match.post_activation_bypass_op)
   _QuantizeActivationLayers(
@@ -669,6 +675,7 @@ def _InsertQuantOp(w_min,
                    init_max=6.0,
                    bits=8,
                    symmetric=False,
+                   ev_quant=False,
                    ema_decay=0.999,
                    quant_delay=None,
                    vars_collection=ops.GraphKeys.GLOBAL_VARIABLES,
@@ -756,6 +763,7 @@ def _InsertQuantOp(w_min,
             is_training=is_training,
             num_bits=bits,
             symmetric=symmetric,
+            ev_quant=ev_quant,
             narrow_range=narrow_range,
             vars_collection=vars_collection,
             name_prefix=name_prefix))
@@ -770,6 +778,7 @@ def _InsertQuantOp(w_min,
             is_training=is_training,
             num_bits=bits,
             symmetric=symmetric,
+            ev_quant=ev_quant,
             narrow_range=narrow_range,
             vars_collection=vars_collection,
             name_prefix=name_prefix))
