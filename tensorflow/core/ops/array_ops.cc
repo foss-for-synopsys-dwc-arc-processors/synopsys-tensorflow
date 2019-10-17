@@ -3054,9 +3054,11 @@ REGISTER_OP("FakeQuantWithMinMaxVars")
     .Input("inputs: float")
     .Input("min: float")
     .Input("max: float")
-    .Input("w_min: float")
-    .Input("w_max: float")
+    .Input("w_scale: float")
+    .Input("ip_scale: float")
     .Output("outputs: float")
+    .Output("op_w_scale: float")
+    .Output("op_ip_scale: float")
     .SetShapeFn([](InferenceContext* c) {
       TF_RETURN_IF_ERROR(shape_inference::UnchangedShape(c));
       ShapeHandle unused;
@@ -3064,6 +3066,8 @@ REGISTER_OP("FakeQuantWithMinMaxVars")
       TF_RETURN_IF_ERROR(c->WithRank(c->input(2), 0, &unused));
       TF_RETURN_IF_ERROR(c->WithRank(c->input(3), 0, &unused));
       TF_RETURN_IF_ERROR(c->WithRank(c->input(4), 0, &unused));
+      c->set_output(1, c->Scalar());
+      c->set_output(2, c->Scalar());
       return Status::OK();
     });
 
@@ -3076,30 +3080,30 @@ REGISTER_OP("FakeQuantWithMinMaxVarsGradient")
     .Input("inputs: float")
     .Input("min: float")
     .Input("max: float")
-    .Input("w_min: float")
-    .Input("w_max: float")
+    .Input("w_scale: float")
+    .Input("ip_scale: float")
     .Output("backprops_wrt_input: float")
     .Output("backprop_wrt_min: float")
     .Output("backprop_wrt_max: float")
-    .Output("backprop_wrt_w_min: float")
-    .Output("backprop_wrt_w_max: float")
+    .Output("backprop_wrt_w_scale: float")
+    .Output("backprop_wrt_ip_scale: float")
     .SetShapeFn([](InferenceContext* c) {
       // gradients and inputs are same size.
       ShapeHandle inputs;
       TF_RETURN_IF_ERROR(c->Merge(c->input(0), c->input(1), &inputs));
 
       // min and max are scalars
-      ShapeHandle min_max, w_min_max;
+      ShapeHandle min_max, scale;
       TF_RETURN_IF_ERROR(c->WithRank(c->input(2), 0, &min_max));
       TF_RETURN_IF_ERROR(c->Merge(min_max, c->input(3), &min_max));
-      TF_RETURN_IF_ERROR(c->WithRank(c->input(4), 0, &w_min_max));
-      TF_RETURN_IF_ERROR(c->Merge(w_min_max, c->input(5), &w_min_max));
+      TF_RETURN_IF_ERROR(c->WithRank(c->input(4), 0, &scale));
+      TF_RETURN_IF_ERROR(c->Merge(scale, c->input(5), &scale));
 
       c->set_output(0, inputs);
       c->set_output(1, min_max);
       c->set_output(2, min_max);
-      c->set_output(3, w_min_max);
-      c->set_output(4, w_min_max);
+      c->set_output(3, scale);
+      c->set_output(4, scale);
       return Status::OK();
     });
 

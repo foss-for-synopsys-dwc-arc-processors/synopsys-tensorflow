@@ -2624,15 +2624,15 @@ def _FakeQuantWithMinMaxArgsGradient(op, grad):
 
 
 @ops.RegisterGradient("FakeQuantWithMinMaxVars")
-def _FakeQuantWithMinMaxVarsGradient(op, grad):
+def _FakeQuantWithMinMaxVarsGradient(op, grad, grad1, grad2):
   """Gradient for FakeQuantWithMinMaxVars op."""
   return fake_quant_with_min_max_vars_gradient(
       grad,
       op.inputs[0],
       op.inputs[1],
       op.inputs[2],
-      w_min=op.inputs[3],
-      w_max=op.inputs[4],
+      op.inputs[3],
+      op.inputs[4],
       num_bits=op.get_attr("num_bits"),
       narrow_range=op.get_attr("narrow_range"),
       ev_quant=op.get_attr("ev_quant"),

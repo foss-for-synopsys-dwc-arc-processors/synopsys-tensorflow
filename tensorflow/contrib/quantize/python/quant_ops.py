@@ -60,8 +60,8 @@ def _ModelVariable(name,
 
 
 def LastValueQuantize(inputs,
-                      w_min,
-                      w_max,
+                      w_scale,
+                      ip_scale,
                       per_channel=False,
                       init_min=-6.0,
                       init_max=6.0,
@@ -125,33 +125,19 @@ def LastValueQuantize(inputs,
         collections=vars_collections,
         trainable=False)
 
-    w_min_var = _ModelVariable(
-        'w_min',
-        shape=min_max_shape,
-        initializer=init_ops.constant_initializer(init_min),
-        collections=vars_collections,
-        trainable=False)
-
-    w_max_var = _ModelVariable(
-        'w_max',
-        shape=min_max_shape,
-        initializer=init_ops.constant_initializer(init_max),
-        collections=vars_collections,
-        trainable=False)
-
     #Used tensor_type as '0' for weights
     if not is_training:
       return _FakeQuantWithMinMaxVars(
           inputs,
           min_var,
           max_var,
-          w_min_var,
-          w_max_var,
+          w_scale,
+          ip_scale,
           per_channel=per_channel,
           num_bits=num_bits,
           narrow_range=narrow_range,
           ev_quant=ev_quant,
-          tensor_type=0), w_min_var, w_max_var
+          tensor_type=0)
 
     if per_channel:
       if input_dim == 2:
@@ -197,10 +183,6 @@ def LastValueQuantize(inputs,
     assign_min = state_ops.assign(min_var, range_min, name='AssignMinLast')
     assign_max = state_ops.assign(max_var, range_max, name='AssignMaxLast')
 
-    #Assign min and max of weights to w_min and w_max which is used in \
-    #activation scale calculation
-    w_min = state_ops.assign(w_min_var, assign_min, name='w_min')
-    w_max = state_ops.assign(w_max_var, assign_max, name='w_max')
 
     #Used tensor_type as '0' for weights
     #Returns w_min and w_max which will be passed to fakequant activation node
@@ -208,17 +190,17 @@ def LastValueQuantize(inputs,
         inputs,
         assign_min,
         assign_max,
-        w_min,
-        w_max,
+        w_scale,
+        ip_scale,
         per_channel=per_channel,
         num_bits=num_bits,
         narrow_range=narrow_range,
         ev_quant=ev_quant,
-        tensor_type=0), w_min, w_max
+        tensor_type=0)
 
 def MovingAvgQuantize(inputs,
-                      w_min,
-                      w_max,
+                      w_scale,
+                      ip_scale,
                       per_channel=False,
                       init_min=-6.0,
                       init_max=6.0,
@@ -290,8 +272,8 @@ def MovingAvgQuantize(inputs,
           inputs,
           min_var,
           max_var,
-          w_min,
-          w_max,
+          w_scale,
+          ip_scale,
           per_channel=per_channel,
           num_bits=num_bits,
           narrow_range=narrow_range,
@@ -349,8 +331,8 @@ def MovingAvgQuantize(inputs,
         inputs,
         assign_min,
         assign_max,
-        w_min,
-        w_max,
+        w_scale,
+        ip_scale,
         per_channel=per_channel,
         num_bits=num_bits,
         narrow_range=narrow_range,
@@ -358,7 +340,7 @@ def MovingAvgQuantize(inputs,
         tensor_type=1)
 
 
-def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, w_min, w_max, per_channel, num_bits,
+def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, w_scale, ip_scale, per_channel, num_bits,
                              narrow_range, ev_quant, tensor_type):
   """Adds a fake quantization operation.
 
@@ -387,4 +369,4 @@ def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, w_min, w_max, per_channel
     assert min_var.get_shape() == []  # pylint: disable=g-explicit-bool-comparison
     assert max_var.get_shape() == []  # pylint: disable=g-explicit-bool-comparison
     return array_ops.fake_quant_with_min_max_vars(
-        inputs, min_var, max_var, w_min, w_max, tensor_type, ev_quant=ev_quant, num_bits=num_bits, narrow_range=narrow_range)
+        inputs, min_var, max_var, w_scale, ip_scale, tensor_type, ev_quant=ev_quant, num_bits=num_bits, narrow_range=narrow_range)

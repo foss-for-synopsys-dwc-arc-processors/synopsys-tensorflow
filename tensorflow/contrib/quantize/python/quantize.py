@@ -86,8 +86,8 @@ def Quantize(graph,
     scope += '/'
   #Variables to track the min and max weight values
   #Values needed to calculate the output scale in activation node
-  w_min = tf.Variable(tf.convert_to_tensor(0.0))
-  w_max = tf.Variable(tf.convert_to_tensor(0.0))
+  w_scale = tf.Variable(initial_value=1.0, trainable=False, name="w_scale")
+  ip_scale = tf.Variable(initial_value=127.5, trainable=False, name="ip_scale")
 
   input_to_ops_map = input_to_ops.InputToOps(graph)
   quantized_ops = set()
@@ -99,10 +99,11 @@ def Quantize(graph,
     # If `scope` is given, only quantize it if the consumer of weights
     # (the layer op) is in the right scope.
     if layer_match.weight_tensor is not None:
-
-      w_min, w_max = _InsertQuantOp(
-          w_min,
-          w_max,
+      #Calculated weight scale(op_w_scale) and input_scale(op_ip_scale)
+      #from the 'FakeQuantWithMinMaxVars' op
+      op_w_scale, op_ip_scale = _InsertQuantOp(
+          w_scale,
+          ip_scale,
           context,
           'weights_quant',
           layer_match.weight_tensor.op,
@@ -131,9 +132,11 @@ def Quantize(graph,
           add_context = ''
       # If `scope` is given, only quantize it if the producer of weights
       # (usually it's the layer op) is in the right scope.
-      _InsertQuantOp(
-          w_min,
-          w_max,
+      #Calculated weight scale(w_scale) and activation_scale(ip_scale)
+      #from the 'FakeQuantWithMinMaxVars' op
+      w_scale, ip_scale = _InsertQuantOp(
+          op_w_scale,
+          op_ip_scale,
           add_context,
           'act_quant',
           layer_match.activation_op,
@@ -156,8 +159,8 @@ def Quantize(graph,
       # If `scope` is given, only quantize it if the both the producer and the
       # consumer are in the right scope.
       _InsertQuantOp(
-          w_min,
-          w_max,
+          w_scale,
+          ip_scale,
           context,
           'conv_quant',
           layer_match.bias_add_op,
@@ -182,8 +185,8 @@ def Quantize(graph,
                      layer_match.bypass_op.name)
       else:
         _InsertQuantOp(
-            w_min,
-            w_max,
+            w_scale,
+            ip_scale,
             add_context,
             'add_quant',
             layer_match.bypass_op,
@@ -220,8 +223,8 @@ def Quantize(graph,
                      layer_match.post_activation_bypass_op.name)
       else:
         _InsertQuantOp(
-            w_min,
-            w_max,
+            w_scale,
+            ip_scale,
             post_activation_bypass_context,
             'post_activation_bypass_quant',
             layer_match.post_activation_bypass_op,
@@ -663,8 +666,8 @@ def _FollowedByFakeQuant(tensor):
   return False
 
 
-def _InsertQuantOp(w_min,
-                   w_max,
+def _InsertQuantOp(w_scale,
+                   ip_scale,
                    context,
                    name,
                    producer,
@@ -755,8 +758,8 @@ def _InsertQuantOp(w_min,
     quant = (
         quant_ops.MovingAvgQuantize(
             inputs,
-            w_min,
-            w_max,
+            w_scale,
+            ip_scale,
             init_min=init_min,
             init_max=init_max,
             ema_decay=ema_decay,
@@ -768,11 +771,11 @@ def _InsertQuantOp(w_min,
             vars_collection=vars_collection,
             name_prefix=name_prefix))
   else:
-    quant,w_min,w_max = (
+     quant = (
         quant_ops.LastValueQuantize(
             inputs,
-            w_min,
-            w_max,
+            w_scale,
+            ip_scale,
             init_min=init_min,
             init_max=init_max,
             is_training=is_training,
@@ -796,7 +799,7 @@ def _InsertQuantOp(w_min,
 
   if consumers:
     tensors_modified_count = common.RerouteTensor(
-        quant, inputs, can_modify=consumers)
+        quant[0], inputs, can_modify=consumers)
     # Some operations can have multiple output tensors going to the same
     # consumer. Since consumers is a set, we need to ensure that
     # tensors_modified_count is greater than or equal to the length of the set
@@ -804,7 +807,7 @@ def _InsertQuantOp(w_min,
     if tensors_modified_count < len(consumers):
       raise ValueError('No inputs quantized for ops: [%s]' % ', '.join(
           [consumer.name for consumer in consumers]))
-  return w_min, w_max
+  return quant[1], quant[2]
 
 def _GetContextFromOp(op):
   """Gets the root context name from the op name."""

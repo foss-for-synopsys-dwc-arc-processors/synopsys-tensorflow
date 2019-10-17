@@ -13099,15 +13099,23 @@ op {
     type: DT_FLOAT
   }
   input_arg {
-    name: "w_min"
+    name: "w_scale"
     type: "DT_FLOAT"
   }
   input_arg {
-    name: "w_max"
+    name: "ip_scale"
     type: "DT_FLOAT"
   }
   output_arg {
     name: "outputs"
+    type: DT_FLOAT
+  }
+  output_arg {
+    name: "op_w_scale"
+    type: DT_FLOAT
+  }
+  output_arg {
+    name: "op_ip_scale"
     type: DT_FLOAT
   }
   attr {
@@ -13158,11 +13166,11 @@ op {
     type: DT_FLOAT
   }
   input_arg {
-    name: "w_min"
+    name: "w_scale"
     type: "DT_FLOAT"
   }
   input_arg {
-    name: "w_max"
+    name: "ip_scale"
     type: "DT_FLOAT"
   }
   output_arg {
@@ -13178,11 +13186,11 @@ op {
     type: DT_FLOAT
   }
   output_arg {
-    name: "backprop_wrt_w_min"
+    name: "backprop_wrt_w_scale"
     type: DT_FLOAT
   }
   output_arg {
-    name: "backprop_wrt_w_max"
+    name: "backprop_wrt_ip_scale"
     type: DT_FLOAT
   }
   attr {
