@@ -87,7 +87,7 @@ def Quantize(graph,
   #Variables to track the min and max weight values
   #Values needed to calculate the output scale in activation node
   w_scale = tf.Variable(initial_value=1.0, trainable=False, name="w_scale")
-  ip_scale = tf.Variable(initial_value=127.5, trainable=False, name="ip_scale")
+  ip_scale = tf.Variable(initial_value=0.007843137, trainable=False, name="ip_scale")
 
   input_to_ops_map = input_to_ops.InputToOps(graph)
   quantized_ops = set()

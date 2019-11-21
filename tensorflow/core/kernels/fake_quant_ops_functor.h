@@ -21,6 +21,7 @@ limitations under the License.
 
 #define EIGEN_STACK_ALLOCATION_LIMIT 0
 #define EIGEN_USE_THREADS
+
 #include "third_party/eigen3/unsupported/Eigen/CXX11/Tensor"
 #include "tensorflow/core/framework/tensor_types.h"
 #include "tensorflow/core/platform/types.h"
@@ -43,7 +44,7 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void Nudge(
     const float min, const float max, const int quant_min, const int quant_max,
     float* nudged_min, float* nudged_max, float* scale, const int tensor_type,
     const bool ev_quant, const float weights_scale = 1.0,
-    const float inputs_scale = 127.5) {
+    const float inputs_scale = (1/127.5)) {
   const float quant_min_float = static_cast<float>(quant_min);
   const float quant_max_float = static_cast<float>(quant_max);
   if(ev_quant) { //EVQuantization Logic
@@ -51,18 +52,18 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void Nudge(
     if(tensor_type == 0){
       const int weight_max_value = 127;//Signed max or (256/2 - 1)
       const float abs_max = std::max(-min, max);
-     *scale = weight_max_value / abs_max;
+     *scale = 1 / (weight_max_value / abs_max);
       }
     //EVQuant formula to calculate Activation Scale
     else if(tensor_type == 1){
       const int num_bits = 8;//8 bits for unsigned / (8-1)bits for signed
       const float abs_act_max = std::max(-min, max);
-      const float value = inputs_scale * weights_scale;
+      const float value = (1/inputs_scale) * (1/weights_scale);
       const float multiplier = value * abs_act_max;
       const int bits_to_shift = (std::ceil(log2(multiplier))) - num_bits;
-      *scale = value / pow(2, bits_to_shift);
+      *scale = 1 / (value / pow(2, bits_to_shift));
       }
-  const float zero_point_from_max = quant_max_float - (max * (*scale));
+  const float zero_point_from_max = quant_max_float - (max / (*scale));
   const uint16 nudged_zero_point = [zero_point_from_max, quant_min,
                                     quant_min_float, quant_max,
                                     quant_max_float] {
@@ -74,8 +75,8 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void Nudge(
     }
     return static_cast<uint16>(StdRound(zero_point_from_max));
   }();
-  *nudged_min = (quant_min_float - nudged_zero_point) / (*scale);
-  *nudged_max = (quant_max_float - nudged_zero_point) / (*scale);
+  *nudged_min = (quant_min_float - nudged_zero_point) * (*scale);
+  *nudged_max = (quant_max_float - nudged_zero_point) * (*scale);
   }
   else {  //TFLogic
     *scale = (max - min) / (quant_max_float - quant_min_float);
@@ -196,7 +197,7 @@ struct FakeQuantWithMinMaxVarsFunctor {
     const auto clamped_shifted = clamped - nudged_min;
 
     if(ev_quant){
-      outputs.device(d) = (clamped_shifted * nudged_scale_repl + 0.5f).floor() /
+      outputs.device(d) = (clamped_shifted / nudged_scale_repl + 0.5f).floor() *
                                nudged_scale_repl + nudged_min;
       //Update calculated Weight Scale in op_w_scale
       if(tensor_type == 0){
