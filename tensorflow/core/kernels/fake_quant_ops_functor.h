@@ -63,6 +63,11 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void Nudge(
       const int bits_to_shift = (std::ceil(log2(multiplier))) - num_bits;
       *scale = 1 / (value / pow(2, bits_to_shift));
       }
+    else if(tensor_type == 2){
+      const int layer_max_value = 127;//Signed max or (256/2 - 1)
+      const float abs_max = std::max(-min, max);
+     *scale = 1 / (layer_max_value / abs_max);
+    }
   const float zero_point_from_max = quant_max_float - (max / (*scale));
   const uint16 nudged_zero_point = [zero_point_from_max, quant_min,
                                     quant_min_float, quant_max,
@@ -179,7 +184,7 @@ struct FakeQuantWithMinMaxVarsFunctor {
     }
     float nudged_min, nudged_max, nudged_scale;
     if(ev_quant){ //EVQuantization Logic
-      if(tensor_type == 0) {
+      if(tensor_type == 0 or tensor_type == 2) {
         Nudge(min_val, max_val, quant_min, quant_max, &nudged_min, &nudged_max,
               &nudged_scale, tensor_type, ev_quant);
       }
@@ -205,7 +210,7 @@ struct FakeQuantWithMinMaxVarsFunctor {
         *op_w_scale = nudged_scale;
       }
       //Update calculated Activation Scale in op_ip_scale
-      else if(tensor_type == 1){
+      else if(tensor_type == 1 or tensor_type == 2){
         *op_ip_scale = nudged_scale;
         *op_w_scale = weights_scale;
       }

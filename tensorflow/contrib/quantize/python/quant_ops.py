@@ -71,6 +71,7 @@ def LastValueQuantize(inputs,
                       is_training=True,
                       num_bits=8,
                       narrow_range=False,
+                      tensor_type=0,
                       symmetric=False,
                       ev_quant=False):
   """Adds a layer that collects quantization ranges as last input ranges.
@@ -137,7 +138,7 @@ def LastValueQuantize(inputs,
           num_bits=num_bits,
           narrow_range=narrow_range,
           ev_quant=ev_quant,
-          tensor_type=0)
+          tensor_type=tensor_type)
 
     if per_channel:
       if input_dim == 2:
@@ -196,7 +197,7 @@ def LastValueQuantize(inputs,
         num_bits=num_bits,
         narrow_range=narrow_range,
         ev_quant=ev_quant,
-        tensor_type=0)
+        tensor_type=tensor_type)
 
 def MovingAvgQuantize(inputs,
                       w_scale,
@@ -211,6 +212,7 @@ def MovingAvgQuantize(inputs,
                       is_training=True,
                       num_bits=8,
                       narrow_range=False,
+                      tensor_type=1,
                       symmetric=False,
                       ev_quant=False):
   """Adds a layer that collects quantization ranges as EMAs of input ranges.
@@ -278,7 +280,7 @@ def MovingAvgQuantize(inputs,
           num_bits=num_bits,
           narrow_range=narrow_range,
           ev_quant=ev_quant,
-          tensor_type=1)
+          tensor_type=tensor_type)
 
     if per_channel:
       if input_dim == 2:
@@ -337,7 +339,7 @@ def MovingAvgQuantize(inputs,
         num_bits=num_bits,
         narrow_range=narrow_range,
         ev_quant=ev_quant,
-        tensor_type=1)
+        tensor_type=tensor_type)
 
 
 def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, w_scale, ip_scale, per_channel, num_bits,

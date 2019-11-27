@@ -102,19 +102,20 @@ def Quantize(graph,
       #Calculated weight scale(op_w_scale) and input_scale(op_ip_scale)
       #from the 'FakeQuantWithMinMaxVars' op
       op_w_scale, op_ip_scale = _InsertQuantOp(
-          w_scale,
-          ip_scale,
           context,
           'weights_quant',
           layer_match.weight_tensor.op,
           input_to_ops_map.ConsumerOperations(layer_match.weight_tensor.op),
           is_training,
+          w_scale,
+          ip_scale,
           moving_avg=False,
           ema_decay=ema_decay,
           quant_delay=quant_delay,
           narrow_range=True,
           vars_collection=vars_collection,
           bits=weight_bits,
+          tensor_type=0,
           symmetric=symmetric,
           ev_quant=ev_quant,
           consumer_scope=scope)
@@ -135,18 +136,19 @@ def Quantize(graph,
       #Calculated weight scale(w_scale) and activation_scale(ip_scale)
       #from the 'FakeQuantWithMinMaxVars' op
       w_scale, ip_scale = _InsertQuantOp(
-          op_w_scale,
-          op_ip_scale,
           add_context,
           'act_quant',
           layer_match.activation_op,
           consumer_ops,
           is_training,
+          op_w_scale,
+          op_ip_scale,
           moving_avg=True,
           ema_decay=ema_decay,
           quant_delay=quant_delay,
           vars_collection=vars_collection,
           bits=activation_bits,
+          tensor_type=1,
           symmetric=symmetric,
           ev_quant=ev_quant,
           init_min=0.0,
@@ -159,18 +161,19 @@ def Quantize(graph,
       # If `scope` is given, only quantize it if the both the producer and the
       # consumer are in the right scope.
       _InsertQuantOp(
-          w_scale,
-          ip_scale,
           context,
           'conv_quant',
           layer_match.bias_add_op,
           input_to_ops_map.ConsumerOperations(layer_match.bias_add_op),
           is_training,
+          w_scale,
+          ip_scale,
           moving_avg=True,
           ema_decay=ema_decay,
           quant_delay=quant_delay,
           vars_collection=vars_collection,
           bits=activation_bits,
+          tensor_type=0,
           symmetric=symmetric,
           ev_quant=ev_quant,
           producer_scope=scope,
@@ -185,18 +188,19 @@ def Quantize(graph,
                      layer_match.bypass_op.name)
       else:
         _InsertQuantOp(
-            w_scale,
-            ip_scale,
             add_context,
             'add_quant',
             layer_match.bypass_op,
             input_to_ops_map.ConsumerOperations(layer_match.bypass_op),
             is_training,
+            w_scale,
+            ip_scale,
             moving_avg=True,
             ema_decay=ema_decay,
             quant_delay=quant_delay,
             vars_collection=vars_collection,
             bits=activation_bits,
+            tensor_type=0,
             symmetric=symmetric,
             ev_quant=ev_quant,
             producer_scope=scope,
@@ -223,18 +227,19 @@ def Quantize(graph,
                      layer_match.post_activation_bypass_op.name)
       else:
         _InsertQuantOp(
-            w_scale,
-            ip_scale,
             post_activation_bypass_context,
             'post_activation_bypass_quant',
             layer_match.post_activation_bypass_op,
             consumers,
             is_training,
+            w_scale,
+            ip_scale,
             moving_avg=True,
             ema_decay=ema_decay,
             quant_delay=quant_delay,
             vars_collection=vars_collection,
             bits=activation_bits,
+            tensor_type=0,
             symmetric=symmetric,
             ev_quant=ev_quant,
             producer_scope=scope)
@@ -243,16 +248,31 @@ def Quantize(graph,
       quantized_ops,
       graph,
       is_training,
+      symmetric,
+      ev_quant,
       activation_bits,
       ema_decay,
       quant_delay,
       vars_collection,
       scope=scope)
+  #To Reroute the input scale nodes correctly based on its order
+  graph_def = graph.as_graph_def()
+  for node in graph_def.node:
+    if(node.op in _QUANTIZABLE_TYPES):
+      for in_node in graph_def.node:
+        if(("FakeQuantWithMinMaxVars" in node.input[0]) and (in_node.name == node.input[1])):
+          if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2"):
+            num3 = common.RerouteTensor(
+                   graph.get_tensor_by_name(node.input[0]+":1"), graph.get_tensor_by_name(in_node.input[3]))
+            num4 = common.RerouteTensor(
+                   graph.get_tensor_by_name(node.input[0]+":2"), graph.get_tensor_by_name(in_node.input[4]))
 
 
 def _QuantizeActivationLayers(quantized_ops,
                               graph,
                               is_training,
+                              symmetric,
+                              ev_quant,
                               activation_bits=8,
                               ema_decay=0.999,
                               quant_delay=None,
@@ -279,19 +299,26 @@ def _QuantizeActivationLayers(quantized_ops,
   Raises:
     ValueError: When quantization fails.
   """
+  w_scale_act = tf.Variable(initial_value=1.0, trainable=False, name="w_scale_act")
+  ip_scale_act = tf.Variable(initial_value=0.007843137, trainable=False, name="ip_scale_act")
   input_to_ops_map = input_to_ops.InputToOps(graph)
   for op in (op for op in graph.get_operations()):
     if _CheckIfQuantizableOp(op, quantized_ops):
       logging.info('Inserting fake quant op activation_%s_quant after %s',
                    op.type, op.name)
       consumers = input_to_ops_map.ConsumerOperations(op)
-      _InsertQuantOp(
+      w_scale_act, ip_scale_act = _InsertQuantOp(
           op.name,
           'activation_' + op.type + '_quant',
           op,
           consumers,
           is_training,
+          w_scale_act,
+          ip_scale_act,
           moving_avg=True,
+          tensor_type=2,
+          symmetric=symmetric,
+          ev_quant=ev_quant,
           ema_decay=ema_decay,
           quant_delay=quant_delay,
           vars_collection=vars_collection,
@@ -666,17 +693,18 @@ def _FollowedByFakeQuant(tensor):
   return False
 
 
-def _InsertQuantOp(w_scale,
-                   ip_scale,
-                   context,
+def _InsertQuantOp(context,
                    name,
                    producer,
                    consumers,
                    is_training,
+                   w_scale=1.0,
+                   ip_scale=0.007843137,
                    moving_avg=True,
                    init_min=-6.0,
                    init_max=6.0,
                    bits=8,
+                   tensor_type=0,
                    symmetric=False,
                    ev_quant=False,
                    ema_decay=0.999,
@@ -765,6 +793,7 @@ def _InsertQuantOp(w_scale,
             ema_decay=ema_decay,
             is_training=is_training,
             num_bits=bits,
+            tensor_type=tensor_type,
             symmetric=symmetric,
             ev_quant=ev_quant,
             narrow_range=narrow_range,
@@ -780,6 +809,7 @@ def _InsertQuantOp(w_scale,
             init_max=init_max,
             is_training=is_training,
             num_bits=bits,
+            tensor_type=tensor_type,
             symmetric=symmetric,
             ev_quant=ev_quant,
             narrow_range=narrow_range,
