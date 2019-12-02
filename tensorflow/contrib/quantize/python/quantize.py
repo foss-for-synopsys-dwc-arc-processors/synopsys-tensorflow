@@ -260,7 +260,7 @@ def Quantize(graph,
   for node in graph_def.node:
     if(node.op in _QUANTIZABLE_TYPES):
       for in_node in graph_def.node:
-        if(("FakeQuantWithMinMaxVars" in node.input[0]) and (in_node.name == node.input[1])):
+        if(("FakeQuantWithMinMaxVars" in node.input[0]) and ("FakeQuantWithMinMaxVars" in node.input[1]) and (in_node.name == node.input[1])):
           if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2"):
             num3 = common.RerouteTensor(
                    graph.get_tensor_by_name(node.input[0]+":1"), graph.get_tensor_by_name(in_node.input[3]))
