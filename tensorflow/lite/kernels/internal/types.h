@@ -112,6 +112,9 @@ enum class FullyConnectedWeightsFormat : uint8 {
 struct QuantizationParams {
   int32 zero_point = 0;
   double scale = 0.0;
+  bool ev_quant = false;
+  bool output_array = false;
+  bool check_initial_input = false;
 };
 
 inline bool operator==(const QuantizationParams& qp1,

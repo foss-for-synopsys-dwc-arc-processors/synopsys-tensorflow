@@ -1680,6 +1680,8 @@ void ResolveModelFlags(const ModelFlags& model_flags, Model* model) {
 
   model->flags.set_change_concat_input_ranges(
       model_flags.change_concat_input_ranges());
+  model->flags.set_ev_quant(
+      model_flags.ev_quant());
   model->flags.set_allow_nonascii_arrays(model_flags.allow_nonascii_arrays());
   model->flags.set_allow_nonexistent_arrays(
       model_flags.allow_nonexistent_arrays());

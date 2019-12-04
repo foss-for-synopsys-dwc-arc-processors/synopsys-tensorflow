@@ -197,7 +197,8 @@ def build_toco_convert_protos(input_tensors,
                               dump_graphviz_dir=None,
                               dump_graphviz_video=False,
                               target_ops=None,
-                              allow_nonexistent_arrays=False):
+                              allow_nonexistent_arrays=False,
+                              ev_quant = False):
   """Builds protocol buffers describing a conversion of a model using TOCO.
 
   Typically this is to convert from TensorFlow GraphDef to TFLite, in which
@@ -297,6 +298,7 @@ def build_toco_convert_protos(input_tensors,
 
   model = _model_flags_pb2.ModelFlags()
   model.change_concat_input_ranges = change_concat_input_ranges
+  model.ev_quant = ev_quant
   for idx, input_tensor in enumerate(input_tensors):
     input_array = model.input_arrays.add()
     input_array.name = util.get_tensor_name(input_tensor)

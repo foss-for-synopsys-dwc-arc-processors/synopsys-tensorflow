@@ -251,6 +251,7 @@ bool ChooseQuantizationForOperatorInput(
     }
   }
 
+  quantization_params->ev_quant = (bool)(model->flags.ev_quant());
   *quantized_data_type = GetQuantizedDataType(array, ArrayDataType::kUint8);
   ChooseQuantizationParamsForArrayAndQuantizedDataType(
       array, *quantized_data_type, quantization_params);
@@ -399,6 +400,10 @@ bool ChooseQuantizationForOperatorOutput(
     }
   }
   *quantized_data_type = GetQuantizedDataType(array, ArrayDataType::kUint8);
+  quantization_params->ev_quant = (bool)(model->flags.ev_quant());
+  if(quantization_params->ev_quant == true) {
+      quantization_params->output_array = true;
+  }
   ChooseQuantizationParamsForArrayAndQuantizedDataType(
       array, *quantized_data_type, quantization_params);
   transformation->AddMessageF(
@@ -633,7 +638,6 @@ void FixMinMaxPostQuantization(GraphTransformation* transformation,
         changed = true;
         const auto& output = op.outputs[output_index];
         auto& output_array = model->GetArray(output);
-
         // Fix up the min/max information on the output array to match the
         // chosen quantization parameters.
         CHECK(output_array.minmax)
@@ -655,6 +659,8 @@ void FixMinMaxPostQuantization(GraphTransformation* transformation,
             dequantized_output_array.GetOrCreateMinMax();
         dequantized_output_minmax.min = output_minmax.min;
         dequantized_output_minmax.max = output_minmax.max;
+        dequantized_output_minmax.w_scale = output_minmax.w_scale;
+        dequantized_output_minmax.ip_scale = output_minmax.ip_scale;
         for (const auto& other_op : model->operators) {
           for (auto& other_op_input : other_op->inputs) {
             if (other_op_input == output) {

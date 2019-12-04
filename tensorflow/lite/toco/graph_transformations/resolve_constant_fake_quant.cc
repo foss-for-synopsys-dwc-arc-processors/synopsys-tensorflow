@@ -98,14 +98,12 @@ void GetBoundsForQuantizedDataType(ArrayDataType quantized_data_type,
   auto& output_array = model->GetArray(fakequant_op->outputs[0]);
   CHECK(input_array.data_type == ArrayDataType::kFloat);
   output_array.data_type = ArrayDataType::kFloat;
-
   // We'll set the final data type to what the fake quant indicates we should
   // have (and would have been set if this stayed around until
   // PropagateFakeQuantNumBits).
   if (propagate_fake_quant_num_bits()) {
     output_array.final_data_type = quantized_data_type;
   }
-
   CHECK(!output_array.buffer);
   const auto& input_buffer = input_array.GetBuffer<ArrayDataType::kFloat>();
   output_array.GetOrCreateMinMax() = *fakequant_op->minmax;
@@ -113,6 +111,7 @@ void GetBoundsForQuantizedDataType(ArrayDataType quantized_data_type,
   const int size = input_buffer.data.size();
   output_buffer.data.resize(size);
   QuantizationParams qparams;
+  qparams.ev_quant = (bool)(model->flags.ev_quant());
   ChooseQuantizationParamsForArrayAndQuantizedDataType(
       output_array, quantized_data_type, &qparams);
   float quantized_min, quantized_max;

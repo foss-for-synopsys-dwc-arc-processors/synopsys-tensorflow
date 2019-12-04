@@ -407,6 +407,10 @@ void ReadModelFlagsFromCommandLineFlags(
         parsed_model_flags.change_concat_input_ranges.value());
   }
 
+  if (!model_flags->has_ev_quant()) {
+    model_flags->set_ev_quant(
+        parsed_model_flags.ev_quant.value());
+  }
   if (parsed_model_flags.arrays_extra_info_file.specified()) {
     string arrays_extra_info_file_contents;
     CHECK(port::file::GetContents(

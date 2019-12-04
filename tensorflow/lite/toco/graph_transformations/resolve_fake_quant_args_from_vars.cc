@@ -41,7 +41,7 @@ namespace toco {
     return ::tensorflow::Status::OK();
   }
 
-  CHECK_EQ(fakequant_op->inputs.size(), 3);
+  CHECK_EQ(fakequant_op->inputs.size(), 5);
   // We need to yield until the min and max parameters have been
   // resolved to constant arrays.
   for (int i = 1; i <= 2; i++) {
@@ -53,12 +53,16 @@ namespace toco {
   // Obtain the final min/max values
   const auto& min_array = model->GetArray(fakequant_op->inputs[1]);
   const auto& max_array = model->GetArray(fakequant_op->inputs[2]);
+  const auto& w_scale_array = model->GetArray(fakequant_op->inputs[3]);
+  const auto& ip_scale_array = model->GetArray(fakequant_op->inputs[4]);
   CHECK_EQ(RequiredBufferSizeForShape(min_array.shape()), 1);
   CHECK_EQ(RequiredBufferSizeForShape(max_array.shape()), 1);
   fakequant_op->minmax.reset(new MinMax);
   MinMax& minmax = *fakequant_op->minmax;
   minmax.min = min_array.GetBuffer<ArrayDataType::kFloat>().data[0];
   minmax.max = max_array.GetBuffer<ArrayDataType::kFloat>().data[0];
+  minmax.w_scale = w_scale_array.GetBuffer<ArrayDataType::kFloat>().data[0];
+  minmax.ip_scale = ip_scale_array.GetBuffer<ArrayDataType::kFloat>().data[0];
   // We always want [min, max] to contain 0.
   if (minmax.min > 0 || minmax.max < 0) {
     LOG(WARNING) << "For " << LogName(*fakequant_op) << " the MinMax range "

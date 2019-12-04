@@ -128,6 +128,7 @@ struct ParsedModelFlags {
   Arg<string> output_array;
   Arg<string> output_arrays;
   Arg<string> input_shapes;
+  Arg<bool> ev_quant = Arg<bool>(false);
   Arg<int> batch_size = Arg<int>(1);
   Arg<float> mean_value = Arg<float>(0.f);
   Arg<string> mean_values;

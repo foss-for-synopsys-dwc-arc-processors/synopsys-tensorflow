@@ -251,6 +251,7 @@ class TFLiteConverterV2(TFLiteConverterBase):
     self._funcs = funcs
     self._trackable_obj = trackable_obj
     self.allow_custom_ops = False
+    self.ev_quant = False
     self.target_spec = TargetSpec()
 
   @classmethod
@@ -382,6 +383,7 @@ class TFLiteConverterV2(TFLiteConverterBase):
         "allow_custom_ops": self.allow_custom_ops,
         "post_training_quantize": self._is_weight_only_quantize(),
         "target_ops": self.target_spec.supported_ops,
+        "ev_quant": self.ev_quant
     }
 
     # Converts model.
@@ -540,6 +542,7 @@ class TFLiteConverter(TFLiteConverterBase):
     self.dump_graphviz_dir = None
     self.dump_graphviz_video = False
     self.target_ops = set([OpsSet.TFLITE_BUILTINS])
+    self.ev_quant = False
 
     # Attributes are used by models that cannot be loaded into TensorFlow.
     if not self._has_valid_tensors():
@@ -875,7 +878,8 @@ class TFLiteConverter(TFLiteConverterBase):
         "post_training_quantize": weight_only_quantize,
         "target_ops": self.target_ops,
         "dump_graphviz_dir": self.dump_graphviz_dir,
-        "dump_graphviz_video": self.dump_graphviz_video
+        "dump_graphviz_video": self.dump_graphviz_video,
+        "ev_quant": self.ev_quant
     }
 
     optimized_graph = self._graph_def

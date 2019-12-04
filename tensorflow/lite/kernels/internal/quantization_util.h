@@ -29,7 +29,9 @@ namespace tflite {
 // reasonable quantization parameters to use for this array.
 template <typename T>
 QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
-                                            bool narrow_range) {
+                                            double w_scale, double ip_scale, bool narrow_range,
+                                            bool ev_quant, bool output_array,
+                                            bool check_initial_input) {
   const T qmin = std::numeric_limits<T>::min() + (narrow_range ? 1 : 0);
   const T qmax = std::numeric_limits<T>::max();
   const double qmin_double = qmin;
@@ -51,8 +53,28 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
   // General case.
   //
   // First determine the scale.
-  const double scale = (rmax - rmin) / (qmax_double - qmin_double);
 
+  double scale_val = 0.0;
+  if(ev_quant) {
+    if(output_array) { //all outputs scales are calculated here (29 times), automatically gets assigned to _dequantized
+      int num_bits = 8;
+      double abs_max = std::max(rmax,-rmin);
+      double value = (1/w_scale) * (1/ip_scale);
+      double multiplier = value * abs_max;
+      int bits_to_shift = (std::ceil(log2(multiplier))) - num_bits;
+      scale_val = 1 / (value / pow(2, bits_to_shift));
+     }
+    else if(check_initial_input) { //initial_input
+      scale_val = (rmax - rmin) / (qmax_double - qmin_double);
+    }
+    else if(narrow_range && !output_array && !check_initial_input) {
+      scale_val = w_scale;  //weights --> goes here 28*2 times (once from resolve_constant_fake_quant and once from quantize.cc_operator_input)
+    }
+  }
+  else {
+    scale_val = (rmax - rmin) / (qmax_double - qmin_double);
+  }
+    const double scale = scale_val;
   // Zero-point computation.
   // First the initial floating-point computation. The zero-point can be
   // determined from solving an affine equation for any known pair
@@ -93,14 +115,19 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
 
   // Finally, store the result nudged quantization params.
   QuantizationParams quantization_params;
-  quantization_params.zero_point = nudged_zero_point;
+  if(ev_quant) {
+    quantization_params.zero_point = static_cast<T>(round(zero_point_from_max));
+  }
+  else {
+    quantization_params.zero_point = nudged_zero_point;
+  }
   quantization_params.scale = scale;
   return quantization_params;
 }
 
 template <typename T>
-QuantizationParams ChooseQuantizationParams(double rmin, double rmax) {
-  return ChooseQuantizationParams<T>(rmin, rmax, false);
+QuantizationParams ChooseQuantizationParams(double rmin, double rmax, double w_scale, double ip_scale) {
+  return ChooseQuantizationParams<T>(rmin, rmax, w_scale, ip_scale, false, false, false, false);
 }
 
 // Converts a floating-point number to an integer. For all inputs x where
