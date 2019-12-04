@@ -119,6 +119,8 @@ def Quantize(graph,
           symmetric=symmetric,
           ev_quant=ev_quant,
           consumer_scope=scope)
+      scale_w = tf.assign(w_scale, op_w_scale, name=context+"/weights_quant/w_scale")
+      scale_ip = tf.assign(ip_scale, op_ip_scale, name=context+"/weights_quant/ip_scale")
 
     # Quantize the activations.
     if layer_match.activation_op is not None:
@@ -141,8 +143,8 @@ def Quantize(graph,
           layer_match.activation_op,
           consumer_ops,
           is_training,
-          op_w_scale,
-          op_ip_scale,
+          scale_w,
+          scale_ip,
           moving_avg=True,
           ema_decay=ema_decay,
           quant_delay=quant_delay,
@@ -154,7 +156,10 @@ def Quantize(graph,
           init_min=0.0,
           producer_scope=scope)
       quantized_ops.add(layer_match.activation_op)
-
+      weight_scale = tf.Variable(initial_value=0.0, trainable=False,  name=add_context+"/act_quant/w_scale")
+      input_scale = tf.Variable(initial_value=0.0, trainable=False, name=add_context+"/act_quant/ip_scale")
+      w_scale = tf.assign(weight_scale,w_scale, name=add_context+"/act_quant/w_scale")
+      ip_scale = tf.assign(input_scale,ip_scale, name=add_context+"/act_quant/ip_scale")
     # Quantize the inputs and output to the bypass (if it exists). The input to
     # the bypass is the bias add, and the output is the activation.
     if layer_match.bypass_op is not None:
@@ -261,7 +266,7 @@ def Quantize(graph,
     if(node.op in _QUANTIZABLE_TYPES):
       for in_node in graph_def.node:
         if(("FakeQuantWithMinMaxVars" in node.input[0]) and ("FakeQuantWithMinMaxVars" in node.input[1]) and (in_node.name == node.input[1])):
-          if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2"):
+          if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2" and "act_quant/w_scale_1" not in in_node.input[3] and "act_quant/ip_scale_1" not in in_node.input[4]):
             num3 = common.RerouteTensor(
                    graph.get_tensor_by_name(node.input[0]+":1"), graph.get_tensor_by_name(in_node.input[3]))
             num4 = common.RerouteTensor(
