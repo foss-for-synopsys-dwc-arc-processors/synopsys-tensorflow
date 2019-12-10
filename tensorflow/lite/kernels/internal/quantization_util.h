@@ -59,7 +59,7 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
     if(w_scale == 0.0f && ip_scale == 0.0f) { //For arrays like initial input, anchor boxes
       scale_val = (rmax - rmin) / (qmax_double - qmin_double);
     }
-    if(output_array) { //all outputs scales are calculated here (29 times), automatically gets assigned to _dequantized
+    else if(output_array) { //all outputs scales are calculated here, automatically gets assigned to _dequantized
       int num_bits = 8;
       double abs_max = std::max(rmax,-rmin);
       double value = (1/w_scale) * (1/ip_scale);
@@ -67,8 +67,8 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
       int bits_to_shift = (std::ceil(log2(multiplier))) - num_bits;
       scale_val = 1 / (value / pow(2, bits_to_shift));
      }
-    else if(narrow_range && !output_array && !check_initial_input) {
-      scale_val = w_scale;  //weights --> goes here 28*2 times (once from resolve_constant_fake_quant and once from quantize.cc_operator_input)
+    else if(narrow_range && !output_array) {
+      scale_val = w_scale;  //weight arrays
     }
   }
   else {
