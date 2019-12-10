@@ -27,11 +27,11 @@ namespace tflite {
 
 // Given the min and max values of a float array, return
 // reasonable quantization parameters to use for this array.
+
 template <typename T>
 QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
                                             double w_scale, double ip_scale, bool narrow_range,
-                                            bool ev_quant, bool output_array,
-                                            bool check_initial_input) {
+                                            bool ev_quant, bool output_array) {
   const T qmin = std::numeric_limits<T>::min() + (narrow_range ? 1 : 0);
   const T qmax = std::numeric_limits<T>::max();
   const double qmin_double = qmin;
@@ -56,6 +56,9 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
 
   double scale_val = 0.0;
   if(ev_quant) {
+    if(w_scale == 0.0f && ip_scale == 0.0f) { //For arrays like initial input, anchor boxes
+      scale_val = (rmax - rmin) / (qmax_double - qmin_double);
+    }
     if(output_array) { //all outputs scales are calculated here (29 times), automatically gets assigned to _dequantized
       int num_bits = 8;
       double abs_max = std::max(rmax,-rmin);
@@ -64,9 +67,6 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
       int bits_to_shift = (std::ceil(log2(multiplier))) - num_bits;
       scale_val = 1 / (value / pow(2, bits_to_shift));
      }
-    else if(check_initial_input) { //initial_input
-      scale_val = (rmax - rmin) / (qmax_double - qmin_double);
-    }
     else if(narrow_range && !output_array && !check_initial_input) {
       scale_val = w_scale;  //weights --> goes here 28*2 times (once from resolve_constant_fake_quant and once from quantize.cc_operator_input)
     }
@@ -127,7 +127,7 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax,
 
 template <typename T>
 QuantizationParams ChooseQuantizationParams(double rmin, double rmax, double w_scale, double ip_scale) {
-  return ChooseQuantizationParams<T>(rmin, rmax, w_scale, ip_scale, false, false, false, false);
+  return ChooseQuantizationParams<T>(rmin, rmax, w_scale, ip_scale, false, false, false);
 }
 
 // Converts a floating-point number to an integer. For all inputs x where

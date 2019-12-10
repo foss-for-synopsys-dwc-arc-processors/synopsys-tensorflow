@@ -79,7 +79,7 @@ void ChooseQuantizationParamsForArrayAndQuantizedDataType(
     const Array& array, QuantizationParams* quantization_params) {
   *quantization_params = ::tflite::ChooseQuantizationParams<DataType<A>>(
       array.minmax->min, array.minmax->max, array.minmax->w_scale, array.minmax->ip_scale,
-      array.narrow_range, quantization_params->ev_quant, quantization_params->output_array, quantization_params->check_initial_input);
+      array.narrow_range, quantization_params->ev_quant, quantization_params->output_array);
 }
 
 void ChooseQuantizationParamsForArrayAndQuantizedDataType(
