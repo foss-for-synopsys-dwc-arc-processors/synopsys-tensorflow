@@ -188,6 +188,8 @@ def _convert_tf1_model(flags):
     converter.dump_graphviz_dir = flags.dump_graphviz_dir
   if flags.dump_graphviz_video:
     converter.dump_graphviz_vode = flags.dump_graphviz_video
+  if flags.ev_quant:
+    converter.ev_quant = flags.ev_quant
 
   # Convert model.
   output_data = converter.convert()
@@ -376,6 +378,9 @@ def _get_tf1_parser():
       help=("Default value for max bound of min/max range values used for all "
             "arrays without a specified range, Intended for experimenting with "
             "quantization via \"dummy quantization\". (default None)"))
+  parser.add_argument(
+      "--ev_quant",
+       action="store_true")
   # quantize_weights is DEPRECATED.
   parser.add_argument(
       "--quantize_weights",

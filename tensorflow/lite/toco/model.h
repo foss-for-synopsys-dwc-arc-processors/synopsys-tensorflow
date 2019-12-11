@@ -925,6 +925,8 @@ struct L2PoolOperator : Operator {
 struct MinMax {
   double min = 0.;
   double max = 0.;
+  double w_scale = 0.;
+  double ip_scale = 0.;
 };
 
 inline bool operator==(const MinMax& m1, const MinMax& m2) {

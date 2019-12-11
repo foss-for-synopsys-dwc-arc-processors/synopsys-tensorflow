@@ -883,12 +883,12 @@ tensorflow::Status ConvertFakeQuantWithMinMaxVars(
     Model* model) {
   CHECK_EQ(node.op(), "FakeQuantWithMinMaxVars");
   const int num_inputs = GetInputsCount(node, tf_import_flags);
-  QCHECK(num_inputs == 3 || num_inputs == 4)
+  QCHECK(num_inputs == 3 || num_inputs == 4 || num_inputs == 5 )
       << "FakeQuantWithMinMaxVars node expects 3 or 4 inputs other than "
          "control dependencies: "
       << node.DebugString();
   auto* op = new FakeQuantOperator;
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 5; i++) {
     op->inputs.push_back(node.input(i));
   }
   op->outputs.push_back(node.name());

@@ -183,6 +183,8 @@ bool HardcodeMinMaxForAverageOrMaxPool(Model* model, Operator* op) {
   auto& output_minmax = output_array.GetOrCreateMinMax();
   output_minmax.min = std::min(input_minmax.min, 0.);
   output_minmax.max = std::max(input_minmax.max, 0.);
+  output_minmax.w_scale = input_minmax.w_scale;
+  output_minmax.ip_scale = input_minmax.ip_scale;
   return true;
 }
 

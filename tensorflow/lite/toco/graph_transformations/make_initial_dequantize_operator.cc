@@ -85,6 +85,9 @@ bool AddDequantizeOperatorToInput(const string& input_name, const Operator* op,
   dequantized_input_minmax = input_minmax;
   auto& input_qparams = input_array.GetOrCreateQuantizationParams();
   input_array.data_type = input_array.final_data_type;
+  dequantized_input_minmax.w_scale = input_minmax.w_scale;
+  dequantized_input_minmax.ip_scale = input_minmax.ip_scale;
+  input_qparams.ev_quant = (bool)(model->flags.ev_quant());
   ChooseQuantizationParamsForArrayAndQuantizedDataType(
       input_array, input_array.data_type, &input_qparams);
 
