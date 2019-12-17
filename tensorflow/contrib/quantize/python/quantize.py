@@ -526,6 +526,9 @@ def _FindLayersToQuantize(graph):
       ],
       ordered_inputs=False)
 
+  fused_batch_norm = graph_matcher.OpTypePattern(
+      'FusedBatchNorm', inputs=[bias_add_pattern, '*', '*', '*', '*'])
+
   # The input to the activation can come from bias add, fold bias add, the
   # bypasses.
   # TODO(suharshs): We should ideally skip Identity operations instead of
@@ -539,6 +542,7 @@ def _FindLayersToQuantize(graph):
               batch_norm_identity,
               bypass_pattern,
               layer_pattern,
+              fused_batch_norm,
           ])
       ])
 
