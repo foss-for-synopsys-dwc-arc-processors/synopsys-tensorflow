@@ -285,7 +285,7 @@ bool IsExactlyRepresentable(double real_value, ArrayDataType data_type,
 // Quantized data type is preset to the type of the input before this function.
 bool ChooseHardcodedQuantizationForOperatorOutput(
     const Operator& op, const Array& array, ArrayDataType* quantized_data_type,
-    QuantizationParams* quantization_params) {
+    QuantizationParams* quantization_params, Model* model) {
   if (op.type == OperatorType::kL2Normalization) {
     // L2Normalization has range: [-1, 1].
     // 0 should be exactly representable, as values will typically be centered
@@ -296,6 +296,10 @@ bool ChooseHardcodedQuantizationForOperatorOutput(
     quantization_params->scale = 1. / (qp.central_value - qp.min_value);
     CHECK(
         IsExactlyRepresentable(0., *quantized_data_type, *quantization_params));
+    bool ev_quant = (bool)(model->flags.ev_quant());
+    if(ev_quant){
+    quantization_params->scale = 1. / 127.5;
+    }
     return true;
   }
   if (op.type == OperatorType::kLogistic || op.type == OperatorType::kSoftmax) {
@@ -355,7 +359,7 @@ bool ChooseQuantizationForOperatorOutput(
   }
   *quantized_data_type = model->GetArray(op.inputs[0]).data_type;
   if (ChooseHardcodedQuantizationForOperatorOutput(
-          op, array, quantized_data_type, quantization_params)) {
+          op, array, quantized_data_type, quantization_params, model)) {
     transformation->AddMessageF(
         "Output array %s is produced by a %s operator. Choosing fixed "
         "quantization params accordingly.",

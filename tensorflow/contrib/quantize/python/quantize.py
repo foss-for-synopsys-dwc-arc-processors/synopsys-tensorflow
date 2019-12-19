@@ -261,17 +261,36 @@ def Quantize(graph,
       vars_collection,
       scope=scope)
   #To Reroute the input scale nodes correctly based on its order
-  graph_def = graph.as_graph_def()
-  for node in graph_def.node:
-    if(node.op in _QUANTIZABLE_TYPES):
-      for in_node in graph_def.node:
-        if(("FakeQuantWithMinMaxVars" in node.input[0]) and ("FakeQuantWithMinMaxVars" in node.input[1]) and (in_node.name == node.input[1])):
-          if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2" and "act_quant/w_scale_1" not in in_node.input[3] and "act_quant/ip_scale_1" not in in_node.input[4]):
-            num3 = common.RerouteTensor(
-                   graph.get_tensor_by_name(node.input[0]+":1"), graph.get_tensor_by_name(in_node.input[3]))
-            num4 = common.RerouteTensor(
-                   graph.get_tensor_by_name(node.input[0]+":2"), graph.get_tensor_by_name(in_node.input[4]))
-
+  if(ev_quant):
+    graph_def = graph.as_graph_def()
+    act_quant = {}
+    for node in graph_def.node: #Searching for all the activation nodes and save the name as 'key' in a dictionary
+      if(node.op in _QUANTIZATION_OP):
+        if(("act_quant/FakeQuantWithMinMaxVars" in node.name) or ("activation_"+node.op+"_quant/FakeQuantWithMinMaxVars")):
+          act_quant[node.name] = []
+    for node in graph_def.node: #Filling dict 'values' with list of nodes getting inputs from 'key'
+      if(node.op in _QUANTIZABLE_TYPES):
+        if(node.input[0] in act_quant.keys()):
+            act_quant[node.input[0]].append(node.name)
+    for key, value in sorted(act_quant.items()): #Deleting 'keys' which is being passed as an input to only one node
+      if(len(value) < 2):
+        del act_quant[key]
+    for node in graph_def.node: #Creating individual weight scale node whenever multiple nodes share the same input node.
+      if(node.op in _QUANTIZABLE_TYPES):
+        for in_node in graph_def.node:
+          if(("FakeQuantWithMinMaxVars" in node.input[0]) and ("FakeQuantWithMinMaxVars" in node.input[1]) and (in_node.name == node.input[1])):
+            if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2"):
+              sub_name = node.input[0].split("/FakeQuantWithMinMaxVars")[0]
+              if(sub_name not in in_node.input[3] and sub_name not in in_node.input[4]):
+                common.RerouteTensor(
+                       graph.get_tensor_by_name(sub_name+"/ip_scale_1:0"), graph.get_tensor_by_name(in_node.input[4]+":0"))
+                if(sub_name in str(act_quant.keys())):
+                  w_scale_new = tf.Variable(initial_value=0.0, trainable=False,  name=in_node.name.split("/")[0]+"/w_scale")
+                  common.RerouteTensor(
+                         graph.get_tensor_by_name(in_node.name.split("/")[0]+"/w_scale:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
+                else:
+                  common.RerouteTensor(
+                           graph.get_tensor_by_name(sub_name+"/w_scale_1:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
 
 def _QuantizeActivationLayers(quantized_ops,
                               graph,
@@ -304,15 +323,15 @@ def _QuantizeActivationLayers(quantized_ops,
   Raises:
     ValueError: When quantization fails.
   """
-  w_scale_act = tf.Variable(initial_value=1.0, trainable=False, name="w_scale_act")
-  ip_scale_act = tf.Variable(initial_value=0.007843137, trainable=False, name="ip_scale_act")
+  w_scale_act = tf.Variable(initial_value=0.0, trainable=False, name="w_scale_act")
+  ip_scale_act = tf.Variable(initial_value=0.0, trainable=False, name="ip_scale_act")
   input_to_ops_map = input_to_ops.InputToOps(graph)
   for op in (op for op in graph.get_operations()):
     if _CheckIfQuantizableOp(op, quantized_ops):
       logging.info('Inserting fake quant op activation_%s_quant after %s',
                    op.type, op.name)
       consumers = input_to_ops_map.ConsumerOperations(op)
-      w_scale_act, ip_scale_act = _InsertQuantOp(
+      op_w_scale_act, op_ip_scale_act = _InsertQuantOp(
           op.name,
           'activation_' + op.type + '_quant',
           op,
@@ -329,7 +348,10 @@ def _QuantizeActivationLayers(quantized_ops,
           vars_collection=vars_collection,
           bits=activation_bits,
           producer_scope=scope)
-
+      weight_scale = tf.Variable(initial_value=0.0, trainable=False,  name=op.name+'/activation_' + op.type + '_quant/w_scale')
+      input_scale = tf.Variable(initial_value=0.0, trainable=False, name=op.name+'/activation_' + op.type + '_quant/ip_scale')
+      w_scale_act_assign = tf.assign(weight_scale, op_w_scale_act, name=op.name+'/activation_' + op.type + '_quant/w_scale')
+      ip_scale_act_assign = tf.assign(input_scale, op_ip_scale_act, name=op.name+'/activation_' + op.type + '_quant/ip_scale')
 
 def _CheckIfQuantizableOp(src_op, quantized_ops):
   """Check if the output of an op should be quantized.
@@ -504,6 +526,9 @@ def _FindLayersToQuantize(graph):
       ],
       ordered_inputs=False)
 
+  fused_batch_norm = graph_matcher.OpTypePattern(
+      'FusedBatchNorm', inputs=[bias_add_pattern, '*', '*', '*', '*'])
+
   # The input to the activation can come from bias add, fold bias add, the
   # bypasses.
   # TODO(suharshs): We should ideally skip Identity operations instead of
@@ -517,6 +542,7 @@ def _FindLayersToQuantize(graph):
               batch_norm_identity,
               bypass_pattern,
               layer_pattern,
+              fused_batch_norm,
           ])
       ])
 
