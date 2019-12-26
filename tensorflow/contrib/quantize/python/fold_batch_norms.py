@@ -204,8 +204,12 @@ def _FindFusedBatchNorms(graph):
       graph_matcher.OneofPattern(
           [matmul_bn_output_reshape_pattern, batch_norm_pattern]))
 
+  mul_pattern = graph_matcher.OpTypePattern(
+      'Mul', inputs=[batch_norm_pattern, graph_matcher.OpTypePattern('*')])
+
   moving_average_sub_pattern = graph_matcher.OpTypePattern(
-      'Sub', inputs=[moving_average_pattern, batch_norm_pattern])
+      'Sub', inputs=[moving_average_pattern, graph_matcher.OneofPattern([batch_norm_pattern, mul_pattern])])
+
   moving_average_mul_pattern = graph_matcher.OpTypePattern(
       'Mul', inputs=[moving_average_sub_pattern, bn_decay_pattern])
 
@@ -295,7 +299,7 @@ def _FindFusedBatchNorms(graph):
           # During training: Batch Mean is bn_op.outputs[1]
           moving_mean_tensor = sub_op.inputs[0]
           bn_decay_mean_tensor = mul_match_result.get_tensor(bn_decay_pattern)
-        if sub_op.inputs[1].name == bn_op.outputs[2].name:
+        if sub_op.inputs[1].name == bn_op.outputs[2].name or sub_op.inputs[1].name.split("/")[0] + "/FusedBatchNorm:2" == bn_op.outputs[2].name :
           # During training: Batch Var is bn_op.outputs[2]
           moving_variance_tensor = sub_op.inputs[0]
           bn_decay_var_tensor = mul_match_result.get_tensor(bn_decay_pattern)
