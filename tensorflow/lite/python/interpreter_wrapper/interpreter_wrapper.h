@@ -53,7 +53,7 @@ class InterpreterWrapper {
 
   ~InterpreterWrapper();
   PyObject* AllocateTensors();
-  PyObject* Invoke();
+  PyObject* Invoke(bool ev_quant);
 
   PyObject* InputIndices() const;
   PyObject* OutputIndices() const;

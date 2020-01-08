@@ -214,7 +214,7 @@ class Subgraph {
   // to evaluate (i.e. if a ResizeTensor() has been performed without an
   // AllocateTensors().
   // Returns status of success or failure.
-  TfLiteStatus Invoke();
+  TfLiteStatus Invoke(bool ev_quant);
 
   // Entry point for C node plugin API to report an error.
   void ReportError(const char* format, ...);

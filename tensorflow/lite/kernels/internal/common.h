@@ -179,6 +179,99 @@ inline int32 MultiplyByQuantizedMultiplier(int32 x, int32 quantized_multiplier,
                              right_shift);
 }
 
+static int saturate_signed(int x, int pxlsize) {
+    int bits = pxlsize-1;
+    // Saturate to signed bits.
+    const signed hi =  (1<<bits)-1;	// E.g.   0xfff for 12+1 bits.
+    const signed lo = -(1<<bits);	// E.g. -0x1000 for 12+1 bits.
+    if (x > hi) return hi;
+    if (x < lo) return lo;
+    return x;
+    }
+ static int saturate_unsigned(unsigned x, int pxlsize) {
+    int bits = pxlsize;
+    // Saturate to unsigned bits.
+    const signed hi =  (1<<bits)-1;	// E.g.   0xfff for 12+1 bits.
+    if (x > hi) return hi;
+    return x;
+    }
+
+static int saturate_lkrelu( int x) {
+    int bits = 15-1;
+    // Saturate to signed bits.
+    const signed lo = -(1<<bits);	// E.g. -0x1000 for 12+1 bits.
+    if (x < lo) return lo;
+    return x;
+    }
+
+#define ROUNDING ROUND_EVEN
+
+#if ROUNDING == ROUND_EVEN
+#define ROUND_SHIFT M_ROUND_UP_EVEN
+#endif
+
+#define SHL1(x) (1<<(x))
+#define M_ROUND_UP_EVEN(X,shift) \
+    ((X + ((X >> (shift)) & 1) + (SHL1(shift-1)-1)) >> (shift))
+
+#define STORE_ROUND_SHIFT(val,shift) (shift != 0 ? ROUND_SHIFT(val,shift) : val)
+
+#define LLSHL1(x) (1LL<<(x))
+#define LL_M_ROUND_UP_EVEN(X,shift) \
+    ((X + ((X >> (shift)) & 1) + (LLSHL1(shift-1)-1)) >> (shift))
+
+#define LKRELU_SHIFT (7)
+#define LKRELU_ROUND_SHIFT(val) ROUND_SHIFT(val,LKRELU_SHIFT)
+
+#define F_RELU_ZERO 8
+#define F_LKRELU 16
+#define F_ZRELUMAX 64
+#define F_FRAC 1
+#define ACC_SHIFT 0
+#define flags_ev 72
+
+#define STORE_ACC(dest,acc,nfrac,pfrac,nshift,pshift,\
+        signed_output,pxlsize,relumax) do { 		\
+    int ans;\
+    if (flags_ev & F_FRAC) { \
+        typedef signed long long SLL; 	\
+        SLL old = acc, prod;		\
+        if (acc < 0) {			\
+            if (flags_ev & F_RELU_ZERO) ans = 0; \
+            else {			\
+                prod = old*nfrac;	\
+                ans = int(LL_M_ROUND_UP_EVEN(prod,nshift-ACC_SHIFT)); \
+                }			\
+            }				\
+        else {				\
+            prod = old*pfrac;	\
+            ans = int(LL_M_ROUND_UP_EVEN(prod,pshift-ACC_SHIFT)); \
+            }				\
+        if (0 && old > 0 && prod < old) printf("overflow! %llx %llx\n",old,prod); \
+        } \
+    else { \
+        /* Bring the accumulator to scale. */				\
+        ans = STORE_ROUND_SHIFT(acc,pshift-ACC_SHIFT);		\
+        if (ans < 0) {	\
+            if (flags_ev & F_RELU_ZERO) ans = 0;				\
+            else if (flags_ev & F_LKRELU) ans = LKRELU_ROUND_SHIFT(saturate_lkrelu(ans)*nfrac);\
+            } \
+        } \
+    /* For compile efficiency we must pass in the boolean indicating whether \
+       we should do this test or not. */				\
+    if ((flags_ev & F_ZRELUMAX) && ans > relumax) ans = relumax; \
+    dest = signed_output ? saturate_signed(ans, pxlsize) : saturate_unsigned(ans, pxlsize); \
+    } while (0)
+
+inline int32 StoreAcc(int32 acc, int bits_to_shift, int relu_max) {
+    int nfrac = 0, pfrac = 0, signed_output = 0;
+    int nshift = bits_to_shift, pshift = bits_to_shift;
+    int pxlsize = 8;
+    int dest;
+    STORE_ACC(dest,acc,nfrac,pfrac,nshift,pshift,signed_output,pxlsize,relu_max); //Round-up even
+  return dest;
+}
+
 template <typename T>
 int CountLeadingZeros(T integer_input) {
   static_assert(std::is_unsigned<T>::value,

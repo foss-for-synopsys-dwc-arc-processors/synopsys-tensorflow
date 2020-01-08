@@ -128,8 +128,8 @@ TfLiteStatus Interpreter::ResizeInputTensor(int tensor_index,
   return primary_subgraph().ResizeInputTensor(tensor_index, dims);
 }
 
-TfLiteStatus Interpreter::Invoke() {
-  TF_LITE_ENSURE_STATUS(primary_subgraph().Invoke());
+TfLiteStatus Interpreter::Invoke(bool ev_quant) {
+  TF_LITE_ENSURE_STATUS(primary_subgraph().Invoke(ev_quant));
 
   if (!allow_buffer_handle_output_) {
     for (int tensor_index : outputs()) {

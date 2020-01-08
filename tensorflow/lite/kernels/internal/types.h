@@ -798,6 +798,9 @@ struct ConvParams {
   int32 output_offset;
   int32 output_multiplier;
   int output_shift;
+  int bits_to_shift;
+  int relu_max;
+  int ev_quant;
   // uint8, etc, activation params.
   int32 quantized_activation_min;
   int32 quantized_activation_max;
@@ -825,6 +828,9 @@ struct DepthwiseParams {
   int32 output_offset;
   int32 output_multiplier;
   int output_shift;
+  int bits_to_shift;
+  int relu_max;
+  int ev_quant;
   // uint8, etc, activation params.
   int32 quantized_activation_min;
   int32 quantized_activation_max;

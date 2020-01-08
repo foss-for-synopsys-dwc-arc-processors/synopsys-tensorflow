@@ -151,7 +151,7 @@ TfLiteStatus Eval(TfLiteContext* context, TfLiteNode* node) {
 
   // Note: It's guaranteed that the subgraphs' `AllocateTensors` are called
   // in `Prepare`, so we don't need to do it here again.
-  TF_LITE_ENSURE_OK(context, active_branch_subgraph.Invoke());
+  TF_LITE_ENSURE_OK(context, active_branch_subgraph.Invoke(node->ev_quant));
 
   for (int tensor_index : active_branch_subgraph.outputs()) {
     active_branch_subgraph.EnsureTensorDataIsReadable(tensor_index);

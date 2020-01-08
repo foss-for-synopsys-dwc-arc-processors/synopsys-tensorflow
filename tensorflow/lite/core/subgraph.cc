@@ -92,6 +92,8 @@ TfLiteQuantizationParams GetLegacyQuantization(
   TfLiteQuantizationParams legacy_quantization;
   legacy_quantization.scale = 0;
   legacy_quantization.zero_point = 0;
+  legacy_quantization.min = 0;
+  legacy_quantization.max = 0;
 
   // If the quantization type isn't affine, return the empty
   // legacy_quantization.
@@ -111,6 +113,8 @@ TfLiteQuantizationParams GetLegacyQuantization(
   // We know its per-layer quantization now.
   legacy_quantization.scale = affine_quantization->scale->data[0];
   legacy_quantization.zero_point = affine_quantization->zero_point->data[0];
+  legacy_quantization.min = affine_quantization->min->data[0];
+  legacy_quantization.max = affine_quantization->max->data[0];
   return legacy_quantization;
 }
 
@@ -680,7 +684,7 @@ TfLiteStatus Subgraph::PrepareOpsAndTensors() {
   return kTfLiteOk;
 }
 
-TfLiteStatus Subgraph::Invoke() {
+TfLiteStatus Subgraph::Invoke(bool ev_quant) {
   if (!consistent_) {
     ReportError("Invoke called on model that is not consistent.");
     return kTfLiteError;
@@ -740,6 +744,7 @@ TfLiteStatus Subgraph::Invoke() {
 
     EnsureTensorsVectorCapacity();
     tensor_resized_since_op_invoke_ = false;
+    node.ev_quant = ev_quant;
     if (OpInvoke(registration, &node) == kTfLiteError) {
       return ReportOpError(context_, node, registration, node_index,
                            "failed to invoke");

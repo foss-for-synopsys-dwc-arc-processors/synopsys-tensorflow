@@ -104,6 +104,7 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
                  const int32* bias_data, const RuntimeShape& output_shape,
                  uint8* output_data, const RuntimeShape& im2col_shape,
                  uint8* im2col_data, void* cpu_backend_context) {
+
   (void)cpu_backend_context;  // only used in optimized code.
   (void)im2col_data;   // only used in optimized code.
   (void)im2col_shape;  // only used in optimized code.
@@ -118,6 +119,9 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
   const int32 output_offset = params.output_offset;
   const int32 output_multiplier = params.output_multiplier;
   const int output_shift = params.output_shift;
+  const int bits_to_shift = params.bits_to_shift;
+  const int relu_max = params.relu_max;
+  const bool ev_quant = params.ev_quant;
   const int32 output_activation_min = params.quantized_activation_min;
   const int32 output_activation_max = params.quantized_activation_max;
   TFLITE_DCHECK_LE(output_activation_min, output_activation_max);
@@ -159,8 +163,13 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
                   int32 filter_val =
                       filter_data[Offset(filter_shape, out_channel, filter_y,
                                          filter_x, in_channel)];
-                  acc +=
-                      (filter_val + filter_offset) * (input_val + input_offset);
+                  if(ev_quant) {
+                    acc +=
+                      (filter_val + filter_offset) * (input_val);
+                  }
+                  else {
+                    acc += (filter_val + filter_offset) * (input_val + input_offset);
+                  }
                 }
               }
             }
@@ -168,12 +177,17 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
           if (bias_data) {
             acc += bias_data[out_channel];
           }
-          acc = MultiplyByQuantizedMultiplier(acc, output_multiplier,
+         if(ev_quant) {
+           acc = StoreAcc(acc, bits_to_shift, relu_max);
+         }
+         else {
+           acc = MultiplyByQuantizedMultiplier(acc, output_multiplier,
                                               output_shift);
-          acc += output_offset;
-          acc = std::max(acc, output_activation_min);
-          acc = std::min(acc, output_activation_max);
-          output_data[Offset(output_shape, batch, out_y, out_x, out_channel)] =
+           acc += output_offset;
+           acc = std::max(acc, output_activation_min);
+           acc = std::min(acc, output_activation_max);
+         }
+         output_data[Offset(output_shape, batch, out_y, out_x, out_channel)] =
               static_cast<uint8>(acc);
         }
       }
