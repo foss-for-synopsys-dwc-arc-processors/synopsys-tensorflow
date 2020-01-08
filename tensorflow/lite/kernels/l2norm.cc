@@ -53,7 +53,7 @@ TfLiteStatus Prepare(TfLiteContext* context, TfLiteNode* node) {
 
   if (output->type == kTfLiteUInt8 || output->type == kTfLiteInt8) {
     // (1/128) for TF Logic and (1/127.5) for EVQuant Logic
-    bool check_cond = ((output->params.scale == (1. / 128.)) || (output->params.scale == (1. / 127.5)));
+    bool check_cond = ((output->params.scale == (1. / 128.)) || (output->params.scale == (float)(1. / 127.5)));
     TF_LITE_ENSURE_EQ(context, check_cond, 1);
     if (output->type == kTfLiteUInt8) {
       TF_LITE_ENSURE_EQ(context, output->params.zero_point, 128);
