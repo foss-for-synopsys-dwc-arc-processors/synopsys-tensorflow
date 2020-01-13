@@ -336,10 +336,19 @@ TfLiteStatus InterpreterBuilder::ParseQuantization(
       malloc(sizeof(TfLiteAffineQuantization)));
   affine_quantization->scale = TfLiteFloatArrayCreate(num_scales);
   affine_quantization->zero_point = TfLiteIntArrayCreate(num_scales);
+  affine_quantization->min = TfLiteFloatArrayCreate(num_scales);
+  affine_quantization->max = TfLiteFloatArrayCreate(num_scales);
   for (size_t i = 0; i < num_scales; ++i) {
     affine_quantization->scale->data[i] = src_quantization->scale()->Get(i);
-    affine_quantization->zero_point->data[i] =
-        src_quantization->zero_point()->Get(i);
+    affine_quantization->zero_point->data[i] = src_quantization->zero_point()->Get(i);
+    if(affine_quantization->zero_point->data[i] != 0) {
+      affine_quantization->min->data[i] = src_quantization->min()->Get(i);
+      affine_quantization->max->data[i] = src_quantization->max()->Get(i);
+     }
+    else {
+      affine_quantization->min->data[i] = 0.0;
+      affine_quantization->max->data[i] = 0.0;
+    }
   }
   affine_quantization->quantized_dimension =
       src_quantization->quantized_dimension();

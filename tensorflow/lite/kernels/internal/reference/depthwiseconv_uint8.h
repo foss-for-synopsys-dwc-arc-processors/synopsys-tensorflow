@@ -63,28 +63,43 @@ namespace depthwise_conv {
 
 template <DepthwiseConvOutputRounding output_rounding>
 inline int32 DepthwiseConvRound(int32 x, int32 quantized_multiplier,
-                                int shift) {
+                                int shift, int bits_to_shift, int relu_max, bool ev_quant) {
   TFLITE_DCHECK_NE(output_rounding, DepthwiseConvOutputRounding::kNone);
-  return MultiplyByQuantizedMultiplier(x, quantized_multiplier, shift);
+  if(ev_quant) {
+    return StoreAcc(x, bits_to_shift, relu_max);
+  }
+  else {
+    return MultiplyByQuantizedMultiplier(x, quantized_multiplier, shift);
+  }
 }
 
 template <>
 inline int32 DepthwiseConvRound<DepthwiseConvOutputRounding::kAwayFromZero>(
-    int32 x, int32 quantized_multiplier, int shift) {
-  return MultiplyByQuantizedMultiplier(x, quantized_multiplier, shift);
+  int32 x, int32 quantized_multiplier, int shift, int bits_to_shift, int relu_max, bool ev_quant) {
+  if(ev_quant) {
+    return StoreAcc(x, bits_to_shift, relu_max);
+  }
+  else {
+    return MultiplyByQuantizedMultiplier(x, quantized_multiplier, shift);
+  }
 }
 
 template <>
 inline int32 DepthwiseConvRound<DepthwiseConvOutputRounding::kUpward>(
-    int32 x, int32 quantized_multiplier, int shift) {
-  using gemmlowp::SaturatingRoundingDoublingHighMul;
-  const int left_shift = shift > 0 ? shift : 0;
-  const int right_shift = shift > 0 ? 0 : -shift;
-  const int rounding_offset = right_shift > 0 ? 1 << (right_shift - 1) : 0;
-  return (SaturatingRoundingDoublingHighMul(x * (1 << left_shift),
-                                            quantized_multiplier) +
-          rounding_offset) >>
-         right_shift;
+    int32 x, int32 quantized_multiplier, int shift, int bits_to_shift, int relu_max, bool ev_quant) {
+  if(ev_quant) {
+    return StoreAcc(x, bits_to_shift, relu_max);
+  }
+  else {
+    using gemmlowp::SaturatingRoundingDoublingHighMul;
+    const int left_shift = shift > 0 ? shift : 0;
+    const int right_shift = shift > 0 ? 0 : -shift;
+    const int rounding_offset = right_shift > 0 ? 1 << (right_shift - 1) : 0;
+    return (SaturatingRoundingDoublingHighMul(x * (1 << left_shift),
+                                              quantized_multiplier) +
+            rounding_offset) >>
+           right_shift;
+  }
 }
 
 template <DepthwiseConvOutputRounding output_rounding>
@@ -96,6 +111,7 @@ struct DepthwiseConvBasicKernel {
                          const uint8* filter_data,
                          const RuntimeShape& bias_shape, const int32* bias_data,
                          const RuntimeShape& output_shape, uint8* output_data) {
+
     const int stride_width = params.stride_width;
     const int stride_height = params.stride_height;
     const int dilation_width_factor = params.dilation_width_factor;
@@ -110,10 +126,12 @@ struct DepthwiseConvBasicKernel {
     const int32 output_offset = params.output_offset;
     const int32 output_multiplier = params.output_multiplier;
     const int output_shift = params.output_shift;
+    const int bits_to_shift = params.bits_to_shift;
+    const int relu_max = params.relu_max;
+    const bool ev_quant = params.ev_quant;
     TFLITE_DCHECK_EQ(input_shape.DimensionsCount(), 4);
     TFLITE_DCHECK_EQ(filter_shape.DimensionsCount(), 4);
     TFLITE_DCHECK_EQ(output_shape.DimensionsCount(), 4);
-
     TFLITE_DCHECK_LE(output_activation_min, output_activation_max);
     const int batches = MatchingDim(input_shape, 0, output_shape, 0);
     const int output_depth = MatchingDim(filter_shape, 3, output_shape, 3);
@@ -126,7 +144,6 @@ struct DepthwiseConvBasicKernel {
     const int output_width = output_shape.Dims(2);
     TFLITE_DCHECK_EQ(output_depth, input_depth * depth_multiplier);
     TFLITE_DCHECK_EQ(bias_shape.FlatSize(), output_depth);
-
     for (int b = 0; b < batches; ++b) {
       for (int out_y = 0; out_y < output_height; ++out_y) {
         for (int out_x = 0; out_x < output_width; ++out_x) {
@@ -150,8 +167,14 @@ struct DepthwiseConvBasicKernel {
                         input_data[Offset(input_shape, b, in_y, in_x, ic)];
                     int32 filter_val = filter_data[Offset(
                         filter_shape, 0, filter_y, filter_x, oc)];
-                    acc += (filter_val + filter_offset) *
+                    if(ev_quant) {
+                      acc += (filter_val + filter_offset) *
+                           (input_val);
+                    }
+                    else {
+                      acc += (filter_val + filter_offset) *
                            (input_val + input_offset);
+                    }
                   }
                 }
               }
@@ -159,10 +182,12 @@ struct DepthwiseConvBasicKernel {
                 acc += bias_data[oc];
               }
               acc = DepthwiseConvRound<output_rounding>(acc, output_multiplier,
-                                                        output_shift);
-              acc += output_offset;
-              acc = std::max(acc, output_activation_min);
-              acc = std::min(acc, output_activation_max);
+                                                        output_shift, bits_to_shift, relu_max, ev_quant);
+              if(!ev_quant) {
+                acc += output_offset;
+                acc = std::max(acc, output_activation_min);
+                acc = std::min(acc, output_activation_max);
+              }
               output_data[Offset(output_shape, b, out_y, out_x, oc)] =
                   static_cast<uint8>(acc);
             }

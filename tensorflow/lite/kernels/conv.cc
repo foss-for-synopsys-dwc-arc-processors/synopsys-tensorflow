@@ -75,6 +75,9 @@ struct OpData {
   // be represented as a fixed point multiplier plus a left shift.
   int32_t output_multiplier;
   int output_shift;
+  int bits_to_shift;
+  int relu_max;
+  int ev_quant;
 
   // Per channel output multiplier and shift.
   std::vector<int32_t> per_channel_output_multiplier;
@@ -314,7 +317,9 @@ TfLiteStatus Prepare(KernelType kernel_type, TfLiteContext* context,
         &data->output_multiplier, &data->output_shift,
         &data->output_activation_min, &data->output_activation_max,
         data->per_channel_output_multiplier.data(),
-        data->per_channel_output_shift.data()));
+        data->per_channel_output_shift.data(),
+        &data->bits_to_shift,
+        &data->relu_max));
   }
 
   TfLiteIntArray* output_size = TfLiteIntArrayCreate(4);
@@ -423,6 +428,7 @@ void EvalQuantized(TfLiteContext* context, TfLiteNode* node,
   auto input_offset = -input->params.zero_point;
   auto filter_offset = -filter->params.zero_point;
   auto output_offset = output->params.zero_point;
+  bool ev_quant = node->ev_quant;
 
   KernelType effective_kernel_type;
   if ((kernel_type == kMultithreadOptimized ||
@@ -451,6 +457,9 @@ void EvalQuantized(TfLiteContext* context, TfLiteNode* node,
   op_params.output_shift = -data->output_shift;
   op_params.quantized_activation_min = data->output_activation_min;
   op_params.quantized_activation_max = data->output_activation_max;
+  op_params.bits_to_shift = data->bits_to_shift;
+  op_params.relu_max = data->relu_max;
+  op_params.ev_quant = ev_quant;
   switch (effective_kernel_type) {
     case kReference: {
       reference_ops::Conv(
@@ -756,7 +765,7 @@ TfLiteRegistration* Register_CONV_2D() {
   // tflite_with_ruy optimizes the generic kernel type.
   return Register_CONVOLUTION_GENERIC_OPT();
 #else
-  return Register_CONVOLUTION_MULTITHREADED_OPT();
+  return Register_CONVOLUTION_REF(); //Register_CONVOLUTION_MULTITHREADED_OPT();
 #endif
 }
 

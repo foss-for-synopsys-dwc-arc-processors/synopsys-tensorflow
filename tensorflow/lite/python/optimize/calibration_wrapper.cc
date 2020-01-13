@@ -134,8 +134,8 @@ PyObject* CalibrationWrapper::FeedTensor(PyObject* input_value) {
       return nullptr;
     }
   }
-
-  TFLITE_PY_CHECK(interpreter_->Invoke());
+  bool ev_quant = false;
+  TFLITE_PY_CHECK(interpreter_->Invoke(ev_quant));
   Py_RETURN_NONE;
 }
 

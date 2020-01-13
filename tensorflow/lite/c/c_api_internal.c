@@ -103,6 +103,14 @@ void TfLiteQuantizationFree(TfLiteQuantization* quantization) {
       TfLiteIntArrayFree(q_params->zero_point);
       q_params->zero_point = NULL;
     }
+    if (q_params->min) {
+      TfLiteIntArrayFree(q_params->min);
+      q_params->min = NULL;
+    }
+    if (q_params->max) {
+      TfLiteIntArrayFree(q_params->max);
+      q_params->max = NULL;
+    }
     free(q_params);
   }
   quantization->params = NULL;

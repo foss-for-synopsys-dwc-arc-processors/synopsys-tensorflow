@@ -245,6 +245,8 @@ typedef struct {
 typedef struct {
   float scale;
   int32_t zero_point;
+  float min;
+  float max;
 } TfLiteQuantizationParams;
 
 // Parameters for asymmetric quantization across a dimension (i.e per output
@@ -257,6 +259,8 @@ typedef struct {
 typedef struct {
   TfLiteFloatArray* scale;
   TfLiteIntArray* zero_point;
+  TfLiteFloatArray* min;
+  TfLiteFloatArray* max;
   int32_t quantized_dimension;
 } TfLiteAffineQuantization;
 
@@ -401,6 +405,7 @@ typedef struct {
   // created by calling `interpreter.ModifyGraphWithDelegate`.
   // WARNING: This is an experimental interface that is subject to change.
   TfLiteDelegate* delegate;
+  bool ev_quant;
 } TfLiteNode;
 
 typedef struct TfLiteContext {

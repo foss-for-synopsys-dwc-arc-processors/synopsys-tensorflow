@@ -288,7 +288,7 @@ class Interpreter(object):
     """
     return lambda: self._interpreter.tensor(self._interpreter, tensor_index)
 
-  def invoke(self):
+  def invoke(self, ev_quant=False):
     """Invoke the interpreter.
 
     Be sure to set the input sizes, allocate tensors and fill values before
@@ -301,7 +301,7 @@ class Interpreter(object):
       ValueError: When the underlying interpreter fails raise ValueError.
     """
     self._ensure_safe()
-    self._interpreter.Invoke()
+    self._interpreter.Invoke(ev_quant)
 
   def reset_all_variables(self):
     return self._interpreter.ResetVariableTensors()

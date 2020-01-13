@@ -58,10 +58,13 @@ struct OpData {
   // be represented as a fixed point multiplier plus a left shift.
   int32_t output_multiplier;
   int output_shift;
+  int bits_to_shift;
+  int relu_max;
   // The range of the fused activation layer. For example for kNone and
   // uint8_t these would be 0 and 255.
   int32_t output_activation_min;
   int32_t output_activation_max;
+  int ev_quant;
 
   // Per channel output multiplier and shift.
   std::vector<int32_t> per_channel_output_multiplier;
@@ -163,7 +166,9 @@ TfLiteStatus Prepare(TfLiteContext* context, TfLiteNode* node) {
         &data->output_multiplier, &data->output_shift,
         &data->output_activation_min, &data->output_activation_max,
         data->per_channel_output_multiplier.data(),
-        data->per_channel_output_shift.data()));
+        data->per_channel_output_shift.data(),
+        &data->bits_to_shift,
+        &data->relu_max));
   }
 
   TfLiteIntArray* outputSize = TfLiteIntArrayCreate(4);
@@ -218,6 +223,7 @@ void EvalQuantized(TfLiteContext* context, TfLiteNode* node,
   auto input_offset = -input->params.zero_point;
   auto filter_offset = -filter->params.zero_point;
   auto output_offset = output->params.zero_point;
+  bool ev_quant = node->ev_quant;
 
   DepthwiseParams op_params;
   op_params.padding_type = PaddingType::kSame;
@@ -235,6 +241,9 @@ void EvalQuantized(TfLiteContext* context, TfLiteNode* node,
   op_params.output_shift = -data->output_shift;
   op_params.quantized_activation_min = data->output_activation_min;
   op_params.quantized_activation_max = data->output_activation_max;
+  op_params.bits_to_shift = data->bits_to_shift;
+  op_params.relu_max = data->relu_max;
+  op_params.ev_quant = ev_quant;
   if (kernel_type == kReference) {
     reference_ops::DepthwiseConv(
         op_params, GetTensorShape(input), GetTensorData<uint8_t>(input),
@@ -354,7 +363,7 @@ TfLiteRegistration* Register_DEPTHWISE_CONVOLUTION_NEON_OPT() {
 
 TfLiteRegistration* Register_DEPTHWISE_CONV_2D() {
 #ifdef USE_NEON
-  return Register_DEPTHWISE_CONVOLUTION_NEON_OPT();
+  return Register_DEPTHWISE_CONVOLUTION_REF(); //Register_DEPTHWISE_CONVOLUTION_NEON_OPT();
 #else
   return Register_DEPTHWISE_CONVOLUTION_GENERIC_OPT();
 #endif
