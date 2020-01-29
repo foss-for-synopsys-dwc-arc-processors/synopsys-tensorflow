@@ -85,11 +85,12 @@ def _tf_http_archive(ctx):
     if ("mirror.tensorflow.org" not in ctx.attr.urls[0] and
         (len(ctx.attr.urls) < 2 and
          ctx.attr.name not in _SINGLE_URL_WHITELIST.to_list())):
-        fail("tf_http_archive(urls) must have redundant URLs. The " +
-             "mirror.tensorflow.org URL must be present and it must come first. " +
-             "Even if you don't have permission to mirror the file, please " +
-             "put the correctly formatted mirror URL there anyway, because " +
-             "someone will come along shortly thereafter and mirror the file.")
+        if("dependencies/gemmlowp" not in ctx.attr.urls[0]):
+            fail("tf_http_archive(urls) must have redundant URLs. The " +
+                 "mirror.tensorflow.org URL must be present and it must come first. " +
+                 "Even if you don't have permission to mirror the file, please " +
+                 "put the correctly formatted mirror URL there anyway, because " +
+                 "someone will come along shortly thereafter and mirror the file.")
 
     use_syslib = _use_system_lib(ctx, ctx.attr.name)
     if not use_syslib:
