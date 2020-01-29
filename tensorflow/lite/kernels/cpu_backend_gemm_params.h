@@ -128,6 +128,9 @@ struct GemmParams {
   DstScalar clamp_max = std::is_floating_point<DstScalar>::value
                             ? std::numeric_limits<DstScalar>::infinity()
                             : std::numeric_limits<DstScalar>::max();
+  int bits_to_shift;
+  int relu_max;
+  bool ev_quant;
 };
 
 /* Convenience typedefs */

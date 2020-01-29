@@ -1205,14 +1205,13 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
                  uint8* output_data, const RuntimeShape& im2col_shape,
                  uint8* im2col_data, CpuBackendContext* cpu_backend_context) {
   gemmlowp::ScopedProfilingLabel label("Conv/8bit");
-
   const int stride_width = params.stride_width;
   const int stride_height = params.stride_height;
   const int dilation_width_factor = params.dilation_width_factor;
   const int dilation_height_factor = params.dilation_height_factor;
-  const int32 input_offset = params.input_offset;
+  int32 input_offset = params.input_offset;
   const int32 filter_offset = params.weights_offset;
-  const int32 output_offset = params.output_offset;
+  int32 output_offset = params.output_offset;
   const int32 output_multiplier = params.output_multiplier;
   const int output_shift = params.output_shift;
   const int32 output_activation_min = params.quantized_activation_min;
@@ -1221,6 +1220,10 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
   TFLITE_DCHECK_EQ(filter_shape.DimensionsCount(), 4);
   TFLITE_DCHECK_EQ(output_shape.DimensionsCount(), 4);
 
+  if(params.ev_quant) {
+    input_offset = 0;
+    output_offset = 0;
+  }
   const uint8* gemm_input_data = nullptr;
   const RuntimeShape* gemm_input_shape = nullptr;
   const int filter_width = filter_shape.Dims(2);
@@ -1297,6 +1300,9 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
   gemm_params.clamp_max = output_activation_max;
   gemm_params.multiplier_fixedpoint = output_multiplier;
   gemm_params.multiplier_exponent = output_shift;
+  gemm_params.bits_to_shift = params.bits_to_shift;
+  gemm_params.relu_max = params.relu_max;
+  gemm_params.ev_quant = params.ev_quant;
   cpu_backend_gemm::Gemm(lhs_params, filter_data, rhs_params, gemm_input_data,
                          dst_params, output_data, gemm_params,
                          cpu_backend_context);
