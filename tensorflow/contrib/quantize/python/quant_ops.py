@@ -371,4 +371,4 @@ def _FakeQuantWithMinMaxVars(inputs, min_var, max_var, w_scale, ip_scale, per_ch
     assert min_var.get_shape() == []  # pylint: disable=g-explicit-bool-comparison
     assert max_var.get_shape() == []  # pylint: disable=g-explicit-bool-comparison
     return array_ops.fake_quant_with_min_max_vars(
-        inputs, min_var, max_var, w_scale, ip_scale, tensor_type, ev_quant=ev_quant, num_bits=num_bits, narrow_range=narrow_range)
+        inputs, min_var, max_var, w_scale, ip_scale, num_bits=num_bits, narrow_range=narrow_range, ev_quant=ev_quant, tensor_type=tensor_type)
