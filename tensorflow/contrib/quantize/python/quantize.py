@@ -266,28 +266,39 @@ def Quantize(graph,
     act_quant = {}
     for node in graph_def.node: #Searching for all the activation nodes and save the name as 'key' in a dictionary
       if(node.op in _QUANTIZATION_OP):
-        if(("act_quant/FakeQuantWithMinMaxVars" in node.name) or ("activation_"+node.op+"_quant/FakeQuantWithMinMaxVars")):
+        if(("act_quant/FakeQuantWithMinMaxVars" in node.name) or ("activation_"+node.op+"_quant/FakeQuantWithMinMaxVars" in node.name)):
           act_quant[node.name] = []
     for node in graph_def.node: #Filling dict 'values' with list of nodes getting inputs from 'key'
       if(node.op in _QUANTIZABLE_TYPES):
         if(node.input[0] in act_quant.keys()):
             act_quant[node.input[0]].append(node.name)
+      elif(node.op in _RELU_TYPES):#Relu taking input from fakequant node
+        if(node.input[0] in act_quant.keys()):
+          for nxt_node in graph_def.node:#So another loop to figure out the corresponding Fakequant node to Relu (to get ip scale, weight_scale)
+            if(nxt_node.op in _QUANTIZABLE_TYPES):
+              if(node.name in nxt_node.input[0]):
+                act_quant[node.input[0]].append(nxt_node.name)
     for key, value in sorted(act_quant.items()): #Deleting 'keys' which is being passed as an input to only one node
       if(len(value) < 2):
         del act_quant[key]
     for node in graph_def.node: #Creating individual weight scale node whenever multiple nodes share the same input node.
       if(node.op in _QUANTIZABLE_TYPES):
         for in_node in graph_def.node:
-          if(("FakeQuantWithMinMaxVars" in node.input[0]) and ("FakeQuantWithMinMaxVars" in node.input[1]) and (in_node.name == node.input[1])):
+          if((("FakeQuantWithMinMaxVars" in node.input[0]) and ("FakeQuantWithMinMaxVars" in node.input[1]) and (in_node.name == node.input[1])) or
+             (("weights_quant/FakeQuantWithMinMaxVars") in node.input[1])  and (in_node.name == node.input[1])):
             if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2"):
               sub_name = node.input[0].split("/FakeQuantWithMinMaxVars")[0]
-              if(sub_name not in in_node.input[3] and sub_name not in in_node.input[4]):
-                common.RerouteTensor(
-                       graph.get_tensor_by_name(sub_name+"/ip_scale_1:0"), graph.get_tensor_by_name(in_node.input[4]+":0"))
+              for inner_node in graph_def.node:
+                if(sub_name in inner_node.name and inner_node.op in _RELU_TYPES):
+                  sub_name = inner_node.input[0].split("/FakeQuantWithMinMaxVars")[0]
+              if((sub_name not in in_node.input[3] and sub_name not in in_node.input[4]) and (in_node.input[3] != "w_scale/read" and in_node.input[4] != "ip_scale/read")):
+                src_tensor = graph.get_tensor_by_name(sub_name+"/ip_scale_1:0")
+                dst_tensor = graph.get_tensor_by_name(in_node.input[4]+":0")
+                common.RerouteTensor(src_tensor, dst_tensor)
                 if(sub_name in str(act_quant.keys())):
-                  w_scale_new = tf.Variable(initial_value=0.0, trainable=False,  name=in_node.name.split("/")[0]+"/w_scale")
+                  w_scale_new = tf.Variable(initial_value=0.0, trainable=False,  name=in_node.name.split("/weights_quant/FakeQuantWithMinMaxVars")[0]+"/w_scale_2")
                   common.RerouteTensor(
-                         graph.get_tensor_by_name(in_node.name.split("/")[0]+"/w_scale:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
+                         graph.get_tensor_by_name(in_node.name.split("/weights_quant/FakeQuantWithMinMaxVars")[0]+"/w_scale_2:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
                 else:
                   common.RerouteTensor(
                            graph.get_tensor_by_name(sub_name+"/w_scale_1:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
@@ -635,7 +646,6 @@ def _FindLayersToQuantize(graph):
       matched_layer_set.add(layer_op)
       layer_matches.append(
           _LayerMatch(layer_op, weight_tensor, activation_op, None, None, None))
-
   return layer_matches
 
 
