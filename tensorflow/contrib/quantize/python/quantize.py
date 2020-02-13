@@ -43,6 +43,7 @@ _INTERMEDIATE_OP = {'Add', 'Mul'}
 _PASS_THROUGH_OP = {'Reshape', 'Identity', 'BatchToSpaceND', 'SpaceToBatchND'}
 _VALID_ACTIVATION_OP = {'Relu', 'Relu6'}
 
+_INPUT_OP_TYPES = {'FakeQuantWithMinMaxVars', 'Relu', 'Relu6'}
 
 def Quantize(graph,
              is_training,
@@ -284,8 +285,7 @@ def Quantize(graph,
     for node in graph_def.node: #Creating individual weight scale node whenever multiple nodes share the same input node.
       if(node.op in _QUANTIZABLE_TYPES):
         for in_node in graph_def.node:
-          if((("FakeQuantWithMinMaxVars" in node.input[0]) and ("FakeQuantWithMinMaxVars" in node.input[1]) and (in_node.name == node.input[1])) or
-             (("weights_quant/FakeQuantWithMinMaxVars") in node.input[1])  and (in_node.name == node.input[1])):
+          if(((graph.get_operation_by_name(node.input[0]).op_def.name in _INPUT_OP_TYPES) and (graph.get_operation_by_name(node.input[1]).op_def.name in _INPUT_OP_TYPES)) and (in_node.name == node.input[1])):
             if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2"):
               sub_name = node.input[0].split("/FakeQuantWithMinMaxVars")[0]
               for inner_node in graph_def.node:
