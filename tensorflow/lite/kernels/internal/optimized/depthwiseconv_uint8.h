@@ -34,12 +34,14 @@ template <bool kAllowStrided, int kFixedInputDepth, int kFixedDepthMultiplier>
 struct QuantizedDepthwiseConvKernel {};
 
 #ifdef USE_NEON
+
 template <>
 struct QuantizedDepthwiseConvKernel<true, 8, 2> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8x2_t filter_u8;
     filter_u8.val[0] = vld1_u8(filter_ptr);
@@ -86,7 +88,8 @@ struct QuantizedDepthwiseConvKernel<false, 8, 1> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     const uint8x8_t filter_u8 = vld1_u8(filter_ptr);
     const int16x8_t filter_s16 = vreinterpretq_s16_u16(vmovl_u8(filter_u8));
@@ -154,7 +157,8 @@ struct QuantizedDepthwiseConvKernel<false, 4, 2> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     const uint8x8_t filter_u8 = vld1_u8(filter_ptr);
     const int16x8_t filter_s16 = vreinterpretq_s16_u16(vmovl_u8(filter_u8));
@@ -224,7 +228,8 @@ struct QuantizedDepthwiseConvKernel<false, 2, 8> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     int16x8_t filter[2];
     for (int i = 0; i < 2; i++) {
@@ -301,7 +306,8 @@ struct QuantizedDepthwiseConvKernel<false, 2, 2> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -367,7 +373,8 @@ struct QuantizedDepthwiseConvKernel<false, 2, 1> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -481,7 +488,8 @@ struct QuantizedDepthwiseConvKernel<false, 1, 2> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -541,7 +549,8 @@ struct QuantizedDepthwiseConvKernel<false, 1, 4> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -636,7 +645,8 @@ struct QuantizedDepthwiseConvKernel<false, 4, 1> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -706,7 +716,8 @@ struct QuantizedDepthwiseConvKernel<false, 4, 4> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     int16x8_t filter[2];
     for (int i = 0; i < 2; i++) {
@@ -791,7 +802,8 @@ struct QuantizedDepthwiseConvKernel<true, 0, 3> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // We will have to duplicate bytes in a NEON register, 3-fold.
     // We will do that by register-level table-look-up using VTBL instructions.
     // Here we prepare the registers containing the table-lookup indices.
@@ -877,7 +889,8 @@ struct QuantizedDepthwiseConvKernel<true, 0, 2> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Handle one output pixel at a time.
     for (int outp = 0; outp < num_output_pixels; outp++) {
       const uint8* local_filter_ptr = filter_ptr;
@@ -942,8 +955,11 @@ struct QuantizedDepthwiseConvKernel<true, 0, 1> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Handle one output pixel at a time.
+    if(ev_quant)
+      input_offset = 0;
     for (int outp = 0; outp < num_output_pixels; outp++) {
       const uint8* local_filter_ptr = filter_ptr;
       const uint8* local_input_ptr = input_ptr;
@@ -1027,7 +1043,8 @@ struct QuantizedDepthwiseConvKernel<true, 16, 1> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8[2];
     for (int i = 0; i < 2; i++) {
@@ -1081,7 +1098,8 @@ struct QuantizedDepthwiseConvKernel<true, 8, 1> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     const uint8x8_t filter_u8 = vld1_u8(filter_ptr);
     const int16x8_t filter_s16 = vreinterpretq_s16_u16(vmovl_u8(filter_u8));
@@ -1115,7 +1133,8 @@ struct QuantizedDepthwiseConvKernel<true, 1, 16> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8[2];
     for (int i = 0; i < 2; i++) {
@@ -1159,7 +1178,8 @@ struct QuantizedDepthwiseConvKernel<true, 1, 32> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8_0 = vld1_u8(filter_ptr + 8 * 0);
     uint8x8_t filter_u8_1 = vld1_u8(filter_ptr + 8 * 1);
@@ -1215,7 +1235,8 @@ struct QuantizedDepthwiseConvKernel<true, 1, 20> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     // NEON wants to load 8 bytes at a time, but 20 is not divisible by 8.
     // We load the first 16 bytes into filter_u8_{0,1} as usual.
@@ -1264,7 +1285,8 @@ struct QuantizedDepthwiseConvKernel<true, 1, 8> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     const uint8x8_t filter_u8 = vld1_u8(filter_ptr);
     const int16x8_t filter = vaddq_s16(
@@ -1296,7 +1318,8 @@ struct QuantizedDepthwiseConvKernel<true, 2, 1> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -1359,7 +1382,8 @@ struct QuantizedDepthwiseConvKernel<true, 4, 1> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     if (num_output_pixels <= 0) {
       return;
     }
@@ -1423,7 +1447,8 @@ struct QuantizedDepthwiseConvKernel<false, 12, 1> {
   static void Run(int num_output_pixels, int input_depth, int depth_multiplier,
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
-                  int16 filter_offset, int32* acc_buffer_ptr) {
+                  int16 filter_offset, int32* acc_buffer_ptr,
+                  int bits_to_shift, int relu_max, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8_0 = vld1_u8(filter_ptr);
     uint8x8_t filter_u8_1 = vld1_u8(filter_ptr + 4);
@@ -1477,7 +1502,8 @@ void QuantizedDepthwiseConvAccumRow(int stride, int dilation_factor,
                                     int filter_width, const uint8* filter_data,
                                     int16 filter_offset, int out_x_buffer_start,
                                     int out_x_buffer_end, int output_depth,
-                                    int32* acc_buffer) {
+                                    int32* acc_buffer, int bits_to_shift,
+                                    int relu_max, bool ev_quant) {
 #ifdef GEMMLOWP_PROFILING
   gemmlowp::ScopedProfilingLabel label(__PRETTY_FUNCTION__);
 #endif
@@ -1538,11 +1564,12 @@ void QuantizedDepthwiseConvAccumRow(int stride, int dilation_factor,
     const uint8* input_ptr = input_data + in_x_origin * input_depth;
     const int num_output_pixels = out_x_loop_end - out_x_loop_start;
     QuantizedDepthwiseConvKernel<
-        kAllowStrided, kFixedInputDepth,
-        kFixedDepthMultiplier>::Run(num_output_pixels, input_depth,
-                                    depth_multiplier, input_ptr, input_offset,
-                                    input_ptr_increment, filter_base_ptr,
-                                    filter_offset, acc_buffer_ptr);
+          kAllowStrided, kFixedInputDepth,
+          kFixedDepthMultiplier>::Run(num_output_pixels, input_depth,
+                                      depth_multiplier, input_ptr, input_offset,
+                                      input_ptr_increment, filter_base_ptr,
+                                      filter_offset, acc_buffer_ptr, bits_to_shift,
+                                      relu_max, ev_quant);
     filter_base_ptr += output_depth;
   }
 }
@@ -1553,7 +1580,7 @@ inline void QuantizedDepthwiseConvAccumRowGeneric(
     const uint8* input_data, int16 input_offset, int pad_width,
     int depth_multiplier, int filter_width, const uint8* filter_data,
     int16 filter_offset, int out_x_buffer_start, int out_x_buffer_end,
-    int output_depth, int32* acc_buffer) {
+    int output_depth, int32* acc_buffer, int bits_to_shift, int relu_max, bool ev_quant) {
   gemmlowp::ScopedProfilingLabel label("DepthwiseConvAccumRowGeneric (slow)");
   const uint8* filter_base_ptr = filter_data;
   for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
@@ -1688,6 +1715,9 @@ inline void DepthwiseConvGeneral(
   const int filter_width = filter_shape.Dims(2);
   const int output_height = output_shape.Dims(1);
   const int output_width = output_shape.Dims(2);
+  const int bits_to_shift = params.bits_to_shift;
+  const int relu_max = params.relu_max;
+  const bool ev_quant = params.ev_quant;
 #ifdef USE_NEON
   const bool shift_left = (output_shift > 0);
   const int32 multiplier_power_of_two = shift_left ? (1 << output_shift) : 1;
@@ -1724,7 +1754,6 @@ inline void DepthwiseConvGeneral(
   // for the cases where multiple kernels could apply.
 
   // Start with the fastest kernels: AllowStrided=false, fixed input depth.
-
   TFMINI_USE_DEPTHWISECONV_KERNEL(false, 1, 2)
   TFMINI_USE_DEPTHWISECONV_KERNEL(false, 2, 2)
   TFMINI_USE_DEPTHWISECONV_KERNEL(false, 4, 2)
@@ -1828,7 +1857,8 @@ inline void DepthwiseConvGeneral(
               input_data + in_y * input_height_stride + b * input_batch_stride,
               input_offset, pad_width, depth_multiplier, filter_width,
               filter_data + filter_y * filter_height_stride, filter_offset,
-              out_x_buffer_start, out_x_buffer_end, output_depth, acc_buffer);
+              out_x_buffer_start, out_x_buffer_end, output_depth, acc_buffer,
+              bits_to_shift, relu_max, ev_quant);
         }
         // Finished accumulating int32 values. Now need to convert them to
         // the final 8bit form and store them.
@@ -1836,140 +1866,234 @@ inline void DepthwiseConvGeneral(
         const int num_output_values = output_depth * num_output_pixels;
         int i = 0;
 #ifdef USE_NEON
-        using gemmlowp::RoundingDivideByPOT;
-        const int32x4_t output_offset_vec = vdupq_n_s32(output_offset);
-        const int32x4_t output_activation_min_vec =
-            vdupq_n_s32(output_activation_min);
-        const int32x4_t output_activation_max_vec =
-            vdupq_n_s32(output_activation_max);
-        // Handle 16 values at once.
-        // This allows us to issue 4 mutually independent int32
-        // multiplications (vqrdmulh), which should alleviate most of their
-        // high latency.
-        for (; i <= num_output_values - 16; i += 16) {
-          int32x4_t acc[4];
-          for (int j = 0; j < 4; j++) {
-            acc[j] = vld1q_s32(acc_buffer + i + 4 * j);
-          }
+          if(ev_quant) {
+            // Handle 16 values at once.
+            const int pixelsize = 8;
+            const int32x4_t v_0[4] = {0,0,0,0};
+            const int32x4_t v_pos_1 = vdupq_n_s32(1);
+            const int32x4_t relu_max = vdupq_n_s32(params.relu_max);
+            const int32x4_t hi_val = vdupq_n_s32((1<<pixelsize)-1);
+            int32x4_t shift_left_val[4], shift_right[4];
+            int32x4_t round_up_even[4], zero_check[4], relu_op[4];
 
-          if (!shift_left) {
-            // Fixed-point multiplication.
-            for (int j = 0; j < 4; j++) {
-              acc[j] = vqrdmulhq_n_s32(acc[j], output_multiplier);
+            for (; i <= num_output_values - 16; i += 16) {
+              int32x4_t acc[4];
+              for (int j = 0; j < 4; j++) {
+                acc[j] = vld1q_s32(acc_buffer + i + 4 * j);
+              }
+              for (int j = 0; j < 4; j++) {
+              shift_right[j] = vandq_s32((vshrq_n_s32(acc[j], params.bits_to_shift)), v_pos_1);
+              shift_left_val[j] = vsubq_s32((vshlq_n_s32(v_pos_1, params.bits_to_shift - 1)), v_pos_1);
+              round_up_even[j] = vshrq_n_s32((vaddq_s32((vaddq_s32(shift_left_val[j], shift_right[j])), acc[j])), params.bits_to_shift);
+              zero_check[j] = vmaxq_s32(round_up_even[j], v_0[j]);
+              relu_op[j] = vminq_s32(zero_check[j], relu_max);
+              acc[j] = vminq_s32(relu_op[j], hi_val);
+              }
+              // Saturating cast to uint8 and store to destination.
+              int16x4_t acc_s16[4];
+              for (int j = 0; j < 4; j++) {
+                acc_s16[j] = vqmovn_s32(acc[j]);
+              }
+              const int16x8_t res_s16_0 = vcombine_s16(acc_s16[0], acc_s16[1]);
+              const int16x8_t res_s16_1 = vcombine_s16(acc_s16[2], acc_s16[3]);
+              const uint8x8_t res_u8_0 = vqmovun_s16(res_s16_0);
+              const uint8x8_t res_u8_1 = vqmovun_s16(res_s16_1);
+              vst1q_u8(output_ptr, vcombine_u8(res_u8_0, res_u8_1));
+              output_ptr += 16;
             }
-            for (int j = 0; j < 4; j++) {
-              acc[j] = RoundingDivideByPOT(acc[j], -output_shift);
-            }
-          } else {
-            // Fixed-point multiplication.
-            for (int j = 0; j < 4; j++) {
-              acc[j] = vmulq_n_s32(acc[j], multiplier_power_of_two);
-              acc[j] = vqrdmulhq_n_s32(acc[j], output_multiplier);
-            }
-          }
-          // Add the output offset.
-          for (int j = 0; j < 4; j++) {
-            acc[j] = vaddq_s32(acc[j], output_offset_vec);
-          }
-          // Apply the activation function.
-          for (int j = 0; j < 4; j++) {
-            acc[j] = vmaxq_s32(acc[j], output_activation_min_vec);
-          }
-          for (int j = 0; j < 4; j++) {
-            acc[j] = vminq_s32(acc[j], output_activation_max_vec);
-          }
-          // Saturating cast to uint8 and store to destination.
-          int16x4_t acc_s16[4];
-          for (int j = 0; j < 4; j++) {
-            acc_s16[j] = vqmovn_s32(acc[j]);
-          }
-          const int16x8_t res_s16_0 = vcombine_s16(acc_s16[0], acc_s16[1]);
-          const int16x8_t res_s16_1 = vcombine_s16(acc_s16[2], acc_s16[3]);
-          const uint8x8_t res_u8_0 = vqmovun_s16(res_s16_0);
-          const uint8x8_t res_u8_1 = vqmovun_s16(res_s16_1);
-          vst1q_u8(output_ptr, vcombine_u8(res_u8_0, res_u8_1));
-          output_ptr += 16;
-        }
-        // Handle 8 values at once.
-        // Not as good as 16 (now we're only issuing 2 mutually independent
-        // vqrdmulh instructions, so we're probably paying for their high
-        // latency).
-        for (; i <= num_output_values - 8; i += 8) {
-          int32x4_t acc0 = vld1q_s32(acc_buffer + i);
-          int32x4_t acc1 = vld1q_s32(acc_buffer + i + 4);
-          if (!shift_left) {
-            // Fixed-point multiplication.
-            acc0 = vqrdmulhq_n_s32(acc0, output_multiplier);
-            acc1 = vqrdmulhq_n_s32(acc1, output_multiplier);
-            // Rounding right shift.
-            acc0 = RoundingDivideByPOT(acc0, -output_shift);
-            acc1 = RoundingDivideByPOT(acc1, -output_shift);
-          } else {
-            // Fixed-point multiplication.
-            acc0 = vmulq_n_s32(acc0, multiplier_power_of_two);
-            acc0 = vqrdmulhq_n_s32(acc0, output_multiplier);
+          // Handle 8 values at once
+          for (; i <= num_output_values - 8; i += 8) {
+            int32x4_t acc0 = vld1q_s32(acc_buffer + i);
+            int32x4_t acc1 = vld1q_s32(acc_buffer + i + 4);
 
-            acc1 = vmulq_n_s32(acc1, multiplier_power_of_two);
-            acc1 = vqrdmulhq_n_s32(acc1, output_multiplier);
+            int32x4_t v0 = vdupq_n_s32(0);
+            int32x4_t shift_left_acc = vsubq_s32((vshlq_n_s32(v_pos_1, params.bits_to_shift - 1)), v_pos_1);
+
+            int32x4_t shift_right_acc0 = vandq_s32((vshrq_n_s32(acc0, params.bits_to_shift)), v_pos_1);
+            int32x4_t shift_right_acc1 = vandq_s32((vshrq_n_s32(acc1, params.bits_to_shift)), v_pos_1);
+            int32x4_t round_up_even_acc0 = vshrq_n_s32((vaddq_s32(vaddq_s32(shift_left_acc, shift_right_acc0), acc0)), params.bits_to_shift);
+            int32x4_t round_up_even_acc1 = vshrq_n_s32((vaddq_s32(vaddq_s32(shift_left_acc, shift_right_acc1), acc1)), params.bits_to_shift);
+
+            int32x4_t zero_check0 = vmaxq_s32(round_up_even_acc0, v0);
+            int32x4_t zero_check1 = vmaxq_s32(round_up_even_acc1, v0);
+
+            int32x4_t relu_op0 = vminq_s32(zero_check0, relu_max);
+            int32x4_t relu_op1 = vminq_s32(zero_check1, relu_max);
+            acc0 = vminq_s32(relu_op0, hi_val);
+            acc1 = vminq_s32(relu_op1, hi_val);
+
+            // Saturating cast to uint8 and store to destination.
+            const int16x4_t acc0_s16 = vqmovn_s32(acc0);
+            const int16x4_t acc1_s16 = vqmovn_s32(acc1);
+            const int16x8_t res_s16 = vcombine_s16(acc0_s16, acc1_s16);
+            const uint8x8_t res_u8 = vqmovun_s16(res_s16);
+            vst1_u8(output_ptr, res_u8);
+            output_ptr += 8;
           }
-          // Add the output offset.
-          acc0 = vaddq_s32(acc0, output_offset_vec);
-          acc1 = vaddq_s32(acc1, output_offset_vec);
-          // Apply the activation function.
-          acc0 = vmaxq_s32(acc0, output_activation_min_vec);
-          acc1 = vmaxq_s32(acc1, output_activation_min_vec);
-          acc0 = vminq_s32(acc0, output_activation_max_vec);
-          acc1 = vminq_s32(acc1, output_activation_max_vec);
-          // Saturating cast to uint8 and store to destination.
-          const int16x4_t acc0_s16 = vqmovn_s32(acc0);
-          const int16x4_t acc1_s16 = vqmovn_s32(acc1);
-          const int16x8_t res_s16 = vcombine_s16(acc0_s16, acc1_s16);
-          const uint8x8_t res_u8 = vqmovun_s16(res_s16);
-          vst1_u8(output_ptr, res_u8);
-          output_ptr += 8;
+          // Handle 4 values at once.
+          for (; i <= num_output_values - 4; i += 4) {
+            int32x4_t acc = vld1q_s32(acc_buffer + i);
+
+            int32x4_t v0 = vdupq_n_s32(0);
+            int32x4_t shift_left_val0 = vsubq_s32((vshlq_n_s32(v_pos_1, params.bits_to_shift - 1)), v_pos_1);
+            int32x4_t shift_right0 = vandq_s32((vshrq_n_s32(acc, params.bits_to_shift)), v_pos_1);
+            int32x4_t round_up_even0 = vshrq_n_s32((vaddq_s32(vaddq_s32(shift_left_val0, shift_right0), acc)), params.bits_to_shift);
+            int32x4_t zero_check0 = vmaxq_s32(round_up_even0, v0);
+            int32x4_t relu_op0 = vminq_s32(zero_check0, relu_max);
+            acc = vminq_s32(relu_op0, hi_val);
+
+            // Saturating cast to uint8 and store to destination.
+            const int16x4_t acc_s16 = vqmovn_s32(acc);
+            const int16x8_t res_s16 = vcombine_s16(acc_s16, acc_s16);
+            const uint8x8_t res_u8 = vqmovun_s16(res_s16);
+            vst1_lane_u8(output_ptr + 0, res_u8, 0);
+            vst1_lane_u8(output_ptr + 1, res_u8, 1);
+            vst1_lane_u8(output_ptr + 2, res_u8, 2);
+            vst1_lane_u8(output_ptr + 3, res_u8, 3);
+            output_ptr += 4;
+          }
         }
-        // Handle 4 values at once. Now we're paying the full price of the
-        // high latency of vqrdmulh. Also, storing only 4 bytes at the end
-        // (without any alignment) can only be done 1 byte at a time.
-        // Yet, that is still worth doing to minimize the amount of leftover
-        // that will have to go through the very slow scalar code.
-        for (; i <= num_output_values - 4; i += 4) {
-          int32x4_t acc = vld1q_s32(acc_buffer + i);
-          if (!shift_left) {
-            // Fixed-point multiplication.
-            acc = vqrdmulhq_n_s32(acc, output_multiplier);
-            // Rounding right shift.
-            acc = RoundingDivideByPOT(acc, -output_shift);
-          } else {
-            // Fixed-point multiplication.
-            acc = vmulq_n_s32(acc, multiplier_power_of_two);
-            acc = vqrdmulhq_n_s32(acc, output_multiplier);
+        else {
+            using gemmlowp::RoundingDivideByPOT;
+            const int32x4_t output_offset_vec = vdupq_n_s32(output_offset);
+            const int32x4_t output_activation_min_vec =
+                vdupq_n_s32(output_activation_min);
+            const int32x4_t output_activation_max_vec =
+                vdupq_n_s32(output_activation_max);
+            // Handle 16 values at once.
+            // This allows us to issue 4 mutually independent int32
+            // multiplications (vqrdmulh), which should alleviate most of their
+            // high latency.
+            for (; i <= num_output_values - 16; i += 16) {
+              int32x4_t acc[4];
+              for (int j = 0; j < 4; j++) {
+                acc[j] = vld1q_s32(acc_buffer + i + 4 * j);
+              }
+
+              if (!shift_left) {
+                // Fixed-point multiplication.
+                for (int j = 0; j < 4; j++) {
+                  acc[j] = vqrdmulhq_n_s32(acc[j], output_multiplier);
+                }
+                for (int j = 0; j < 4; j++) {
+                  acc[j] = RoundingDivideByPOT(acc[j], -output_shift);
+                }
+              } else {
+                // Fixed-point multiplication.
+                for (int j = 0; j < 4; j++) {
+                  acc[j] = vmulq_n_s32(acc[j], multiplier_power_of_two);
+                  acc[j] = vqrdmulhq_n_s32(acc[j], output_multiplier);
+                }
+              }
+              // Add the output offset.
+              for (int j = 0; j < 4; j++) {
+                acc[j] = vaddq_s32(acc[j], output_offset_vec);
+              }
+              // Apply the activation function.
+              for (int j = 0; j < 4; j++) {
+                acc[j] = vmaxq_s32(acc[j], output_activation_min_vec);
+              }
+              for (int j = 0; j < 4; j++) {
+                acc[j] = vminq_s32(acc[j], output_activation_max_vec);
+              }
+              // Saturating cast to uint8 and store to destination.
+              int16x4_t acc_s16[4];
+              for (int j = 0; j < 4; j++) {
+                acc_s16[j] = vqmovn_s32(acc[j]);
+              }
+              const int16x8_t res_s16_0 = vcombine_s16(acc_s16[0], acc_s16[1]);
+              const int16x8_t res_s16_1 = vcombine_s16(acc_s16[2], acc_s16[3]);
+              const uint8x8_t res_u8_0 = vqmovun_s16(res_s16_0);
+              const uint8x8_t res_u8_1 = vqmovun_s16(res_s16_1);
+              vst1q_u8(output_ptr, vcombine_u8(res_u8_0, res_u8_1));
+              output_ptr += 16;
+            }
+          // Handle 8 values at once.
+          // Not as good as 16 (now we're only issuing 2 mutually independent
+          // vqrdmulh instructions, so we're probably paying for their high
+          // latency).
+          for (; i <= num_output_values - 8; i += 8) {
+            int32x4_t acc0 = vld1q_s32(acc_buffer + i);
+            int32x4_t acc1 = vld1q_s32(acc_buffer + i + 4);
+            if (!shift_left) {
+              // Fixed-point multiplication.
+              acc0 = vqrdmulhq_n_s32(acc0, output_multiplier);
+              acc1 = vqrdmulhq_n_s32(acc1, output_multiplier);
+              // Rounding right shift.
+              acc0 = RoundingDivideByPOT(acc0, -output_shift);
+              acc1 = RoundingDivideByPOT(acc1, -output_shift);
+            } else {
+              // Fixed-point multiplication.
+              acc0 = vmulq_n_s32(acc0, multiplier_power_of_two);
+              acc0 = vqrdmulhq_n_s32(acc0, output_multiplier);
+
+              acc1 = vmulq_n_s32(acc1, multiplier_power_of_two);
+              acc1 = vqrdmulhq_n_s32(acc1, output_multiplier);
+            }
+            // Add the output offset.
+            acc0 = vaddq_s32(acc0, output_offset_vec);
+            acc1 = vaddq_s32(acc1, output_offset_vec);
+            // Apply the activation function.
+            acc0 = vmaxq_s32(acc0, output_activation_min_vec);
+            acc1 = vmaxq_s32(acc1, output_activation_min_vec);
+            acc0 = vminq_s32(acc0, output_activation_max_vec);
+            acc1 = vminq_s32(acc1, output_activation_max_vec);
+            // Saturating cast to uint8 and store to destination.
+            const int16x4_t acc0_s16 = vqmovn_s32(acc0);
+            const int16x4_t acc1_s16 = vqmovn_s32(acc1);
+            const int16x8_t res_s16 = vcombine_s16(acc0_s16, acc1_s16);
+            const uint8x8_t res_u8 = vqmovun_s16(res_s16);
+            vst1_u8(output_ptr, res_u8);
+            output_ptr += 8;
           }
-          // Add the output offset.
-          acc = vaddq_s32(acc, output_offset_vec);
-          // Apply the activation function.
-          acc = vmaxq_s32(acc, output_activation_min_vec);
-          acc = vminq_s32(acc, output_activation_max_vec);
-          // Saturating cast to uint8 and store to destination.
-          const int16x4_t acc_s16 = vqmovn_s32(acc);
-          const int16x8_t res_s16 = vcombine_s16(acc_s16, acc_s16);
-          const uint8x8_t res_u8 = vqmovun_s16(res_s16);
-          vst1_lane_u8(output_ptr + 0, res_u8, 0);
-          vst1_lane_u8(output_ptr + 1, res_u8, 1);
-          vst1_lane_u8(output_ptr + 2, res_u8, 2);
-          vst1_lane_u8(output_ptr + 3, res_u8, 3);
-          output_ptr += 4;
+          // Handle 4 values at once. Now we're paying the full price of the
+          // high latency of vqrdmulh. Also, storing only 4 bytes at the end
+          // (without any alignment) can only be done 1 byte at a time.
+          // Yet, that is still worth doing to minimize the amount of leftover
+          // that will have to go through the very slow scalar code.
+          for (; i <= num_output_values - 4; i += 4) {
+            int32x4_t acc = vld1q_s32(acc_buffer + i);
+            if (!shift_left) {
+              // Fixed-point multiplication.
+              acc = vqrdmulhq_n_s32(acc, output_multiplier);
+              // Rounding right shift.
+              acc = RoundingDivideByPOT(acc, -output_shift);
+            } else {
+              // Fixed-point multiplication.
+              acc = vmulq_n_s32(acc, multiplier_power_of_two);
+              acc = vqrdmulhq_n_s32(acc, output_multiplier);
+            }
+            // Add the output offset.
+            acc = vaddq_s32(acc, output_offset_vec);
+            // Apply the activation function.
+            acc = vmaxq_s32(acc, output_activation_min_vec);
+            acc = vminq_s32(acc, output_activation_max_vec);
+            // Saturating cast to uint8 and store to destination.
+            const int16x4_t acc_s16 = vqmovn_s32(acc);
+            const int16x8_t res_s16 = vcombine_s16(acc_s16, acc_s16);
+            const uint8x8_t res_u8 = vqmovun_s16(res_s16);
+            vst1_lane_u8(output_ptr + 0, res_u8, 0);
+            vst1_lane_u8(output_ptr + 1, res_u8, 1);
+            vst1_lane_u8(output_ptr + 2, res_u8, 2);
+            vst1_lane_u8(output_ptr + 3, res_u8, 3);
+            output_ptr += 4;
+          }
         }
 #endif  // USE_NEON
 
         // Handle leftover values, one by one. This is very slow.
         for (; i < num_output_values; i++) {
           int32 acc = acc_buffer[i];
-          acc = MultiplyByQuantizedMultiplier(acc, output_multiplier,
-                                              output_shift);
-          acc += output_offset;
-          acc = std::max(acc, output_activation_min);
-          acc = std::min(acc, output_activation_max);
+          if(ev_quant) {
+            acc = StoreAcc(acc, bits_to_shift, relu_max);
+          }
+          else {
+            acc = MultiplyByQuantizedMultiplier(acc, output_multiplier,
+                                                output_shift);
+            acc += output_offset;
+            acc = std::max(acc, output_activation_min);
+            acc = std::min(acc, output_activation_max);
+          }
           *output_ptr++ = static_cast<uint8>(acc);
         }
       }
@@ -2002,6 +2126,9 @@ inline void DepthwiseConvWithRounding(
   TFLITE_DCHECK_LE(output_activation_min, output_activation_max);
   const int output_depth = MatchingDim(filter_shape, 3, output_shape, 3);
   const int input_depth = input_shape.Dims(3);
+  const int bits_to_shift = params.bits_to_shift;
+  const int relu_max = params.relu_max;
+  const bool ev_quant = params.ev_quant;
   TFLITE_DCHECK_EQ(output_depth, input_depth * depth_multiplier);
   TFLITE_DCHECK_EQ(bias_shape.FlatSize(), output_depth);
 

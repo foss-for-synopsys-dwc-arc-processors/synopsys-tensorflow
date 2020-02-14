@@ -765,7 +765,7 @@ TfLiteRegistration* Register_CONV_2D() {
   // tflite_with_ruy optimizes the generic kernel type.
   return Register_CONVOLUTION_GENERIC_OPT();
 #else
-  return Register_CONVOLUTION_REF(); //Register_CONVOLUTION_MULTITHREADED_OPT();
+  return Register_CONVOLUTION_MULTITHREADED_OPT(); //Register_CONVOLUTION_REF();
 #endif
 }
 

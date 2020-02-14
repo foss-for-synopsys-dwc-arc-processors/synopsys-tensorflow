@@ -105,10 +105,25 @@ struct GemmImplUsingGemmlowp<
     SaturatingCastStageType saturating_cast_stage;
     auto output_pipeline = std::make_tuple(bias_addition_stage, scale_stage,
                                            clamp_stage, saturating_cast_stage);
+
+    gemmlowp::EVRoundUpEven round_stage;
+    round_stage.bits_to_shift = params.bits_to_shift;
+    round_stage.relu_max = params.relu_max;
+    auto ev_output_pipeline = std::make_tuple(bias_addition_stage, round_stage,
+                                             saturating_cast_stage);
+
     using BitDepthParams = typename GemmlowpBitDepthParams<SrcScalar>::Type;
-    gemmlowp::GemmWithOutputPipeline<SrcScalar, DstScalar, BitDepthParams>(
-        context->gemmlowp_context(), gemmlowp_lhs, gemmlowp_rhs, &gemmlowp_dst,
-        -lhs_params.zero_point, -rhs_params.zero_point, output_pipeline);
+    if(params.ev_quant)
+    {
+        gemmlowp::GemmWithOutputPipeline<SrcScalar, DstScalar, BitDepthParams>(
+          context->gemmlowp_context(), gemmlowp_lhs, gemmlowp_rhs, &gemmlowp_dst,
+            -lhs_params.zero_point, -rhs_params.zero_point, ev_output_pipeline);
+    }
+    else {
+        gemmlowp::GemmWithOutputPipeline<SrcScalar, DstScalar, BitDepthParams>(
+            context->gemmlowp_context(), gemmlowp_lhs, gemmlowp_rhs, &gemmlowp_dst,
+            -lhs_params.zero_point, -rhs_params.zero_point, output_pipeline);
+    }
   }
 };
 
@@ -137,7 +152,6 @@ struct GemmImplUsingGemmlowp<LhsScalar, RhsScalar, AccumScalar, DstScalar,
         gemmlowp_rhs(rhs_data, rhs_params.rows, rhs_params.cols);
     gemmlowp::MatrixMap<DstScalar, gemmlowp::MapOrder::ColMajor> gemmlowp_dst(
         dst_data, dst_params.rows, dst_params.cols);
-
     using ColVectorMap =
         gemmlowp::VectorMap<const int32, gemmlowp::VectorShape::Col>;
     ColVectorMap bias_vector(params.bias, lhs_params.rows);
