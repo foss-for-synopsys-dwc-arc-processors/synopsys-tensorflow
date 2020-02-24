@@ -163,13 +163,8 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
                   int32 filter_val =
                       filter_data[Offset(filter_shape, out_channel, filter_y,
                                          filter_x, in_channel)];
-                  if(ev_quant) {
-                    acc +=
-                      (filter_val + filter_offset) * (input_val);
-                  }
-                  else {
-                    acc += (filter_val + filter_offset) * (input_val + input_offset);
-                  }
+                  acc +=
+                      (filter_val + filter_offset) * (input_val + input_offset);
                 }
               }
             }
@@ -183,10 +178,10 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
          else {
            acc = MultiplyByQuantizedMultiplier(acc, output_multiplier,
                                               output_shift);
-           acc += output_offset;
-           acc = std::max(acc, output_activation_min);
-           acc = std::min(acc, output_activation_max);
          }
+         acc += output_offset;
+         acc = std::max(acc, output_activation_min);
+         acc = std::min(acc, output_activation_max);
          output_data[Offset(output_shape, batch, out_y, out_x, out_channel)] =
               static_cast<uint8>(acc);
         }

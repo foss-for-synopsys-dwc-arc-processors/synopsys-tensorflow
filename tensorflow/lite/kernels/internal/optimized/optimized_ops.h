@@ -1219,11 +1219,6 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
   TFLITE_DCHECK_EQ(input_shape.DimensionsCount(), 4);
   TFLITE_DCHECK_EQ(filter_shape.DimensionsCount(), 4);
   TFLITE_DCHECK_EQ(output_shape.DimensionsCount(), 4);
-
-  if(params.ev_quant) {
-    input_offset = 0;
-    output_offset = 0;
-  }
   const uint8* gemm_input_data = nullptr;
   const RuntimeShape* gemm_input_shape = nullptr;
   const int filter_width = filter_shape.Dims(2);
