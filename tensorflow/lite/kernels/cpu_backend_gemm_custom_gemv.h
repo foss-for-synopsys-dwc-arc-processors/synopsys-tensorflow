@@ -544,20 +544,14 @@ struct CustomGemvImpl<LhsScalar, RhsScalar, std::int32_t, DstScalar,
       reduced = vaddq_s32(reduced, bias_vec);
 
       if (params.ev_quant) {
-        const int pixelsize = 8;
-        int32x4_t relu_max = vdupq_n_s32(params.relu_max);
-        int32x4_t high_val = vdupq_n_s32((1 << pixelsize) - 1);
-        int32x4_t v_0 = vdupq_n_s32(0);
         int32x4_t v_pos_1 = vdupq_n_s32(1);
         int32x4_t shift_left = vsubq_s32((vshlq_n_s32(v_pos_1, params.bits_to_shift - 1)), v_pos_1);
         int32x4_t shift_right = vandq_s32((vshrq_n_s32(reduced, params.bits_to_shift)), v_pos_1);
         int32x4_t round_up_even = vshrq_n_s32((vaddq_s32(vaddq_s32(shift_left, shift_right), reduced)), params.bits_to_shift);
-        int32x4_t acc = vmaxq_s32(round_up_even, v_0);
-        int32x4_t relu_op = vminq_s32(acc, relu_max);
-        int32x4_t result = vminq_s32(relu_op, high_val);
+
         // Add the output offset.
         const int32x4_t output_offset_vec = vdupq_n_s32(dst_params.zero_point);
-        reduced = vaddq_s32(result, output_offset_vec);
+        reduced = vaddq_s32(round_up_even, output_offset_vec);
         ClampAndStore(reduced, params.clamp_min, params.clamp_max,
                       dst_data + row);
       }

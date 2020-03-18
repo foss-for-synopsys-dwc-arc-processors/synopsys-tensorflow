@@ -105,7 +105,7 @@ TfLiteStatus PopulateConvolutionQuantizationParams(
     const TfLiteTensor* filter, const TfLiteTensor* bias, TfLiteTensor* output,
     const TfLiteFusedActivation& activation, int32_t* multiplier, int* shift,
     int32_t* output_activation_min, int32_t* output_activation_max,
-    int32_t* per_channel_multiplier, int* per_channel_shift, int* bits_to_shift, int* relu_max);
+    int32_t* per_channel_multiplier, int* per_channel_shift, int* bits_to_shift);
 
 // QuantizedMultiplier with the guard that shift will not be smaller than -31.
 void GuardedQuantizeMultiplier(double effective_output_scale,
@@ -145,9 +145,6 @@ void BitsToShift(TfLiteContext* context,
                  const TfLiteTensor* filter,
                  TfLiteTensor* output,
                  int* bits);
-void FindReluMax(TfLiteContext* context,
-                 TfLiteTensor* output,
-                 int* relumax);
 // Calculates the useful range of an activation layer given its activation
 // tensor.a
 template <typename T>

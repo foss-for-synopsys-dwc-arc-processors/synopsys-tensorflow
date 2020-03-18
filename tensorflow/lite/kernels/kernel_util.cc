@@ -40,7 +40,7 @@ TfLiteStatus PopulateConvolutionQuantizationParams(
     const TfLiteTensor* filter, const TfLiteTensor* bias, TfLiteTensor* output,
     const TfLiteFusedActivation& activation, int32_t* multiplier, int* shift,
     int32_t* output_activation_min, int32_t* output_activation_max,
-    int32_t* per_channel_multiplier, int* per_channel_shift, int* bits_to_shift, int* relu_max) {
+    int32_t* per_channel_multiplier, int* per_channel_shift, int* bits_to_shift) {
   TF_LITE_ENSURE_EQ(context, input->quantization.type,
                     kTfLiteAffineQuantization);
   TF_LITE_ENSURE_EQ(context, filter->quantization.type,
@@ -97,7 +97,6 @@ TfLiteStatus PopulateConvolutionQuantizationParams(
     QuantizeMultiplier(real_multiplier, multiplier, &exponent);
     *shift = -exponent;
     BitsToShift(context, input, filter, output, bits_to_shift);
-    FindReluMax(context, output, relu_max);
     CalculateActivationRangeUint8(activation, output, output_activation_min,
                                   output_activation_max);
   }
@@ -217,13 +216,6 @@ void BitsToShift(TfLiteContext* context,
   const double abs_act_max = std::max(-output->params.min, output->params.max);
   const double multiplier = (1/input->params.scale) * (1/filter->params.scale) * abs_act_max;
   *bits = (std::ceil(log2(multiplier))) - num_bits;
-}
-
-void FindReluMax(TfLiteContext* context,
-                 TfLiteTensor* output,
-                 int* relumax) {
-  const double abs_act_max = std::max(-output->params.min, output->params.max);
-  *relumax = std::round((1/output->params.scale) * abs_act_max);
 }
 
 bool HaveSameShapes(const TfLiteTensor* input1, const TfLiteTensor* input2) {

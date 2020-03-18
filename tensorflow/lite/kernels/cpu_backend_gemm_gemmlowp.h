@@ -108,7 +108,6 @@ struct GemmImplUsingGemmlowp<
 
     gemmlowp::EVRoundUpEven round_stage;
     round_stage.bits_to_shift = params.bits_to_shift;
-    round_stage.relu_max = params.relu_max;
     round_stage.output_offset = dst_params.zero_point;
 
     auto ev_output_pipeline = std::make_tuple(bias_addition_stage, round_stage,
