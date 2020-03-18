@@ -56,6 +56,8 @@ struct OpData {
   // uint8_t these would be 0 and 255.
   int32_t output_activation_min;
   int32_t output_activation_max;
+  int bits_to_shift;
+  int ev_quant;
   // The index of the temporary tensor where the quantized inputs are cached.
   int scratch_tensor_index;
 };
@@ -173,6 +175,7 @@ TfLiteStatus Prepare(TfLiteContext* context, TfLiteNode* node) {
     int exponent;
     QuantizeMultiplier(real_multiplier, &data->output_multiplier, &exponent);
     data->output_shift = exponent;
+    BitsToShift(context, input, filter, output,  &data->bits_to_shift);
     TF_LITE_ENSURE_STATUS(CalculateActivationRangeQuantized(
         context, params->activation, output, &data->output_activation_min,
         &data->output_activation_max));
@@ -355,6 +358,7 @@ TfLiteStatus EvalQuantized(TfLiteContext* context, TfLiteNode* node,
   int32_t input_offset = -input->params.zero_point;
   int32_t filter_offset = -filter->params.zero_point;
   int32_t output_offset = output->params.zero_point;
+  bool ev_quant = node->ev_quant;
   // Only the Pie path supports quantized models and float inputs/outputs.
   if (input->type == kTfLiteFloat32) {
     TfLiteTensor* input_quantized = GetTemporary(context, node, /*index=*/0);
@@ -370,6 +374,8 @@ TfLiteStatus EvalQuantized(TfLiteContext* context, TfLiteNode* node,
     op_params.output_shift = data->output_shift;
     op_params.quantized_activation_min = data->output_activation_min;
     op_params.quantized_activation_max = data->output_activation_max;
+    op_params.bits_to_shift = data->bits_to_shift;
+    op_params.ev_quant = ev_quant;
     switch (output->type) {
       case kTfLiteUInt8:
         if (kernel_type == kReference) {
@@ -579,7 +585,7 @@ TfLiteRegistration* Register_FULLY_CONNECTED_PIE() {
 }
 
 TfLiteRegistration* Register_FULLY_CONNECTED() {
-  return Register_FULLY_CONNECTED_GENERIC_OPT();
+  return Register_FULLY_CONNECTED_GENERIC_OPT();//Register_FULLY_CONNECTED_REF();
 }
 
 }  // namespace builtin

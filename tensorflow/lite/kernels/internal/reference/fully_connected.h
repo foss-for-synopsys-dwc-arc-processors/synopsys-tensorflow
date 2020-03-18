@@ -74,6 +74,8 @@ inline void FullyConnected(
   const int output_shift = params.output_shift;
   const int32 output_activation_min = params.quantized_activation_min;
   const int32 output_activation_max = params.quantized_activation_max;
+  const bool ev_quant = params.ev_quant;
+  const int bits_to_shift = params.bits_to_shift;
   TFLITE_DCHECK_GE(filter_shape.DimensionsCount(), 2);
   TFLITE_DCHECK_GE(output_shape.DimensionsCount(), 1);
 
@@ -100,7 +102,12 @@ inline void FullyConnected(
       if (bias_data) {
         acc += bias_data[out_c];
       }
-      acc = MultiplyByQuantizedMultiplier(acc, output_multiplier, output_shift);
+      if(ev_quant) {
+        acc = StoreAcc(acc, bits_to_shift);
+      }
+      else {
+        acc = MultiplyByQuantizedMultiplier(acc, output_multiplier, output_shift);
+      }
       acc += output_offset;
       acc = std::max(acc, output_activation_min);
       acc = std::min(acc, output_activation_max);

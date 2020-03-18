@@ -218,7 +218,7 @@ def tf_workspace(path_prefix = "", tf_repo_name = ""):
 
     tf_http_archive(
         name = "gemmlowp",
-        sha256 = "e63f261ff6a4341ea3ebbf1b6e1a6bceacf34c2bacbf70f71eda5908e9a2cc0d",
+        sha256 = "fb73b4d3b059997719e588a08d1c6ce0cdb6b23f4d1bea7b166cee9f3b99a640",
         strip_prefix = "gemmlowp",
         urls = [
             "https://github.com/SowmyaDhanapal/tensorflow/raw/r1.14/dependencies/gemmlowp.zip"

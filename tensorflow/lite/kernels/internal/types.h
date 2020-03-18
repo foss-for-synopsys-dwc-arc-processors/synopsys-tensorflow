@@ -861,6 +861,8 @@ struct FullyConnectedParams {
   // float activation params.
   float float_activation_min;
   float float_activation_max;
+  int bits_to_shift;
+  int ev_quant;
   FullyConnectedWeightsFormat weights_format;
 };
 
