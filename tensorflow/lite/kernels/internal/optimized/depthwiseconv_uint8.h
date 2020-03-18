@@ -958,8 +958,6 @@ struct QuantizedDepthwiseConvKernel<true, 0, 1> {
                   int16 filter_offset, int32* acc_buffer_ptr,
                   int bits_to_shift, int relu_max, bool ev_quant) {
     // Handle one output pixel at a time.
-    if(ev_quant)
-      input_offset = 0;
     for (int outp = 0; outp < num_output_pixels; outp++) {
       const uint8* local_filter_ptr = filter_ptr;
       const uint8* local_input_ptr = input_ptr;
@@ -1875,6 +1873,11 @@ inline void DepthwiseConvGeneral(
             const int32x4_t hi_val = vdupq_n_s32((1<<pixelsize)-1);
             int32x4_t shift_left_val[4], shift_right[4];
             int32x4_t round_up_even[4], zero_check[4], relu_op[4];
+            const int32x4_t output_offset_vec = vdupq_n_s32(output_offset);
+            const int32x4_t output_activation_min_vec =
+                vdupq_n_s32(output_activation_min);
+            const int32x4_t output_activation_max_vec =
+                vdupq_n_s32(output_activation_max);
 
             for (; i <= num_output_values - 16; i += 16) {
               int32x4_t acc[4];
@@ -1889,6 +1892,19 @@ inline void DepthwiseConvGeneral(
               relu_op[j] = vminq_s32(zero_check[j], relu_max);
               acc[j] = vminq_s32(relu_op[j], hi_val);
               }
+
+              // Add the output offset.
+              for (int j = 0; j < 4; j++) {
+                acc[j] = vaddq_s32(acc[j], output_offset_vec);
+              }
+              // Apply the activation function.
+              for (int j = 0; j < 4; j++) {
+                acc[j] = vmaxq_s32(acc[j], output_activation_min_vec);
+              }
+              for (int j = 0; j < 4; j++) {
+                acc[j] = vminq_s32(acc[j], output_activation_max_vec);
+              }
+
               // Saturating cast to uint8 and store to destination.
               int16x4_t acc_s16[4];
               for (int j = 0; j < 4; j++) {
@@ -1922,6 +1938,15 @@ inline void DepthwiseConvGeneral(
             acc0 = vminq_s32(relu_op0, hi_val);
             acc1 = vminq_s32(relu_op1, hi_val);
 
+            // Add the output offset.
+            acc0 = vaddq_s32(acc0, output_offset_vec);
+            acc1 = vaddq_s32(acc1, output_offset_vec);
+            // Apply the activation function.
+            acc0 = vmaxq_s32(acc0, output_activation_min_vec);
+            acc1 = vmaxq_s32(acc1, output_activation_min_vec);
+            acc0 = vminq_s32(acc0, output_activation_max_vec);
+            acc1 = vminq_s32(acc1, output_activation_max_vec);
+
             // Saturating cast to uint8 and store to destination.
             const int16x4_t acc0_s16 = vqmovn_s32(acc0);
             const int16x4_t acc1_s16 = vqmovn_s32(acc1);
@@ -1941,6 +1966,12 @@ inline void DepthwiseConvGeneral(
             int32x4_t zero_check0 = vmaxq_s32(round_up_even0, v0);
             int32x4_t relu_op0 = vminq_s32(zero_check0, relu_max);
             acc = vminq_s32(relu_op0, hi_val);
+
+            // Add the output offset.
+            acc = vaddq_s32(acc, output_offset_vec);
+            // Apply the activation function.
+            acc = vmaxq_s32(acc, output_activation_min_vec);
+            acc = vminq_s32(acc, output_activation_max_vec);
 
             // Saturating cast to uint8 and store to destination.
             const int16x4_t acc_s16 = vqmovn_s32(acc);
@@ -2090,10 +2121,10 @@ inline void DepthwiseConvGeneral(
           else {
             acc = MultiplyByQuantizedMultiplier(acc, output_multiplier,
                                                 output_shift);
-            acc += output_offset;
-            acc = std::max(acc, output_activation_min);
-            acc = std::min(acc, output_activation_max);
           }
+          acc += output_offset;
+          acc = std::max(acc, output_activation_min);
+          acc = std::min(acc, output_activation_max);
           *output_ptr++ = static_cast<uint8>(acc);
         }
       }

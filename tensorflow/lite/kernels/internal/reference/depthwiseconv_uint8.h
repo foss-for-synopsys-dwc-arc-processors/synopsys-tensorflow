@@ -167,14 +167,8 @@ struct DepthwiseConvBasicKernel {
                         input_data[Offset(input_shape, b, in_y, in_x, ic)];
                     int32 filter_val = filter_data[Offset(
                         filter_shape, 0, filter_y, filter_x, oc)];
-                    if(ev_quant) {
-                      acc += (filter_val + filter_offset) *
-                           (input_val);
-                    }
-                    else {
-                      acc += (filter_val + filter_offset) *
+                    acc += (filter_val + filter_offset) *
                            (input_val + input_offset);
-                    }
                   }
                 }
               }
@@ -183,11 +177,9 @@ struct DepthwiseConvBasicKernel {
               }
               acc = DepthwiseConvRound<output_rounding>(acc, output_multiplier,
                                                         output_shift, bits_to_shift, relu_max, ev_quant);
-              if(!ev_quant) {
-                acc += output_offset;
-                acc = std::max(acc, output_activation_min);
-                acc = std::min(acc, output_activation_max);
-              }
+              acc += output_offset;
+              acc = std::max(acc, output_activation_min);
+              acc = std::min(acc, output_activation_max);
               output_data[Offset(output_shape, b, out_y, out_x, oc)] =
                   static_cast<uint8>(acc);
             }

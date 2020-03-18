@@ -272,40 +272,6 @@ inline void ClampAndStore(int32x4_t src, std::int16_t clamp_min,
   vst1_lane_s16(dst + 3, res16, 3);
 }
 
-inline void Store(int32x4_t src, std::uint8_t* dst) {
-  // Narrow values down to 16 bit signed.
-  const int16x4_t res16 = vqmovn_s32(src);
-  // Narrow values down to 8 bit unsigned, saturating.
-  uint8x8_t res8 = vqmovun_s16(vcombine_s16(res16, res16));
-  // Store results to destination.
-  vst1_lane_u8(dst + 0, res8, 0);
-  vst1_lane_u8(dst + 1, res8, 1);
-  vst1_lane_u8(dst + 2, res8, 2);
-  vst1_lane_u8(dst + 3, res8, 3);
-}
-
-inline void Store(int32x4_t src,  std::int8_t* dst) {
-  // Narrow values down to 16 bit signed.
-  const int16x4_t res16 = vqmovn_s32(src);
-  // Narrow values down to 8 bit unsigned, saturating.
-  int8x8_t res8 = vqmovn_s16(vcombine_s16(res16, res16));
-  // Store results to destination.
-  vst1_lane_s8(dst + 0, res8, 0);
-  vst1_lane_s8(dst + 1, res8, 1);
-  vst1_lane_s8(dst + 2, res8, 2);
-  vst1_lane_s8(dst + 3, res8, 3);
-}
-
-inline void Store(int32x4_t src, std::int16_t* dst) {
-  // Narrow values down to 16 bit signed.
-  int16x4_t res16 = vqmovn_s32(src);
-  // Store results to destination.
-  vst1_lane_s16(dst + 0, res16, 0);
-  vst1_lane_s16(dst + 1, res16, 1);
-  vst1_lane_s16(dst + 2, res16, 2);
-  vst1_lane_s16(dst + 3, res16, 3);
-}
-
 template <typename LhsScalar, typename RhsScalar, typename DstScalar,
           QuantizationFlavor quantization_flavor>
 struct CustomGemvImpl<LhsScalar, RhsScalar, std::int32_t, DstScalar,
@@ -395,15 +361,8 @@ struct CustomGemvImpl<LhsScalar, RhsScalar, std::int32_t, DstScalar,
       // at a time. This allows for decent NEON implementation.
       for (; in <= lhs_params.cols - 16; in += 16) {
         const LhsScalar* local_filter_ptr = filter_ptr;
-        int16x8x2_t input_val;
-        if(params.ev_quant) {
-            input_val =
-                Load16AndSubtractZeroPoint(rhs_data + in, 0);
-        }
-        else {
-            input_val =
-                Load16AndSubtractZeroPoint(rhs_data + in, rhs_params.zero_point);
-        }
+        int16x8x2_t input_val =
+            Load16AndSubtractZeroPoint(rhs_data + in, rhs_params.zero_point);
         int16x8x2_t filter_val_0 =
             Load16AndSubtractZeroPoint(local_filter_ptr, lhs_params.zero_point);
         optimized_ops_preload_l1_stream(local_filter_ptr +
@@ -459,15 +418,8 @@ struct CustomGemvImpl<LhsScalar, RhsScalar, std::int32_t, DstScalar,
       }
       // Less that 16 values remain. Try to handle 8 more.
       if (in <= lhs_params.cols - 8) {
-        int16x8_t input_val;
-        if(params.ev_quant) {
-            input_val =
-                Load8AndSubtractZeroPoint(rhs_data + in, 0);
-        }
-        else {
-            input_val =
-                Load8AndSubtractZeroPoint(rhs_data + in, rhs_params.zero_point);
-        }
+        int16x8_t input_val  =
+            Load8AndSubtractZeroPoint(rhs_data + in, rhs_params.zero_point);
         int16x8_t filter_val_0 = Load8AndSubtractZeroPoint(
             filter_ptr + 0 * lhs_params.cols, lhs_params.zero_point);
         int16x8_t filter_val_1 = Load8AndSubtractZeroPoint(
@@ -508,15 +460,8 @@ struct CustomGemvImpl<LhsScalar, RhsScalar, std::int32_t, DstScalar,
         TFLITE_DCHECK_GE(back, 1);
         TFLITE_DCHECK_LE(back, 7);
         // Load 8 values as usual.
-        int16x8_t input_val;
-        if(params.ev_quant) {
-            input_val = Load8AndSubtractZeroPoint(
-                rhs_data + lhs_params.cols - 8, 0);
-        }
-        else {
-            input_val = Load8AndSubtractZeroPoint(
-                rhs_data + lhs_params.cols - 8, rhs_params.zero_point);
-        }
+        int16x8_t input_val = Load8AndSubtractZeroPoint(
+            rhs_data + lhs_params.cols - 8, rhs_params.zero_point);
         const LhsScalar* local_filter_ptr = filter_ptr - back;
         filter_ptr += lhs_params.cols - in;
         int16x8_t filter_val_0 =
@@ -610,7 +555,11 @@ struct CustomGemvImpl<LhsScalar, RhsScalar, std::int32_t, DstScalar,
         int32x4_t acc = vmaxq_s32(round_up_even, v_0);
         int32x4_t relu_op = vminq_s32(acc, relu_max);
         int32x4_t result = vminq_s32(relu_op, high_val);
-        Store(result, dst_data + row);
+        // Add the output offset.
+        const int32x4_t output_offset_vec = vdupq_n_s32(dst_params.zero_point);
+        reduced = vaddq_s32(result, output_offset_vec);
+        ClampAndStore(reduced, params.clamp_min, params.clamp_max,
+                      dst_data + row);
       }
       else {
         // Get multiplier parameters.
