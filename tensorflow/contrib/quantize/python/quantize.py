@@ -43,7 +43,8 @@ _INTERMEDIATE_OP = {'Add', 'Mul'}
 _PASS_THROUGH_OP = {'Reshape', 'Identity', 'BatchToSpaceND', 'SpaceToBatchND'}
 _VALID_ACTIVATION_OP = {'Relu', 'Relu6'}
 
-_INPUT_OP_TYPES = {'FakeQuantWithMinMaxVars', 'Relu', 'Relu6'}
+_BY_PASS_OP = {'Relu', 'Relu6', 'MaxPool'}
+_INPUT_OP_TYPES = {'FakeQuantWithMinMaxVars', 'Relu', 'Relu6', 'MaxPool'}
 
 def Quantize(graph,
              is_training,
@@ -273,9 +274,9 @@ def Quantize(graph,
       if(node.op in _QUANTIZABLE_TYPES):
         if(node.input[0] in act_quant.keys()):
             act_quant[node.input[0]].append(node.name)
-      elif(node.op in _RELU_TYPES):#Relu taking input from fakequant node
+      elif(node.op in _BY_PASS_OP):#Relu/MaxPool taking input from fakequant node
         if(node.input[0] in act_quant.keys()):
-          for nxt_node in graph_def.node:#So another loop to figure out the corresponding Fakequant node to Relu (to get ip scale, weight_scale)
+          for nxt_node in graph_def.node:#So another loop to figure out the corresponding Fakequant node to Relu, MaxPool (to get ip scale, weight_scale)
             if(nxt_node.op in _QUANTIZABLE_TYPES):
               if(node.name in nxt_node.input[0]):
                 act_quant[node.input[0]].append(nxt_node.name)
@@ -285,21 +286,22 @@ def Quantize(graph,
     for node in graph_def.node: #Creating individual weight scale node whenever multiple nodes share the same input node.
       if(node.op in _QUANTIZABLE_TYPES):
         for in_node in graph_def.node:
-          if(((graph.get_operation_by_name(node.input[0]).op_def.name in _INPUT_OP_TYPES) and (graph.get_operation_by_name(node.input[1]).op_def.name in _INPUT_OP_TYPES)) and (in_node.name == node.input[1])):
-            if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2"):
-              sub_name = node.input[0].split("/FakeQuantWithMinMaxVars")[0]
+          if(((graph.get_operation_by_name(node.input[0]).op_def.name in _INPUT_OP_TYPES) and (graph.get_operation_by_name(node.input[1]).op_def.name in _INPUT_OP_TYPES)) and (in_node.name == node.input[1])): #To check if weight_quant Node is the input to the Quantizable nodes.
+            if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2"): #To check if weight_quant takes scales from previous act_quant node
+              sub_name = node.input[0].split("/FakeQuantWithMinMaxVars")[0] #To get input name from the Quantizable node (Conv,FC,DepthConv)
               for inner_node in graph_def.node:
-                if(sub_name in inner_node.name and inner_node.op in _RELU_TYPES):
+                if(sub_name in inner_node.name and inner_node.op in _BY_PASS_OP): #Another loop to figure out the act_quant name from the above sub_name
                   sub_name = inner_node.input[0].split("/FakeQuantWithMinMaxVars")[0]
               if((sub_name not in in_node.input[3] and sub_name not in in_node.input[4]) and (in_node.input[3] != "w_scale/read" and in_node.input[4] != "ip_scale/read")):
+                # To reroute ip_scales
                 src_tensor = graph.get_tensor_by_name(sub_name+"/ip_scale_1:0")
                 dst_tensor = graph.get_tensor_by_name(in_node.input[4]+":0")
                 common.RerouteTensor(src_tensor, dst_tensor)
-                if(sub_name in str(act_quant.keys())):
+                if(sub_name in str(act_quant.keys())): #To create individual copy for w_scale (for branching points)
                   w_scale_new = tf.Variable(initial_value=0.0, trainable=False,  name=in_node.name.split("/weights_quant/FakeQuantWithMinMaxVars")[0]+"/w_scale_2")
                   common.RerouteTensor(
                          graph.get_tensor_by_name(in_node.name.split("/weights_quant/FakeQuantWithMinMaxVars")[0]+"/w_scale_2:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
-                else:
+                else: #To reroute w_scale without creating a copy
                   common.RerouteTensor(
                            graph.get_tensor_by_name(sub_name+"/w_scale_1:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
 
