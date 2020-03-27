@@ -383,14 +383,14 @@ bool ChooseQuantizationForOperatorOutput(
     }
     return true;
   }
-
   if ((op.type == OperatorType::kConcatenation &&
        model->flags.change_concat_input_ranges()) ||
       op.type == OperatorType::kDepthToSpace ||
       op.type == OperatorType::kSpaceToDepth ||
       op.type == OperatorType::kReshape || op.type == OperatorType::kSplit ||
       op.type == OperatorType::kRelu || op.type == OperatorType::kRelu1 ||
-      op.type == OperatorType::kRelu6 || op.type == OperatorType::kPRelu) {
+      op.type == OperatorType::kRelu6 || op.type == OperatorType::kPRelu ||
+      (op.type == OperatorType::kPad && model->flags.ev_quant())) {
     int data_input_index = 0;
     if (op.type == OperatorType::kSplit) {
       data_input_index = 1;

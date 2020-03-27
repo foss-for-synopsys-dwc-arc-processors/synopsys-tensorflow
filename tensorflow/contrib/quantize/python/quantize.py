@@ -268,7 +268,7 @@ def Quantize(graph,
     act_quant = {}
     for node in graph_def.node: #Searching for all the activation nodes and save the name as 'key' in a dictionary
       if(node.op in _QUANTIZATION_OP):
-        if(("act_quant/FakeQuantWithMinMaxVars" in node.name) or ("activation_"+node.op+"_quant/FakeQuantWithMinMaxVars" in node.name)):
+        if(("act_quant/FakeQuantWithMinMaxVars" in node.name) or ("activation_" in node.name)):
           act_quant[node.name] = []
     for node in graph_def.node: #Filling dict 'values' with list of nodes getting inputs from 'key'
       if(node.op in _QUANTIZABLE_TYPES):
