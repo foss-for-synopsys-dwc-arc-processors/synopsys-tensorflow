@@ -291,6 +291,8 @@ inline void FullyConnected(
   gemm_params.clamp_max = output_activation_max;
   gemm_params.multiplier_fixedpoint = output_multiplier;
   gemm_params.multiplier_exponent = output_shift;
+  gemm_params.bits_to_shift = params.bits_to_shift;
+  gemm_params.ev_quant = params.ev_quant;
   cpu_backend_gemm::Gemm(lhs_params, filter_data, rhs_params, input_data,
                          dst_params, output_data, gemm_params,
                          cpu_backend_context);
@@ -1296,7 +1298,6 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
   gemm_params.multiplier_fixedpoint = output_multiplier;
   gemm_params.multiplier_exponent = output_shift;
   gemm_params.bits_to_shift = params.bits_to_shift;
-  gemm_params.relu_max = params.relu_max;
   gemm_params.ev_quant = params.ev_quant;
   cpu_backend_gemm::Gemm(lhs_params, filter_data, rhs_params, gemm_input_data,
                          dst_params, output_data, gemm_params,

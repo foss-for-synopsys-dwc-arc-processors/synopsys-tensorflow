@@ -799,7 +799,6 @@ struct ConvParams {
   int32 output_multiplier;
   int output_shift;
   int bits_to_shift;
-  int relu_max;
   int ev_quant;
   // uint8, etc, activation params.
   int32 quantized_activation_min;
@@ -829,7 +828,6 @@ struct DepthwiseParams {
   int32 output_multiplier;
   int output_shift;
   int bits_to_shift;
-  int relu_max;
   int ev_quant;
   // uint8, etc, activation params.
   int32 quantized_activation_min;
@@ -863,6 +861,8 @@ struct FullyConnectedParams {
   // float activation params.
   float float_activation_min;
   float float_activation_max;
+  int bits_to_shift;
+  int ev_quant;
   FullyConnectedWeightsFormat weights_format;
 };
 

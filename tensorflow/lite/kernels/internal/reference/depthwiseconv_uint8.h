@@ -63,10 +63,10 @@ namespace depthwise_conv {
 
 template <DepthwiseConvOutputRounding output_rounding>
 inline int32 DepthwiseConvRound(int32 x, int32 quantized_multiplier,
-                                int shift, int bits_to_shift, int relu_max, bool ev_quant) {
+                                int shift, int bits_to_shift, bool ev_quant) {
   TFLITE_DCHECK_NE(output_rounding, DepthwiseConvOutputRounding::kNone);
   if(ev_quant) {
-    return StoreAcc(x, bits_to_shift, relu_max);
+    return StoreAcc(x, bits_to_shift);
   }
   else {
     return MultiplyByQuantizedMultiplier(x, quantized_multiplier, shift);
@@ -75,9 +75,9 @@ inline int32 DepthwiseConvRound(int32 x, int32 quantized_multiplier,
 
 template <>
 inline int32 DepthwiseConvRound<DepthwiseConvOutputRounding::kAwayFromZero>(
-  int32 x, int32 quantized_multiplier, int shift, int bits_to_shift, int relu_max, bool ev_quant) {
+  int32 x, int32 quantized_multiplier, int shift, int bits_to_shift, bool ev_quant) {
   if(ev_quant) {
-    return StoreAcc(x, bits_to_shift, relu_max);
+    return StoreAcc(x, bits_to_shift);
   }
   else {
     return MultiplyByQuantizedMultiplier(x, quantized_multiplier, shift);
@@ -86,9 +86,9 @@ inline int32 DepthwiseConvRound<DepthwiseConvOutputRounding::kAwayFromZero>(
 
 template <>
 inline int32 DepthwiseConvRound<DepthwiseConvOutputRounding::kUpward>(
-    int32 x, int32 quantized_multiplier, int shift, int bits_to_shift, int relu_max, bool ev_quant) {
+    int32 x, int32 quantized_multiplier, int shift, int bits_to_shift, bool ev_quant) {
   if(ev_quant) {
-    return StoreAcc(x, bits_to_shift, relu_max);
+    return StoreAcc(x, bits_to_shift);
   }
   else {
     using gemmlowp::SaturatingRoundingDoublingHighMul;
@@ -127,7 +127,6 @@ struct DepthwiseConvBasicKernel {
     const int32 output_multiplier = params.output_multiplier;
     const int output_shift = params.output_shift;
     const int bits_to_shift = params.bits_to_shift;
-    const int relu_max = params.relu_max;
     const bool ev_quant = params.ev_quant;
     TFLITE_DCHECK_EQ(input_shape.DimensionsCount(), 4);
     TFLITE_DCHECK_EQ(filter_shape.DimensionsCount(), 4);
@@ -176,7 +175,7 @@ struct DepthwiseConvBasicKernel {
                 acc += bias_data[oc];
               }
               acc = DepthwiseConvRound<output_rounding>(acc, output_multiplier,
-                                                        output_shift, bits_to_shift, relu_max, ev_quant);
+                                                        output_shift, bits_to_shift, ev_quant);
               acc += output_offset;
               acc = std::max(acc, output_activation_min);
               acc = std::min(acc, output_activation_max);

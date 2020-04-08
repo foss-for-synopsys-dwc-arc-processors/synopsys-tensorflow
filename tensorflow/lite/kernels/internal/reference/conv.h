@@ -120,7 +120,6 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
   const int32 output_multiplier = params.output_multiplier;
   const int output_shift = params.output_shift;
   const int bits_to_shift = params.bits_to_shift;
-  const int relu_max = params.relu_max;
   const bool ev_quant = params.ev_quant;
   const int32 output_activation_min = params.quantized_activation_min;
   const int32 output_activation_max = params.quantized_activation_max;
@@ -173,7 +172,7 @@ inline void Conv(const ConvParams& params, const RuntimeShape& input_shape,
             acc += bias_data[out_channel];
           }
          if(ev_quant) {
-           acc = StoreAcc(acc, bits_to_shift, relu_max);
+           acc = StoreAcc(acc, bits_to_shift);
          }
          else {
            acc = MultiplyByQuantizedMultiplier(acc, output_multiplier,

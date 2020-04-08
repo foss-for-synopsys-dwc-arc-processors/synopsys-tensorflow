@@ -50,10 +50,8 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void Nudge(
   if(ev_quant) { //EVQuantization Logic
     //EVQuant formula to calculate Weight Scale
     if(tensor_type == 0){
-      const int weight_max_value = 127;//Signed max or (256/2 - 1)
-      const float abs_max = std::max(-min, max);
-     *scale = 1 / (weight_max_value / abs_max);
-      }
+      *scale = (max - min) / (quant_max_float - quant_min_float);
+    }
     //EVQuant formula to calculate Activation Scale
     else if(tensor_type == 1){
       const int num_bits = 8;//8 bits for unsigned / (8-1)bits for signed
@@ -64,9 +62,7 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void Nudge(
       *scale = 1 / (value / pow(2, bits_to_shift));
       }
     else if(tensor_type == 2){
-      const int layer_max_value = 127;//Signed max or (256/2 - 1)
-      const float abs_max = std::max(-min, max);
-     *scale = 1 / (layer_max_value / abs_max);
+      *scale = (max - min) / (quant_max_float - quant_min_float);
     }
   const float zero_point_from_max = quant_max_float - (max / (*scale));
   const uint16 nudged_zero_point = [zero_point_from_max, quant_min,

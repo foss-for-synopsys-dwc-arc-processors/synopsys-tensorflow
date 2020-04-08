@@ -41,7 +41,7 @@ struct QuantizedDepthwiseConvKernel<true, 8, 2> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8x2_t filter_u8;
     filter_u8.val[0] = vld1_u8(filter_ptr);
@@ -89,7 +89,7 @@ struct QuantizedDepthwiseConvKernel<false, 8, 1> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     const uint8x8_t filter_u8 = vld1_u8(filter_ptr);
     const int16x8_t filter_s16 = vreinterpretq_s16_u16(vmovl_u8(filter_u8));
@@ -158,7 +158,7 @@ struct QuantizedDepthwiseConvKernel<false, 4, 2> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     const uint8x8_t filter_u8 = vld1_u8(filter_ptr);
     const int16x8_t filter_s16 = vreinterpretq_s16_u16(vmovl_u8(filter_u8));
@@ -229,7 +229,7 @@ struct QuantizedDepthwiseConvKernel<false, 2, 8> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     int16x8_t filter[2];
     for (int i = 0; i < 2; i++) {
@@ -307,7 +307,7 @@ struct QuantizedDepthwiseConvKernel<false, 2, 2> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -374,7 +374,7 @@ struct QuantizedDepthwiseConvKernel<false, 2, 1> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -489,7 +489,7 @@ struct QuantizedDepthwiseConvKernel<false, 1, 2> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -550,7 +550,7 @@ struct QuantizedDepthwiseConvKernel<false, 1, 4> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -646,7 +646,7 @@ struct QuantizedDepthwiseConvKernel<false, 4, 1> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -717,7 +717,7 @@ struct QuantizedDepthwiseConvKernel<false, 4, 4> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     int16x8_t filter[2];
     for (int i = 0; i < 2; i++) {
@@ -803,7 +803,7 @@ struct QuantizedDepthwiseConvKernel<true, 0, 3> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // We will have to duplicate bytes in a NEON register, 3-fold.
     // We will do that by register-level table-look-up using VTBL instructions.
     // Here we prepare the registers containing the table-lookup indices.
@@ -890,7 +890,7 @@ struct QuantizedDepthwiseConvKernel<true, 0, 2> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Handle one output pixel at a time.
     for (int outp = 0; outp < num_output_pixels; outp++) {
       const uint8* local_filter_ptr = filter_ptr;
@@ -956,7 +956,7 @@ struct QuantizedDepthwiseConvKernel<true, 0, 1> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Handle one output pixel at a time.
     for (int outp = 0; outp < num_output_pixels; outp++) {
       const uint8* local_filter_ptr = filter_ptr;
@@ -1042,7 +1042,7 @@ struct QuantizedDepthwiseConvKernel<true, 16, 1> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8[2];
     for (int i = 0; i < 2; i++) {
@@ -1097,7 +1097,7 @@ struct QuantizedDepthwiseConvKernel<true, 8, 1> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     const uint8x8_t filter_u8 = vld1_u8(filter_ptr);
     const int16x8_t filter_s16 = vreinterpretq_s16_u16(vmovl_u8(filter_u8));
@@ -1132,7 +1132,7 @@ struct QuantizedDepthwiseConvKernel<true, 1, 16> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8[2];
     for (int i = 0; i < 2; i++) {
@@ -1177,7 +1177,7 @@ struct QuantizedDepthwiseConvKernel<true, 1, 32> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8_0 = vld1_u8(filter_ptr + 8 * 0);
     uint8x8_t filter_u8_1 = vld1_u8(filter_ptr + 8 * 1);
@@ -1234,7 +1234,7 @@ struct QuantizedDepthwiseConvKernel<true, 1, 20> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     // NEON wants to load 8 bytes at a time, but 20 is not divisible by 8.
     // We load the first 16 bytes into filter_u8_{0,1} as usual.
@@ -1284,7 +1284,7 @@ struct QuantizedDepthwiseConvKernel<true, 1, 8> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     const uint8x8_t filter_u8 = vld1_u8(filter_ptr);
     const int16x8_t filter = vaddq_s16(
@@ -1317,7 +1317,7 @@ struct QuantizedDepthwiseConvKernel<true, 2, 1> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8 = vdup_n_u8(0);
     filter_u8 = vset_lane_u8(filter_ptr[0], filter_u8, 0);
@@ -1381,7 +1381,7 @@ struct QuantizedDepthwiseConvKernel<true, 4, 1> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     if (num_output_pixels <= 0) {
       return;
     }
@@ -1446,7 +1446,7 @@ struct QuantizedDepthwiseConvKernel<false, 12, 1> {
                   const uint8* input_ptr, int16 input_offset,
                   int input_ptr_increment, const uint8* filter_ptr,
                   int16 filter_offset, int32* acc_buffer_ptr,
-                  int bits_to_shift, int relu_max, bool ev_quant) {
+                  int bits_to_shift, bool ev_quant) {
     // Load the filters, add filter_offset.
     uint8x8_t filter_u8_0 = vld1_u8(filter_ptr);
     uint8x8_t filter_u8_1 = vld1_u8(filter_ptr + 4);
@@ -1501,7 +1501,7 @@ void QuantizedDepthwiseConvAccumRow(int stride, int dilation_factor,
                                     int16 filter_offset, int out_x_buffer_start,
                                     int out_x_buffer_end, int output_depth,
                                     int32* acc_buffer, int bits_to_shift,
-                                    int relu_max, bool ev_quant) {
+                                    bool ev_quant) {
 #ifdef GEMMLOWP_PROFILING
   gemmlowp::ScopedProfilingLabel label(__PRETTY_FUNCTION__);
 #endif
@@ -1566,8 +1566,7 @@ void QuantizedDepthwiseConvAccumRow(int stride, int dilation_factor,
           kFixedDepthMultiplier>::Run(num_output_pixels, input_depth,
                                       depth_multiplier, input_ptr, input_offset,
                                       input_ptr_increment, filter_base_ptr,
-                                      filter_offset, acc_buffer_ptr, bits_to_shift,
-                                      relu_max, ev_quant);
+                                      filter_offset, acc_buffer_ptr, bits_to_shift, ev_quant);
     filter_base_ptr += output_depth;
   }
 }
@@ -1578,7 +1577,7 @@ inline void QuantizedDepthwiseConvAccumRowGeneric(
     const uint8* input_data, int16 input_offset, int pad_width,
     int depth_multiplier, int filter_width, const uint8* filter_data,
     int16 filter_offset, int out_x_buffer_start, int out_x_buffer_end,
-    int output_depth, int32* acc_buffer, int bits_to_shift, int relu_max, bool ev_quant) {
+    int output_depth, int32* acc_buffer, int bits_to_shift, bool ev_quant) {
   gemmlowp::ScopedProfilingLabel label("DepthwiseConvAccumRowGeneric (slow)");
   const uint8* filter_base_ptr = filter_data;
   for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
@@ -1714,7 +1713,6 @@ inline void DepthwiseConvGeneral(
   const int output_height = output_shape.Dims(1);
   const int output_width = output_shape.Dims(2);
   const int bits_to_shift = params.bits_to_shift;
-  const int relu_max = params.relu_max;
   const bool ev_quant = params.ev_quant;
 #ifdef USE_NEON
   const bool shift_left = (output_shift > 0);
@@ -1856,7 +1854,7 @@ inline void DepthwiseConvGeneral(
               input_offset, pad_width, depth_multiplier, filter_width,
               filter_data + filter_y * filter_height_stride, filter_offset,
               out_x_buffer_start, out_x_buffer_end, output_depth, acc_buffer,
-              bits_to_shift, relu_max, ev_quant);
+              bits_to_shift, ev_quant);
         }
         // Finished accumulating int32 values. Now need to convert them to
         // the final 8bit form and store them.
@@ -1866,13 +1864,9 @@ inline void DepthwiseConvGeneral(
 #ifdef USE_NEON
           if(ev_quant) {
             // Handle 16 values at once.
-            const int pixelsize = 8;
-            const int32x4_t v_0[4] = {0,0,0,0};
             const int32x4_t v_pos_1 = vdupq_n_s32(1);
-            const int32x4_t relu_max = vdupq_n_s32(params.relu_max);
-            const int32x4_t hi_val = vdupq_n_s32((1<<pixelsize)-1);
             int32x4_t shift_left_val[4], shift_right[4];
-            int32x4_t round_up_even[4], zero_check[4], relu_op[4];
+            int32x4_t round_up_even[4];
             const int32x4_t output_offset_vec = vdupq_n_s32(output_offset);
             const int32x4_t output_activation_min_vec =
                 vdupq_n_s32(output_activation_min);
@@ -1888,14 +1882,11 @@ inline void DepthwiseConvGeneral(
               shift_right[j] = vandq_s32((vshrq_n_s32(acc[j], params.bits_to_shift)), v_pos_1);
               shift_left_val[j] = vsubq_s32((vshlq_n_s32(v_pos_1, params.bits_to_shift - 1)), v_pos_1);
               round_up_even[j] = vshrq_n_s32((vaddq_s32((vaddq_s32(shift_left_val[j], shift_right[j])), acc[j])), params.bits_to_shift);
-              zero_check[j] = vmaxq_s32(round_up_even[j], v_0[j]);
-              relu_op[j] = vminq_s32(zero_check[j], relu_max);
-              acc[j] = vminq_s32(relu_op[j], hi_val);
               }
 
               // Add the output offset.
               for (int j = 0; j < 4; j++) {
-                acc[j] = vaddq_s32(acc[j], output_offset_vec);
+                acc[j] = vaddq_s32(round_up_even[j], output_offset_vec);
               }
               // Apply the activation function.
               for (int j = 0; j < 4; j++) {
@@ -1930,17 +1921,9 @@ inline void DepthwiseConvGeneral(
             int32x4_t round_up_even_acc0 = vshrq_n_s32((vaddq_s32(vaddq_s32(shift_left_acc, shift_right_acc0), acc0)), params.bits_to_shift);
             int32x4_t round_up_even_acc1 = vshrq_n_s32((vaddq_s32(vaddq_s32(shift_left_acc, shift_right_acc1), acc1)), params.bits_to_shift);
 
-            int32x4_t zero_check0 = vmaxq_s32(round_up_even_acc0, v0);
-            int32x4_t zero_check1 = vmaxq_s32(round_up_even_acc1, v0);
-
-            int32x4_t relu_op0 = vminq_s32(zero_check0, relu_max);
-            int32x4_t relu_op1 = vminq_s32(zero_check1, relu_max);
-            acc0 = vminq_s32(relu_op0, hi_val);
-            acc1 = vminq_s32(relu_op1, hi_val);
-
             // Add the output offset.
-            acc0 = vaddq_s32(acc0, output_offset_vec);
-            acc1 = vaddq_s32(acc1, output_offset_vec);
+            acc0 = vaddq_s32(round_up_even_acc0, output_offset_vec);
+            acc1 = vaddq_s32(round_up_even_acc1, output_offset_vec);
             // Apply the activation function.
             acc0 = vmaxq_s32(acc0, output_activation_min_vec);
             acc1 = vmaxq_s32(acc1, output_activation_min_vec);
@@ -1963,12 +1946,9 @@ inline void DepthwiseConvGeneral(
             int32x4_t shift_left_val0 = vsubq_s32((vshlq_n_s32(v_pos_1, params.bits_to_shift - 1)), v_pos_1);
             int32x4_t shift_right0 = vandq_s32((vshrq_n_s32(acc, params.bits_to_shift)), v_pos_1);
             int32x4_t round_up_even0 = vshrq_n_s32((vaddq_s32(vaddq_s32(shift_left_val0, shift_right0), acc)), params.bits_to_shift);
-            int32x4_t zero_check0 = vmaxq_s32(round_up_even0, v0);
-            int32x4_t relu_op0 = vminq_s32(zero_check0, relu_max);
-            acc = vminq_s32(relu_op0, hi_val);
 
             // Add the output offset.
-            acc = vaddq_s32(acc, output_offset_vec);
+            acc = vaddq_s32(round_up_even0, output_offset_vec);
             // Apply the activation function.
             acc = vmaxq_s32(acc, output_activation_min_vec);
             acc = vminq_s32(acc, output_activation_max_vec);
@@ -2116,7 +2096,7 @@ inline void DepthwiseConvGeneral(
         for (; i < num_output_values; i++) {
           int32 acc = acc_buffer[i];
           if(ev_quant) {
-            acc = StoreAcc(acc, bits_to_shift, relu_max);
+            acc = StoreAcc(acc, bits_to_shift);
           }
           else {
             acc = MultiplyByQuantizedMultiplier(acc, output_multiplier,
@@ -2158,7 +2138,6 @@ inline void DepthwiseConvWithRounding(
   const int output_depth = MatchingDim(filter_shape, 3, output_shape, 3);
   const int input_depth = input_shape.Dims(3);
   const int bits_to_shift = params.bits_to_shift;
-  const int relu_max = params.relu_max;
   const bool ev_quant = params.ev_quant;
   TFLITE_DCHECK_EQ(output_depth, input_depth * depth_multiplier);
   TFLITE_DCHECK_EQ(bias_shape.FlatSize(), output_depth);

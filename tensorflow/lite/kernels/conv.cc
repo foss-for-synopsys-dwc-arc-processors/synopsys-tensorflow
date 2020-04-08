@@ -76,7 +76,6 @@ struct OpData {
   int32_t output_multiplier;
   int output_shift;
   int bits_to_shift;
-  int relu_max;
   int ev_quant;
 
   // Per channel output multiplier and shift.
@@ -318,8 +317,7 @@ TfLiteStatus Prepare(KernelType kernel_type, TfLiteContext* context,
         &data->output_activation_min, &data->output_activation_max,
         data->per_channel_output_multiplier.data(),
         data->per_channel_output_shift.data(),
-        &data->bits_to_shift,
-        &data->relu_max));
+        &data->bits_to_shift));
   }
 
   TfLiteIntArray* output_size = TfLiteIntArrayCreate(4);
@@ -458,7 +456,6 @@ void EvalQuantized(TfLiteContext* context, TfLiteNode* node,
   op_params.quantized_activation_min = data->output_activation_min;
   op_params.quantized_activation_max = data->output_activation_max;
   op_params.bits_to_shift = data->bits_to_shift;
-  op_params.relu_max = data->relu_max;
   op_params.ev_quant = ev_quant;
   switch (effective_kernel_type) {
     case kReference: {

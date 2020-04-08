@@ -59,7 +59,6 @@ struct OpData {
   int32_t output_multiplier;
   int output_shift;
   int bits_to_shift;
-  int relu_max;
   // The range of the fused activation layer. For example for kNone and
   // uint8_t these would be 0 and 255.
   int32_t output_activation_min;
@@ -167,8 +166,7 @@ TfLiteStatus Prepare(TfLiteContext* context, TfLiteNode* node) {
         &data->output_activation_min, &data->output_activation_max,
         data->per_channel_output_multiplier.data(),
         data->per_channel_output_shift.data(),
-        &data->bits_to_shift,
-        &data->relu_max));
+        &data->bits_to_shift));
   }
 
   TfLiteIntArray* outputSize = TfLiteIntArrayCreate(4);
@@ -242,7 +240,6 @@ void EvalQuantized(TfLiteContext* context, TfLiteNode* node,
   op_params.quantized_activation_min = data->output_activation_min;
   op_params.quantized_activation_max = data->output_activation_max;
   op_params.bits_to_shift = data->bits_to_shift;
-  op_params.relu_max = data->relu_max;
   op_params.ev_quant = ev_quant;
   if (kernel_type == kReference) {
     reference_ops::DepthwiseConv(
