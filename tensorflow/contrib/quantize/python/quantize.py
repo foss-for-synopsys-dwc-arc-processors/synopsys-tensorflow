@@ -855,20 +855,24 @@ def _InsertQuantOp(context,
             vars_collection=vars_collection,
             name_prefix=name_prefix))
 
+  quant_0 = quant[0]
+  quant_1 = quant[1]
+  quant_2 = quant[2]
+
   if quant_delay and quant_delay > 0:
     activate_quant = math_ops.greater_equal(
         common.CreateOrGetQuantizationStep(),
         quant_delay,
         name=name_prefix + '/activate_quant')
-    quant = control_flow_ops.cond(
+    quant_0 = control_flow_ops.cond(
         activate_quant,
-        lambda: quant,
+        lambda: quant_0,
         lambda: inputs,
         name=name_prefix + '/delayed_quant')
 
   if consumers:
     tensors_modified_count = common.RerouteTensor(
-        quant[0], inputs, can_modify=consumers)
+        quant_0, inputs, can_modify=consumers)
     # Some operations can have multiple output tensors going to the same
     # consumer. Since consumers is a set, we need to ensure that
     # tensors_modified_count is greater than or equal to the length of the set
@@ -876,7 +880,7 @@ def _InsertQuantOp(context,
     if tensors_modified_count < len(consumers):
       raise ValueError('No inputs quantized for ops: [%s]' % ', '.join(
           [consumer.name for consumer in consumers]))
-  return quant[1], quant[2]
+  return quant_1, quant_2
 
 def _GetContextFromOp(op):
   """Gets the root context name from the op name."""
