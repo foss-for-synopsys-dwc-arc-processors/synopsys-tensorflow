@@ -361,7 +361,7 @@ def Quantize(graph,
       remove_list = []
       # Append Fake quant node from the inputs of concat layer
       for concat_node in graph_def.node:
-        if(concat_node.op == "ConcatV2"):
+        if(concat_node.op == "ConcatV2" and concat_node.name in quantizable_nodes_dict.values()):
           if ("N" in concat_node.attr):
             concat_dict[concat_node.name] = []
             # Iterates until number of inputs to concat node
