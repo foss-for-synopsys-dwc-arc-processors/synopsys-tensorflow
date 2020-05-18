@@ -390,7 +390,7 @@ bool ChooseQuantizationForOperatorOutput(
       op.type == OperatorType::kReshape || op.type == OperatorType::kSplit ||
       op.type == OperatorType::kRelu || op.type == OperatorType::kRelu1 ||
       op.type == OperatorType::kRelu6 || op.type == OperatorType::kPRelu ||
-      ((op.type == OperatorType::kMaxPool || op.type == OperatorType::kAveragePool) && model->flags.ev_quant())) ||
+      ((op.type == OperatorType::kMaxPool || op.type == OperatorType::kAveragePool) && model->flags.ev_quant()) ||
       (op.type == OperatorType::kPad && model->flags.ev_quant())) {
     int data_input_index = 0;
     if (op.type == OperatorType::kSplit) {
