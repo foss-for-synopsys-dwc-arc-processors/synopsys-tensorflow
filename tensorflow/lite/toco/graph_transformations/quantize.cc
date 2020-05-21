@@ -373,7 +373,7 @@ bool ChooseQuantizationForOperatorOutput(
     for (const string& input_name : op.inputs) {
       const auto& input_array = model->GetArray(input_name);
       auto& input_minmax = input_array.GetMinMax();
-      if(input_minmax.min < concat_min && input_minmax.max > concat_max) {
+      if(input_minmax.max > concat_max) {
         concat_min = input_minmax.min;
         concat_max = input_minmax.max;
         const auto& input_quantization_params = input_array.GetQuantizationParams();
@@ -390,6 +390,7 @@ bool ChooseQuantizationForOperatorOutput(
       op.type == OperatorType::kReshape || op.type == OperatorType::kSplit ||
       op.type == OperatorType::kRelu || op.type == OperatorType::kRelu1 ||
       op.type == OperatorType::kRelu6 || op.type == OperatorType::kPRelu ||
+      ((op.type == OperatorType::kMaxPool || op.type == OperatorType::kAveragePool) && model->flags.ev_quant()) ||
       (op.type == OperatorType::kPad && model->flags.ev_quant())) {
     int data_input_index = 0;
     if (op.type == OperatorType::kSplit) {

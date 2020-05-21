@@ -43,8 +43,10 @@ _INTERMEDIATE_OP = {'Add', 'Mul'}
 _PASS_THROUGH_OP = {'Reshape', 'Identity', 'BatchToSpaceND', 'SpaceToBatchND'}
 _VALID_ACTIVATION_OP = {'Relu', 'Relu6'}
 
-_BY_PASS_OP = {'Relu', 'Relu6', 'MaxPool'}
-_INPUT_OP_TYPES = {'FakeQuantWithMinMaxVars', 'Relu', 'Relu6', 'MaxPool'}
+_BY_PASS_OP = {'Relu', 'Relu6', 'MaxPool', 'ConcatV2', 'AvgPool'}
+_INPUT_OP_TYPES = {'FakeQuantWithMinMaxVars', 'Relu', 'Relu6', 'MaxPool', 'ConcatV2', 'AvgPool'}
+_INPUT_OP = {'Conv2D', 'FakeQuantWithMinMaxVars', 'Relu', 'Relu6', 'MaxPool', 'ConcatV2', 'AvgPool', 'Identity', 'Reshape', 'MatMul', 'Mul', 'DepthwiseConv2dNative'}
+_SCALE_PROPAGATE_OP = {'FakeQuantWithMinMaxVars', 'ConcatV2'}
 
 def Quantize(graph,
              is_training,
@@ -93,36 +95,111 @@ def Quantize(graph,
 
   input_to_ops_map = input_to_ops.InputToOps(graph)
   quantized_ops = set()
+
+  # To store the quantizable descendants(Conv, DepthwiseConv, FC) of concat layer
+  concat_descendant_list = []
+  # To store the context of the quantizable descendants(Conv, DepthwiseConv, FC) of concat layer
+  concat_descendant_context_list = []
+  # List to hold the concat layers which feds output to quantizable node and takes input from activations (ignoring preprocessing concats)
+  valid_concat_list = []
+  # Dictionary : key -> concat node name, value -> act quant node name from the inputs of concat node
+  concat_dict = dict()
+  # Dictionary : key -> quantizable node name, value -> act quant node name from the input of quantizable node
+  quantizable_nodes_dict = dict()
+
+  graph_def = graph.as_graph_def()
+
+  # Returns the node with passed node_name
+  def fetch_node(node_name):
+    for node in graph_def.node:
+      if(node.name == node_name):
+        return node
+
+  # Finds the quantizable node taking inputs from concat layer
+  def find_through_concat_nodes(node_in, quantizable_node_name, quantizable_node_op):
+    if(node_in.op is not None and node_in.op == "ConcatV2"):
+      if(quantizable_node_name not in quantizable_nodes_dict.keys()):
+        concat_descendant_context_list.append(quantizable_node_name.split("/"+quantizable_node_op)[0])
+        concat_descendant_list.append(quantizable_node_name)
+        quantizable_nodes_dict[quantizable_node_name] = []
+        quantizable_nodes_dict[quantizable_node_name].append(node_in.name)
+        valid_concat_list.append(node_in.name)
+        for iterator in range(node_in.attr["N"].i):
+          if("concat" in node_in.input[iterator]):
+            valid_concat_list.append(node_in.input[iterator])
+        return
+    else:
+      if(node_in.op in _RELU_TYPES):
+        return
+      if(node_in.op is not None and node_in.op in _INPUT_OP):
+        input_node = fetch_node(node_in.input[0])
+        find_through_concat_nodes(input_node, quantizable_node_name, quantizable_node_op)
+
+  count = 0 #To check for the first convolution
+  first_node_name = "" #To store the first convolution node name spliting leaf in node name
+  for node in graph_def.node:
+    if(node.op in _QUANTIZABLE_TYPES and "AuxLogits" not in node.name):
+      if(count == 0):
+        first_node_name = node.name.split("Conv2D")[0]
+        quantizable_nodes_dict[node.name] = [] #Assigning empty list for first convolution with 'Conv2D' leaf in node name
+        count = count+1
+      else:
+        if(node.name.split("Conv2D_Fold")[0] != first_node_name): #Avoid concat node search for first convolution with 'Conv2D_Fold' leaf in node name
+          find_through_concat_nodes(node, node.name, node.op)
+        else:
+          quantizable_nodes_dict[node.name] = [] #Assigning empty list for first convolution with 'Conv2D_Fold' leaf in node name
+
   for layer_match in _FindLayersToQuantize(graph):
     # Quantize the weights.
-
     context = _GetContextFromOp(layer_match.layer_op)
-
     # If `scope` is given, only quantize it if the consumer of weights
     # (the layer op) is in the right scope.
     if layer_match.weight_tensor is not None:
-      #Calculated weight scale(op_w_scale) and input_scale(op_ip_scale)
-      #from the 'FakeQuantWithMinMaxVars' op
-      op_w_scale, op_ip_scale = _InsertQuantOp(
-          context,
-          'weights_quant',
-          layer_match.weight_tensor.op,
-          input_to_ops_map.ConsumerOperations(layer_match.weight_tensor.op),
-          is_training,
-          w_scale,
-          ip_scale,
-          moving_avg=False,
-          ema_decay=ema_decay,
-          quant_delay=quant_delay,
-          narrow_range=True,
-          vars_collection=vars_collection,
-          bits=weight_bits,
-          tensor_type=0,
-          symmetric=symmetric,
-          ev_quant=ev_quant,
-          consumer_scope=scope)
-      scale_w = tf.assign(w_scale, op_w_scale, name=context+"/weights_quant/w_scale")
-      scale_ip = tf.assign(ip_scale, op_ip_scale, name=context+"/weights_quant/ip_scale")
+      # Create individual w_scale and ip_scale for descendants of concat
+      if(context in concat_descendant_context_list):
+        w_scale_concat = tf.Variable(initial_value=0.00, trainable=False, name=context+"/w_scale_concat")
+        ip_scale_concat = tf.Variable(initial_value=0.00, trainable=False, name=context+"/ip_scale_concat")
+        op_w_scale, op_ip_scale = _InsertQuantOp(
+            context,
+            'weights_quant',
+            layer_match.weight_tensor.op,
+            input_to_ops_map.ConsumerOperations(layer_match.weight_tensor.op),
+            is_training,
+            w_scale_concat,
+            ip_scale_concat,
+            moving_avg=False,
+            ema_decay=ema_decay,
+            quant_delay=quant_delay,
+            narrow_range=True,
+            vars_collection=vars_collection,
+            bits=weight_bits,
+            tensor_type=0,
+            symmetric=symmetric,
+            ev_quant=ev_quant,
+            consumer_scope=scope)
+        scale_w = tf.assign(w_scale_concat, op_w_scale, name=context+"/weights_quant/w_scale")
+        scale_ip = tf.assign(ip_scale_concat, op_ip_scale, name=context+"/weights_quant/ip_scale")
+      else:
+        op_w_scale, op_ip_scale = _InsertQuantOp(
+            context,
+            'weights_quant',
+            layer_match.weight_tensor.op,
+            input_to_ops_map.ConsumerOperations(layer_match.weight_tensor.op),
+            is_training,
+            w_scale,
+            ip_scale,
+            moving_avg=False,
+            ema_decay=ema_decay,
+            quant_delay=quant_delay,
+            narrow_range=True,
+            vars_collection=vars_collection,
+            bits=weight_bits,
+            tensor_type=0,
+            symmetric=symmetric,
+            ev_quant=ev_quant,
+            consumer_scope=scope)
+        scale_w = tf.assign(w_scale, op_w_scale, name=context+"/weights_quant/w_scale")
+        scale_ip = tf.assign(ip_scale, op_ip_scale, name=context+"/weights_quant/ip_scale")
 
     # Quantize the activations.
     if layer_match.activation_op is not None:
@@ -283,27 +360,115 @@ def Quantize(graph,
     for key, value in sorted(act_quant.items()): #Deleting 'keys' which is being passed as an input to only one node
       if(len(value) < 2):
         del act_quant[key]
-    for node in graph_def.node: #Creating individual weight scale node whenever multiple nodes share the same input node.
-      if(node.op in _QUANTIZABLE_TYPES):
+
+    # Traverse to get fake quant(act_quant) node or concat node in case of sequential concat layers
+    # Maintains the fake quant node of all the concat layer inputs under the corresponding concat node name as key
+    def find_scale_propagate_nodes(node_in, dictionary, dict_entry):
+      if(node_in.op is not None and node_in.op in _SCALE_PROPAGATE_OP):
+        dictionary[dict_entry].append(node_in.name)
+        return
+      else:
+        if(node_in.op is not None and node_in.op in _INPUT_OP):#changed from node.op in _INPUT_OP
+          node = fetch_node(node_in.input[0])
+          find_scale_propagate_nodes(node, dictionary, dict_entry)
+
+    # Updates the fake quant node for concat inputs
+    def fill_concat_dict():
+      add_list = []
+      remove_list = []
+      # Append Fake quant node from the inputs of concat layer
+      for concat_node in graph_def.node:
+        if(concat_node.op == "ConcatV2" and concat_node.name in valid_concat_list):
+          if ("N" in concat_node.attr):
+            concat_dict[concat_node.name] = []
+            # Iterates until number of inputs to concat node
+            for iterator in range(concat_node.attr["N"].i):
+              # Fetch the input node for the concat layer
+              input_node = fetch_node(concat_node.input[iterator])
+              find_scale_propagate_nodes(input_node, concat_dict, concat_node.name)
+      # Append the concat list in case of sequential concat layers (i.e concat -> concat)
+      for concat_key in concat_dict.keys():
+        # Iterates for number of inputs to concat layer
+        for iterator in range(len(concat_dict[concat_key])):
+          # Check if the input of concat layer is another concat layer
+          if(concat_dict[concat_key][iterator] in concat_dict.keys()):
+            branch_concat = concat_dict[concat_key][iterator]
+            # Add the fake quant node of input concat layer to add list
+            for iterator1 in range(len(concat_dict[branch_concat])):
+              add_list.append(concat_dict[branch_concat][iterator1])
+            # Add the input concat name to the remove list, in order to remove it from the final concat node
+            remove_list.append(branch_concat)
+        for val in add_list:
+          concat_dict[concat_key].append(val)
+        for val in remove_list:
+          concat_dict[concat_key].remove(val)
+        add_list.clear()
+        remove_list.clear()
+      return concat_dict
+
+    def max_of_concat_inputs(concat_name, concat_dict):
+      # Tensors to hold max value and scale value from the inputs of concat layer
+      max_tensor = tf.Variable(initial_value=0.0, name="MaxTensor")
+      scale_tensor = tf.Variable(initial_value=0.0, name="ScaleTensor")
+      # Iterates for inputs of concat layer and updates the maxtensor
+      for iterator in range(len(concat_dict[concat_name])):
         for in_node in graph_def.node:
-          if(((graph.get_operation_by_name(node.input[0]).op_def.name in _INPUT_OP_TYPES) and (graph.get_operation_by_name(node.input[1]).op_def.name in _INPUT_OP_TYPES)) and (in_node.name == node.input[1])): #To check if weight_quant Node is the input to the Quantizable nodes.
-            if(in_node.input[3] != node.input[0]+":1" and in_node.input[4] != node.input[0]+":2"): #To check if weight_quant takes scales from previous act_quant node
-              sub_name = node.input[0].split("/FakeQuantWithMinMaxVars")[0] #To get input name from the Quantizable node (Conv,FC,DepthConv)
-              for inner_node in graph_def.node:
-                if(sub_name in inner_node.name and inner_node.op in _BY_PASS_OP): #Another loop to figure out the act_quant name from the above sub_name
-                  sub_name = inner_node.input[0].split("/FakeQuantWithMinMaxVars")[0]
+          if(in_node.name == concat_dict[concat_name][iterator]):
+            input_tensor = graph.get_tensor_by_name(in_node.input[2]+":0")
+            if(not iterator):
+              max_tensor = tf.assign(max_tensor, input_tensor)
+            else:
+              max_tensor = tf.cond(tf.greater(input_tensor, max_tensor), lambda: input_tensor, lambda: max_tensor)
+            break
+      # Iterates for inputs of concat layer and updates the scaletensor with the scale of maxtensor
+      for iterator in range(len(concat_dict[concat_name])):
+        for in_node in graph_def.node:
+          if(in_node.name == concat_dict[concat_name][iterator]):
+            input_tensor = graph.get_tensor_by_name(in_node.input[2]+":0")
+            scale_tensor_1 = graph.get_tensor_by_name(concat_dict[concat_name][iterator].split("/FakeQuantWithMinMaxVars")[0] + "/ip_scale_1:0")
+            if(not iterator):
+              scale_tensor = tf.assign(scale_tensor, scale_tensor_1)
+            scale_tensor = tf.cond(tf.equal(input_tensor, max_tensor), lambda: scale_tensor_1, lambda: scale_tensor)
+            break
+      return scale_tensor
+
+    # Fills the fake quant node for corresponding quantizable nodes(Conv, Depthwiseconv, FC)
+    for node in graph_def.node:
+      if(node.op in _QUANTIZABLE_TYPES and node.name not in quantizable_nodes_dict.keys() and "AuxLogits" not in node.name):
+        quantizable_nodes_dict[node.name] = []
+        find_scale_propagate_nodes(node, quantizable_nodes_dict, node.name)
+
+    # Fills concat-dict with fake quant node corresponding to the inputs of concat
+    concat_dict = fill_concat_dict()
+    # Reroutes the ip_scale and w_scale from fakequant(act quant) node stored in quantizable_nodes_dict
+    for key_val in sorted(quantizable_nodes_dict.keys()):
+      quantizable_node = fetch_node(key_val)
+      dict_value = quantizable_nodes_dict[key_val]
+      for in_node in graph_def.node:
+        # Check for weight_quant corresponding to the quantizable node
+        if(in_node.op in _QUANTIZATION_OP and in_node.name == quantizable_node.input[1]):
+          dst_tensor = graph.get_tensor_by_name(in_node.input[4]+":0")
+          # Assigns scale tensor from the max of concat inputs
+          if(len(dict_value) > 0):
+            if(key_val in concat_descendant_list and dict_value[0] in concat_dict.keys()):
+              scale_tensor = max_of_concat_inputs(dict_value[0], concat_dict)
+              # Reroutes ip_scale in weight quant from the fetched scale tensor
+              # w_scale wont be updated for concat descendants
+              common.RerouteTensor(scale_tensor, dst_tensor)
+            # Reroutes ip_scale and w_scale for branching points from conv layer
+            else:
+              sub_name = dict_value[0].split("/FakeQuantWithMinMaxVars")[0]
               if((sub_name not in in_node.input[3] and sub_name not in in_node.input[4]) and (in_node.input[3] != "w_scale/read" and in_node.input[4] != "ip_scale/read")):
                 # To reroute ip_scales
                 src_tensor = graph.get_tensor_by_name(sub_name+"/ip_scale_1:0")
-                dst_tensor = graph.get_tensor_by_name(in_node.input[4]+":0")
                 common.RerouteTensor(src_tensor, dst_tensor)
                 if(sub_name in str(act_quant.keys())): #To create individual copy for w_scale (for branching points)
                   w_scale_new = tf.Variable(initial_value=0.0, trainable=False,  name=in_node.name.split("/weights_quant/FakeQuantWithMinMaxVars")[0]+"/w_scale_2")
                   common.RerouteTensor(
-                         graph.get_tensor_by_name(in_node.name.split("/weights_quant/FakeQuantWithMinMaxVars")[0]+"/w_scale_2:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
+                          graph.get_tensor_by_name(in_node.name.split("/weights_quant/FakeQuantWithMinMaxVars")[0]+"/w_scale_2:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
                 else: #To reroute w_scale without creating a copy
                   common.RerouteTensor(
-                           graph.get_tensor_by_name(sub_name+"/w_scale_1:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
+                          graph.get_tensor_by_name(sub_name+"/w_scale_1:0"), graph.get_tensor_by_name(in_node.input[3]+":0"))
 
 def _QuantizeActivationLayers(quantized_ops,
                               graph,
@@ -316,7 +481,6 @@ def _QuantizeActivationLayers(quantized_ops,
                               vars_collection=ops.GraphKeys.GLOBAL_VARIABLES,
                               scope=None):
   """Quantize intermediate activation tensors after addition and multiplication.
-
   Args:
     quantized_ops: Set of previously quantized activation ops.
     graph: Graph to modify.
@@ -332,7 +496,6 @@ def _QuantizeActivationLayers(quantized_ops,
       quantization interval ends.
     scope: The scope to be transformed. If it's not None, only the ops which are
       in this scope will be transformed.
-
   Raises:
     ValueError: When quantization fails.
   """
@@ -368,11 +531,9 @@ def _QuantizeActivationLayers(quantized_ops,
 
 def _CheckIfQuantizableOp(src_op, quantized_ops):
   """Check if the output of an op should be quantized.
-
   Args:
     src_op: op to be checked
     quantized_ops: Set of previously quantized activation ops.
-
   Returns:
     Boolean specifying if output should be quantized or not.
   """
@@ -417,10 +578,8 @@ def _CheckIfQuantizableOp(src_op, quantized_ops):
 
 def _FindLayersToQuantize(graph):
   """Matches layers in graph to quantize.
-
   The following patterns get matched. Nodes surrounded by [] will be
   optionally matched:
-
           weight|folded_weight
                 /
          conv|fc
@@ -436,7 +595,6 @@ def _FindLayersToQuantize(graph):
         activation
             |
    [post_activation_bypass]
-
   Match replacements:
     If weight|folded_weight is found, FakeQuant is added afterwards.
     If bypass is found, FakeQuant is added before and after.
@@ -650,13 +808,10 @@ def _FindLayersToQuantize(graph):
           _LayerMatch(layer_op, weight_tensor, activation_op, None, None, None))
   return layer_matches
 
-
 def _IsSkipLayer(activation_op):
   """Skip quantizing conv->identity->Batch norm layers.
-
   Args:
     activation_op: Activation op detected by layer matching pattern
-
   Returns:
     skip_layer: boolean, true when conv->identity->batch norm is detected.
   """
@@ -675,7 +830,6 @@ def _IsSkipLayer(activation_op):
             'followed by a identity, feeding a fused batch norm.',
             activation_op.name)
   return skip_layer
-
 
 class _LayerMatch(object):
   """Contains all information related to a matched Layer."""
@@ -713,7 +867,6 @@ class _LayerMatch(object):
   def bias_add_op(self):
     return self._bias_add_op
 
-
 def _FollowedByFakeQuant(tensor):
   """Returns True if the tensor is followed by a FakeQuant."""
   fake_quant_ops = set([
@@ -730,7 +883,6 @@ def _FollowedByFakeQuant(tensor):
       for output in c.outputs:
         consumers.extend(output.consumers())
   return False
-
 
 def _InsertQuantOp(context,
                    name,
@@ -753,7 +905,6 @@ def _InsertQuantOp(context,
                    producer_scope=None,
                    consumer_scope=None):
   """Inserts a quant op between a producer op and (multiple) consumer ops.
-
   Args:
     context: Context where producer and consumer operations are nested.
     name: Name for the new quantization op within the context.
@@ -855,20 +1006,23 @@ def _InsertQuantOp(context,
             vars_collection=vars_collection,
             name_prefix=name_prefix))
 
+  quant_0 = quant[0]
+  quant_1 = quant[1]
+  quant_2 = quant[2]
   if quant_delay and quant_delay > 0:
     activate_quant = math_ops.greater_equal(
         common.CreateOrGetQuantizationStep(),
         quant_delay,
         name=name_prefix + '/activate_quant')
-    quant = control_flow_ops.cond(
+    quant_0 = control_flow_ops.cond(
         activate_quant,
-        lambda: quant,
+        lambda: quant_0,
         lambda: inputs,
         name=name_prefix + '/delayed_quant')
 
   if consumers:
     tensors_modified_count = common.RerouteTensor(
-        quant[0], inputs, can_modify=consumers)
+        quant_0, inputs, can_modify=consumers)
     # Some operations can have multiple output tensors going to the same
     # consumer. Since consumers is a set, we need to ensure that
     # tensors_modified_count is greater than or equal to the length of the set
@@ -876,7 +1030,7 @@ def _InsertQuantOp(context,
     if tensors_modified_count < len(consumers):
       raise ValueError('No inputs quantized for ops: [%s]' % ', '.join(
           [consumer.name for consumer in consumers]))
-  return quant[1], quant[2]
+  return quant_1, quant_2
 
 def _GetContextFromOp(op):
   """Gets the root context name from the op name."""
@@ -884,7 +1038,6 @@ def _GetContextFromOp(op):
   if context_re:
     return context_re.group(1)
   return ''
-
 
 def _AddContextToName(context, name):
   """Adds the context to the name if it exists."""
