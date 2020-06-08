@@ -180,7 +180,7 @@ struct FakeQuantWithMinMaxVarsFunctor {
     }
     float nudged_min, nudged_max, nudged_scale;
     if(ev_quant){ //EVQuantization Logic
-      if(tensor_type == 0 or tensor_type == 2) {
+      if(tensor_type == 0 || tensor_type == 2) {
         Nudge(min_val, max_val, quant_min, quant_max, &nudged_min, &nudged_max,
               &nudged_scale, tensor_type, ev_quant);
       }
@@ -206,7 +206,7 @@ struct FakeQuantWithMinMaxVarsFunctor {
         *op_w_scale = nudged_scale;
       }
       //Update calculated Activation Scale in op_ip_scale
-      else if(tensor_type == 1 or tensor_type == 2){
+      else if(tensor_type == 1 || tensor_type == 2){
         *op_ip_scale = nudged_scale;
         *op_w_scale = weights_scale;
       }

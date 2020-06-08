@@ -556,7 +556,7 @@ Status GraphConstructor::InitFromEdges() {
         // If an input is not mapped, then the input should appear in the graph
         // being imported.
         auto iter = gdef_nodes_.find(id.first);
-        if("w_scale" != node_def.input(i) and "ip_scale" != node_def.input(i)) {
+        if("w_scale" != node_def.input(i) && "ip_scale" != node_def.input(i)) {
           if (iter == gdef_nodes_.end()) {
             return errors::InvalidArgument("Node '", node_def.name(),
                                           "': Unknown input node '",
@@ -618,10 +618,10 @@ Status GraphConstructor::ValidateShape(Node* node) {
     // No _output_shapes attribute, the AddNode call above was sufficient.
     return Status::OK();
   }
-  if("FakeQuantWithMinMaxVars" == node->type_string() and shape_attrs.size() == 1) {
+  if("FakeQuantWithMinMaxVars" == node->type_string() && shape_attrs.size() == 1) {
     shape_attrs.resize(3);
   }
-  if("FakeQuantWithMinMaxVarsGradient" == node->type_string() and shape_attrs.size() == 3) {
+  if("FakeQuantWithMinMaxVarsGradient" == node->type_string() && shape_attrs.size() == 3) {
     shape_attrs.resize(5);
   }
   auto* ic = refiner_->GetContext(node);
@@ -1035,12 +1035,12 @@ Status GraphConstructor::Convert() {
       // in it. Might make sense to change the API for ImportGraphDef to take
       // a mutable GraphDef* and avoid the copying.
       imported_node_def = original_node_def;
-      if("FakeQuantWithMinMaxVars" == imported_node_def.op() and imported_node_def.input_size() == 3) {
+      if("FakeQuantWithMinMaxVars" == imported_node_def.op() && imported_node_def.input_size() == 3) {
         *(imported_node_def.mutable_input()->Add()) = "w_scale";
         *(imported_node_def.mutable_input()->Add()) = "ip_scale";
       }
 
-      if("FakeQuantWithMinMaxVarsGradient" == imported_node_def.op() and imported_node_def.input_size() == 4) {
+      if("FakeQuantWithMinMaxVarsGradient" == imported_node_def.op() && imported_node_def.input_size() == 4) {
         *(imported_node_def.mutable_input()->Add()) = "w_scale";
         *(imported_node_def.mutable_input()->Add()) = "ip_scale";
       }
@@ -1077,7 +1077,7 @@ Status GraphConstructor::Convert() {
         src_index = tensor_id.index();
         if (src_node == nullptr) has_data_back_edge = true;
       }
-      else if (node_def->input(i) != "w_scale" and node_def->input(i) != "ip_scale") {
+      else if (node_def->input(i) != "w_scale" && node_def->input(i) != "ip_scale") {
         // Input refers to preexistng node in graph
         auto iter = existing_nodes_.find(tensor_id.node());
         DCHECK(iter != existing_nodes_.end()) << tensor_id.node();
