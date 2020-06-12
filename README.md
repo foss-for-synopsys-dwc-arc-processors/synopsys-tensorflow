@@ -117,7 +117,7 @@ The origin is based on TensorFlow 1.14.0.
 * Bazel Installation
     * Download bazel [bazel-0.24.1-windows-x86_64.exe](https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-windows-x86_64.exe)
     * Install the prerequisites [Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145)
-    * Rename the Bazel binary to `bazel.exe` and add it to your `%PATH%` environment variable.
+    * Rename the Bazel binary to `bazel.exe` and add the folder that contains it to your `%PATH%` environment variable.
     * Run `bazel version` to ensure that you have successfully installed it
 
 * Install Python package dependencies
