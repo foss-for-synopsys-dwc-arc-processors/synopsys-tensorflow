@@ -43,9 +43,11 @@ _INTERMEDIATE_OP = {'Add', 'Mul'}
 _PASS_THROUGH_OP = {'Reshape', 'Identity', 'BatchToSpaceND', 'SpaceToBatchND'}
 _VALID_ACTIVATION_OP = {'Relu', 'Relu6'}
 
+# To track Relu/Pool/Concat nodes taking input from FakeQuant node
 _BY_PASS_OP = {'Relu', 'Relu6', 'MaxPool', 'ConcatV2', 'AvgPool'}
-_INPUT_OP_TYPES = {'FakeQuantWithMinMaxVars', 'Relu', 'Relu6', 'MaxPool', 'ConcatV2', 'AvgPool'}
+# Holds the possible input node types for the concat layer.
 _INPUT_OP = {'Conv2D', 'FakeQuantWithMinMaxVars', 'Relu', 'Relu6', 'MaxPool', 'ConcatV2', 'AvgPool', 'Identity', 'Reshape', 'MatMul', 'Mul', 'DepthwiseConv2dNative'}
+# To get fake quant(act_quant) node or concat node in case of sequential concat layers
 _SCALE_PROPAGATE_OP = {'FakeQuantWithMinMaxVars', 'ConcatV2'}
 
 def Quantize(graph,
@@ -88,7 +90,6 @@ def Quantize(graph,
   """
   if scope and not scope.endswith('/'):
     scope += '/'
-  #Variables to track the min and max weight values
   #Values needed to calculate the output scale in activation node
   w_scale = tf.Variable(initial_value=1.0, trainable=False, name="w_scale")
   ip_scale = tf.Variable(initial_value=0.007843137, trainable=False, name="ip_scale")
@@ -237,8 +238,8 @@ def Quantize(graph,
       quantized_ops.add(layer_match.activation_op)
       weight_scale = tf.Variable(initial_value=0.0, trainable=False,  name=add_context+"/act_quant/w_scale")
       input_scale = tf.Variable(initial_value=0.0, trainable=False, name=add_context+"/act_quant/ip_scale")
-      w_scale = tf.assign(weight_scale,w_scale, name=add_context+"/act_quant/w_scale")
-      ip_scale = tf.assign(input_scale,ip_scale, name=add_context+"/act_quant/ip_scale")
+      w_scale = tf.assign(weight_scale, w_scale, name=add_context+"/act_quant/w_scale")
+      ip_scale = tf.assign(input_scale, ip_scale, name=add_context+"/act_quant/ip_scale")
     # Quantize the inputs and output to the bypass (if it exists). The input to
     # the bypass is the bias add, and the output is the activation.
     if layer_match.bypass_op is not None:
@@ -368,7 +369,7 @@ def Quantize(graph,
         dictionary[dict_entry].append(node_in.name)
         return
       else:
-        if(node_in.op is not None and node_in.op in _INPUT_OP):#changed from node.op in _INPUT_OP
+        if(node_in.op is not None and node_in.op in _INPUT_OP):
           node = fetch_node(node_in.input[0])
           find_scale_propagate_nodes(node, dictionary, dict_entry)
 
