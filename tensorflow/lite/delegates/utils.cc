@@ -17,6 +17,7 @@ limitations under the License.
 
 #include <algorithm>
 #include <vector>
+#include <iostream>
 
 #include "tensorflow/lite/builtin_ops.h"
 #include "tensorflow/lite/context_util.h"
@@ -63,6 +64,7 @@ TfLiteStatus GraphPartitionHelper::Partition(
   for (int i = 0; i < num_partitions_; ++i) {
     partitions_.push_back(partition_params_array_ + i);
   }
+  std::cout<<"\nPartitions size : "<<partitions_.size()<<std::endl;
 
   return kTfLiteOk;
 }

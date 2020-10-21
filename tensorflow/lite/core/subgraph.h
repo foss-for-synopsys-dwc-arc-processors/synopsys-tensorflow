@@ -20,6 +20,7 @@ limitations under the License.
 #include <map>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 #include "tensorflow/lite/allocation.h"
 #include "tensorflow/lite/c/common.h"
@@ -404,6 +405,7 @@ class Subgraph {
 
   // Invoke the operator represented by 'node'.
   TfLiteStatus OpInvoke(const TfLiteRegistration& op_reg, TfLiteNode* node) {
+    std::cout<<"\nInside Subgraph OpInvoke!!"<<std::endl;
     if (op_reg.invoke == nullptr) return kTfLiteError;
     return op_reg.invoke(&context_, node);
   }

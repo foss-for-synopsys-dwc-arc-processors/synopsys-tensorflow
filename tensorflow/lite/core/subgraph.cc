@@ -28,6 +28,8 @@ limitations under the License.
 #include "tensorflow/lite/schema/schema_generated.h"
 #include "tensorflow/lite/util.h"
 
+#include <iostream>
+
 namespace tflite {
 
 namespace impl {
@@ -344,6 +346,8 @@ void PopulatePreviewDelegateParams(const NodeSubset& node_subset,
 TfLiteStatus Subgraph::ReplaceNodeSubsetsWithDelegateKernels(
     TfLiteRegistration registration, const TfLiteIntArray* nodes_to_replace,
     TfLiteDelegate* delegate) {
+  std::cout<<"\nInside ReplaceNodeSubsetsWithDelegateKernels !! nodes to replace : "<<nodes_to_replace->size<<std::endl;
+
   // Ignore empty node replacement sets.
   if (!nodes_to_replace->size) {
     return kTfLiteOk;
@@ -376,12 +380,13 @@ TfLiteStatus Subgraph::ReplaceNodeSubsetsWithDelegateKernels(
       case NodeSubset::kTfNonPartition:
         for (auto it = node_subset.nodes.begin(); it != node_subset.nodes.end();
              ++it) {
+          std::cout<<"\nNumber of nodes in Nodesubset of kTfNonPartition type: "<<node_subset.nodes.size()<<std::endl;
           execution_plan_.push_back(*it);
         }
         break;
       case NodeSubset::kTfPartition: {
         int node_index;
-
+        std::cout<<"\nNumber of nodes in Nodesubset of kTfPartition type: "<<node_subset.nodes.size()<<std::endl;
         TfLiteDelegateParams* params =
             CreateDelegateParams(delegate, node_subset);
         TF_LITE_ENSURE_STATUS(AddNodeWithParameters(
@@ -917,6 +922,7 @@ TfLiteStatus Subgraph::PrepareOpsAndTensors() {
 }
 
 TfLiteStatus Subgraph::Invoke() {
+  std::cout<<"\nInside Subgraph Invoke"<<std::endl;
   if (!consistent_) {
     ReportError("Invoke called on model that is not consistent.");
     return kTfLiteError;
@@ -942,6 +948,7 @@ TfLiteStatus Subgraph::Invoke() {
   // Note that calling Invoke repeatedly will cause the original memory plan to
   // be reused, unless either ResizeInputTensor() or AllocateTensors() has been
   // called.
+  std::cout<<"\nexecution_plan_ size: "<<execution_plan_.size()<<std::endl;
   for (int execution_plan_index = 0;
        execution_plan_index < execution_plan_.size(); execution_plan_index++) {
     if (execution_plan_index == next_execution_plan_index_to_prepare_) {
@@ -995,6 +1002,7 @@ TfLiteStatus Subgraph::Invoke() {
 
     EnsureTensorsVectorCapacity();
     tensor_resized_since_op_invoke_ = false;
+    std::cout<<"\nExecution Plan Index: "<<execution_plan_index<<std::endl;
     if (OpInvoke(registration, &node) != kTfLiteOk) {
       return ReportOpError(&context_, node, registration, node_index,
                            "failed to invoke");
