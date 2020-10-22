@@ -12,7 +12,7 @@
     ./bazel-3.6.0-installer-linux-x86_64.sh --user
     export PATH="$HOME/bin:$PATH"
 ```
-* Update the version number in `/path/to/synopsys-tensorflow/.bazelversion` file
+* Update the version number in `synopsys-tensorflow/.bazelversion` file
 
 2. Configure tensorflow build
 ```
@@ -39,16 +39,35 @@
     bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:MetaWareNN_implementation //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
 ```
 
+
 ### Run the Inference using MetaWareNN Delegate
-1.  Add Include path to flatbuffers and cloned synopsys-tensorflow,
-    * export CPLUS_INCLUDE_PATH=/path/to/synopsys-tensorflow:/path/to/flatbuffers/include:
-2.  Add Environment Library path with generated MetawareNN dependent libs,
-      * export LD_LIBRARY_PATH=/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders:$LD_LIBRARY_PATH
-3. Download MobilenetV2 model using below command,
-    * wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz
-4. cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference
-5. Open inference_metawarenn.cpp and replace path in line no:12 with the downloaded TFLite model path.
-6. Compile the inference script, 
-    *   g++ -o inference inference_metawarenn.cpp -I/path/to/synopsys-tensorflow/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib -lMetaWareNN_implementation
-7. Run the object file,
-    *   ./inference
+
+1.  Install flatbuffers and set up the include path
+```
+git clone https://github.com/google/flatbuffers.git
+cd flatbuffers
+cmake -G "Unix Makefiles"
+make
+
+export CPLUS_INCLUDE_PATH=synopsys-tensorflow:/path/to/flatbuffers/include
+```
+    
+2.  Set up environment paths with generated MetawareNN dependent libs
+```
+export LD_LIBRARY_PATH=synopsys-tensorflow/bazel-bin/tensorflow/lite:synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN:synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders:$LD_LIBRARY_PATH
+```
+
+3. Download MobileNet v2 TFlite model
+```
+wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz
+tar -vzxf mobilenet_v2_1.0_224.tgz
+```
+
+4. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`  
+Open `inference_metawarenn.cpp` and replace the path in line no. 12 with the downloaded MobileNet v2 TFlite model path
+
+5. Compile the inference script  
+`g++ -o inference inference_metawarenn.cpp -I synopsys-tensorflow/flatbuffers/include -L synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib -lMetaWareNN_implementation`  
+
+6. Run the object file  
+`./inference`
