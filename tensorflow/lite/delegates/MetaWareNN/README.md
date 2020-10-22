@@ -1,5 +1,6 @@
 ### Steps to build TensorFlow-MetaWareNN Delagate
 
+1. Check Bazel version
 * `git clone https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
 * `git checkout metawarenn_dev`
 * Check the bazel version using the command `bazel version`
@@ -13,30 +14,31 @@
 ```
 * Update the version number in `/path/to/synopsys-tensorflow/.bazelversion` file
 
-#### Configure the tensorflow build
+2. Configure tensorflow build
 ```
     cd synopsys-tensorflow
     ./configure
 ```
 
-#### Create Virtual Environment
+3. Create Virtual Environment
 ```
     sudo pip install virtualenv
-    virtualenv --python=/usr//bin/python3.6 /path/to/new/environment
+    virtualenv --python=/usr/bin/python3.6 /path/to/new/environment
     source /path/to/new/environment/bin/activate
 ```
 
-#### Build Tensorflow from scratch using below command
+4. Build Tensorflow from scratch using below command
 ```
     bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
     ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
     pip install /tmp/tensorflow_pkg/tensorflow-2.3.1-cp36-cp36m-linux_x86_64.whl
 ```
 
-#### Build MetaWareNN and its dependent libraries
+5. Build MetaWareNN and its dependent libraries
 ```
     bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:MetaWareNN_implementation //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
 ```
+
 ### Run the Inference using MetaWareNN Delegate
 1.  Add Include path to flatbuffers and cloned synopsys-tensorflow,
     * export CPLUS_INCLUDE_PATH=/path/to/synopsys-tensorflow:/path/to/flatbuffers/include:
