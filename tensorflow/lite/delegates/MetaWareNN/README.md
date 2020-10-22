@@ -1,4 +1,4 @@
-### Steps to build TensorFlow-MetaWareNN Delagate
+## Steps to build TensorFlow-MetaWareNN Delagate
 
 1. Check Bazel version
 * `git clone https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
@@ -40,7 +40,7 @@
 ```
 
 
-### Run the Inference using MetaWareNN Delegate
+## Run the Inference using MetaWareNN Delegate
 
 1.  Install flatbuffers and set up the include path
 ```
@@ -64,10 +64,12 @@ tar -vzxf mobilenet_v2_1.0_224.tgz
 ```
 
 4. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`  
-Open `inference_metawarenn.cpp` and replace the path in line no. 12 with the downloaded MobileNet v2 TFlite model path
+Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the downloaded MobileNet v2 TFlite model path
 
 5. Compile the inference script  
-`g++ -o inference inference_metawarenn.cpp -I synopsys-tensorflow/flatbuffers/include -L synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib -lMetaWareNN_implementation`  
+```
+g++ -o inference inference_metawarenn.cpp -I synopsys-tensorflow/flatbuffers/include -L synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib -lMetaWareNN_implementation
+```
 
 6. Run the object file  
 `./inference`
