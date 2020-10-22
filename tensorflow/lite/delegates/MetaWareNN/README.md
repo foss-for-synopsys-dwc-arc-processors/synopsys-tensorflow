@@ -5,7 +5,7 @@
 * `git checkout metawarenn_dev`
 * Check the bazel version using the command `bazel version`
 * If the version is older than 3.1.0, then download bazel version newer than 3.1.0 and install it
-* Download and Install bazel 3.6.0 using below commands:
+* Download and Install bazel 3.6.0 using the following commands:
 ```
     wget https://github.com/bazelbuild/bazel/releases/download/3.6.0/bazel-3.6.0-installer-linux-x86_64.sh
     chmod +x bazel-3.6.0-installer-linux-x86_64.sh
@@ -49,7 +49,7 @@ cd flatbuffers
 cmake -G "Unix Makefiles"
 make
 
-export CPLUS_INCLUDE_PATH=synopsys-tensorflow:/path/to/flatbuffers/include
+export CPLUS_INCLUDE_PATH=/path/to/synopsys-tensorflow:/path/to/flatbuffers/include
 ```
     
 2.  Set up environment paths with generated MetawareNN dependent libs
