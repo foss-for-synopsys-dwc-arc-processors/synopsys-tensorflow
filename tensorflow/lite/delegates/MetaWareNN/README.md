@@ -1,6 +1,6 @@
 ## Steps to build TensorFlow-MetaWareNN Delagate
 
-1. Check Bazel version
+1. Check bazel version
 * `git clone https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
 * `git checkout metawarenn_dev`
 * Check the bazel version using the command `bazel version`
@@ -20,14 +20,15 @@
     ./configure
 ```
 
-3. Create Virtual Environment
+3. Create virtual environment and install dependent packages
 ```
     sudo pip install virtualenv
     virtualenv --python=/usr/bin/python3.6 /path/to/new/environment
     source /path/to/new/environment/bin/activate
+    pip install numpy
 ```
 
-4. Build Tensorflow from scratch using below command
+4. Build Tensorflow from scratch
 ```
     bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
     ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
@@ -44,23 +45,23 @@
 
 1.  Install flatbuffers and set up the include path
 ```
-git clone https://github.com/google/flatbuffers.git
-cd flatbuffers
-cmake -G "Unix Makefiles"
-make
+    git clone https://github.com/google/flatbuffers.git
+    cd flatbuffers
+    cmake -G "Unix Makefiles"
+    make
 
-export CPLUS_INCLUDE_PATH=/path/to/synopsys-tensorflow:/path/to/flatbuffers/include
+    export CPLUS_INCLUDE_PATH=/path/to/synopsys-tensorflow:/path/to/flatbuffers/include
 ```
     
 2.  Set up environment paths with generated MetawareNN dependent libs
 ```
-export LD_LIBRARY_PATH=/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders:$LD_LIBRARY_PATH
 ```
 
 3. Download MobileNet v2 TFlite model
 ```
-wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz
-tar -vzxf mobilenet_v2_1.0_224.tgz
+    wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz
+    tar -vzxf mobilenet_v2_1.0_224.tgz
 ```
 
 4. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`  
@@ -68,7 +69,7 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
 
 5. Compile the inference script  
 ```
-g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib -lMetaWareNN_implementation
+    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib -lMetaWareNN_implementation
 ```
 
 6. Run the object file  
