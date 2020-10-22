@@ -54,7 +54,7 @@ export CPLUS_INCLUDE_PATH=/path/to/synopsys-tensorflow:/path/to/flatbuffers/incl
     
 2.  Set up environment paths with generated MetawareNN dependent libs
 ```
-export LD_LIBRARY_PATH=synopsys-tensorflow/bazel-bin/tensorflow/lite:synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN:synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders:$LD_LIBRARY_PATH
 ```
 
 3. Download MobileNet v2 TFlite model
