@@ -1,43 +1,43 @@
-### Steps to build TensorFlow-MetaWareNN Delagate:
+### Steps to build TensorFlow-MetaWareNN Delagate
 
 * `git clone https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
-* `git checkout v2.3.1`
 * `git checkout metawarenn_dev`
 * Check the bazel version using the command `bazel version`
-* If the version is less than 3.1.0, then download bazel of version between 3.1.0 to 3.99.0 and install it
+* If the version is older than 3.1.0, then download bazel version newer than 3.1.0 and install it
 * Download and Install bazel 3.6.0 using below commands:
 ```
     wget https://github.com/bazelbuild/bazel/releases/download/3.6.0/bazel-3.6.0-installer-linux-x86_64.sh
     chmod +x bazel-3.6.0-installer-linux-x86_64.sh
     ./bazel-3.6.0-installer-linux-x86_64.sh --user
+    export PATH="$HOME/bin:$PATH"
 ```
 * Update the version number in `/path/to/synopsys-tensorflow/.bazelversion` file
 
-#### Configure the tensorflow build:
+#### Configure the tensorflow build
 ```
     cd synopsys-tensorflow
     ./configure
 ```
 
-#### Create Virtual Environment:
+#### Create Virtual Environment
 ```
     sudo pip install virtualenv
     virtualenv --python=/usr//bin/python3.6 /path/to/new/environment
     source /path/to/new/environment/bin/activate
 ```
 
-#### Build Tensorflow from scratch using below command:
+#### Build Tensorflow from scratch using below command
 ```
     bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
     ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
     pip install /tmp/tensorflow_pkg/tensorflow-2.3.1-cp36-cp36m-linux_x86_64.whl
 ```
 
-#### Build MetaWareNN and its dependent libraries:
+#### Build MetaWareNN and its dependent libraries
 ```
     bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:MetaWareNN_implementation //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
 ```
-### To Run the Inference using MetaWareNN Delegate
+### Run the Inference using MetaWareNN Delegate
 1.  Add Include path to flatbuffers and cloned synopsys-tensorflow,
     * export CPLUS_INCLUDE_PATH=/path/to/synopsys-tensorflow:/path/to/flatbuffers/include:
 2.  Add Environment Library path with generated MetawareNN dependent libs,
