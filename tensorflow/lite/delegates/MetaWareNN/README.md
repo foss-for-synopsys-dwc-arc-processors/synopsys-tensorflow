@@ -33,6 +33,7 @@
     bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
     ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
     pip install /tmp/tensorflow_pkg/tensorflow-2.3.1-cp36-cp36m-linux_x86_64.whl
+    # Note: 36 could be other numbers if you use other python version  
 ```
 
 5. Build MetaWareNN and its dependent libraries
@@ -68,6 +69,7 @@
 Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the downloaded MobileNet v2 TFlite model path
 
 5. Compile the inference script  
+  Note: we suggest to use g++ 7 to avoid possible errors.  
 ```
     g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib -lMetaWareNN_implementation
 ```
