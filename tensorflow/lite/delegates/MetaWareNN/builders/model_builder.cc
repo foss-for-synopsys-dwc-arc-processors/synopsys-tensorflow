@@ -5,6 +5,8 @@
 #include "helper.h"
 #include "tensorflow/lite/context_util.h"
 #include "tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib/MetaWareNN_implementation.h" //To access MetawareNN APIs from shared library
+#include "tensorflow/lite/builtin_ops.h"
+#include "tensorflow/lite/c/builtin_op_data.h"
 
 namespace tflite {
 namespace delegates {
@@ -19,11 +21,15 @@ TfLiteStatus ModelBuilder::BuildGraph(TfLiteContext* context) {
   std::cout<<"\nBuildGraph!!"<<std::endl;
   metawarenn_model_ = std::unique_ptr<delegates::metawarenn::Model>
                       (new delegates::metawarenn::Model());
+  mwnn_graph_.set_name("MetaWareNN_NodeSubSet_1");
   /* Create and Populate the metawarenn_model_ by adding ops and operands using MetaWareNN API */
   TF_LITE_ENSURE_STATUS(AddOperations(context));
   return kTfLiteOk;
 }
 
+/* TODO: High Level Graph to MetaWareNN Graph Representation,
+         Apply Passes on MetaWareNN Graph,
+         Generate Low Level Graph to run on devices*/
 TfLiteStatus ModelBuilder::MetaWareNNCompile() {
   return kTfLiteOk;
 }
@@ -36,16 +42,91 @@ IOpBuilder* ModelBuilder::GetOpBuilder(int32_t op_type) {
 
 TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
   std::cout<<"\nAddOperations!!\n"<<std::endl;
+  std::cout << "\n----------------------------------------------------------------------------------------------------------------\n";
+  std::cout << "\n MWNN Graph Name : " << mwnn_graph_.get_name();
   for (size_t node_index = 0; node_index < subgraph_nodes_.size(); node_index++) {
     TfLiteNode* node;
     TfLiteRegistration* reg;
     const auto status = context->GetNodeAndRegistration(context, node_index,
                                                          &node, &reg);
     auto op_type = reg->builtin_code;
+
+    std::string node_name;
+    std::string node_op_type;
+    std::vector<std::string> node_inputs;
+    std::vector<std::string> node_outputs;
+
+    //Op Names are added to follow the same pattern like in ONNX as of now.
+    if (op_type == kTfLiteBuiltinConv2d) {
+      node_op_type = "Conv";
+      node_name = node_op_type + std::to_string(node_index);
+    }
+    else if (op_type == kTfLiteBuiltinDepthwiseConv2d) {
+      node_op_type = "Conv";
+      node_name = node_op_type + std::to_string(node_index);
+    }
+    else if (op_type == kTfLiteBuiltinAveragePool2d) {
+      node_op_type = "GlobalAveragePool";
+      node_name = node_op_type + std::to_string(node_index);
+    }
+    else if (op_type == kTfLiteBuiltinAdd) {
+      node_op_type = "Add";
+      node_name = node_op_type + std::to_string(node_index);
+    }
+    else if (op_type == kTfLiteBuiltinRelu) {
+      node_op_type = "Relu";
+      node_name = node_op_type + std::to_string(node_index);
+    }
+    else if (op_type == kTfLiteBuiltinReshape) {
+      node_op_type = "Reshape";
+      node_name = node_op_type + std::to_string(node_index);
+    }
+    else if (op_type == kTfLiteBuiltinSoftmax) {
+      node_op_type = "Softmax";
+      node_name = node_op_type + std::to_string(node_index);
+    }
+    else {
+      std::cout << "\n Unsupported op_type: " << op_type;
+      exit(1);
+    }
+
+    for (int i = 0; i < node->inputs->size; ++i) {
+      const int tensor_id = node->inputs->data[i];
+      node_inputs.emplace_back(context->tensors[tensor_id].name);
+    }
+
+    for (int i = 0; i < node->outputs->size; ++i) {
+      const int tensor_id = node->outputs->data[i];
+      node_outputs.emplace_back(context->tensors[tensor_id].name);
+    }
+
+    ::metawarenn::MWNNNode mwnn_node(node_name, node_op_type, node_inputs, node_outputs);
+    mwnn_graph_.set_graph_nodes(mwnn_node);
+
+    for (int i = 0; i < node->inputs->size; ++i) {
+      const int tensor_id = node->inputs->data[i];
+      const auto& input_tensor = context->tensors[tensor_id];
+
+      if (input_tensor.allocation_type == kTfLiteMmapRo) {
+          std::vector<int> dims_vec(input_tensor.dims->data, input_tensor.dims->data + input_tensor.dims->size);
+          auto num_tensor_elements = std::accumulate(begin(dims_vec), end(dims_vec), 1, std::multiplies<int>());
+          std::vector<float> tensor_vec(input_tensor.data.f, input_tensor.data.f + num_tensor_elements);
+          ::metawarenn::MWNNTensor mwnn_tensor(input_tensor.name, dims_vec,  tensor_vec);
+          mwnn_graph_.set_graph_initializers(mwnn_tensor);
+      }
+    }
+
     if (auto* op_builder = GetOpBuilder(op_type)) {
       TF_LITE_ENSURE_STATUS(op_builder->AddToModelBuilder(*this, op_type));
     }
   }
+  std::cout << "\n----------------------------------------------------------------------------------------------------------------\n";
+  /*for (auto& it : mwnn_graph_.get_graph_initializers()) {
+    std::cout << "\n Tensor Name: " << it.get_name();
+  }
+  for (auto& it : mwnn_graph_.get_graph_nodes()) {
+    std::cout << "\n Node Name: " << it.get_name();
+  }*/
   return kTfLiteOk;
 }
 

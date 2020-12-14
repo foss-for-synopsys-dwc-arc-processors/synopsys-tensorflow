@@ -1,7 +1,13 @@
 #include "model.h"
 #include <unordered_map>
 #include <memory>
+#include <numeric>
 #include "tensorflow/lite/c/common.h"
+
+#include "metawarenn_lib/metawarenn_model.h"
+#include "metawarenn_lib/metawarenn_graph.h"
+#include "metawarenn_lib/metawarenn_tensor.h"
+#include "metawarenn_lib/metawarenn_node.h"
 
 namespace tflite {
 namespace delegates {
@@ -29,8 +35,11 @@ class ModelBuilder {
   TfLiteStatus AddOperations(TfLiteContext* context) ;
 
   IOpBuilder* GetOpBuilder(int32_t op_type);
+
+  ::metawarenn::MWNNModel mwnn_model_;
+  ::metawarenn::MWNNGraph mwnn_graph_;
 };
 
 } // namespace metaware
 } // namespace delegates
-} //namespace onnxruntime
+} //namespace tflite
