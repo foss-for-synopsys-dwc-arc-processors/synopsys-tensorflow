@@ -28,5 +28,6 @@ cc_library(
         "//tensorflow/lite/c:common",
         "//tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:MetaWareNN_implementation",
         "//tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib:metawarenn_lib",
+        "//tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/optimizer:metawarenn_optimizer",
     ],
 )

@@ -9,6 +9,12 @@
 #include "metawarenn_lib/metawarenn_tensor.h"
 #include "metawarenn_lib/metawarenn_node.h"
 
+#include "metawarenn_lib/optimizer/pass_manager.h"
+#include "metawarenn_lib/optimizer/metawarenn_optimizer.h"
+#include "metawarenn_lib/optimizer/dummy_pass_1.h"
+#include "metawarenn_lib/optimizer/dummy_pass_2.h"
+#include "metawarenn_lib/optimizer/dummy_pass_3.h"
+
 namespace tflite {
 namespace delegates {
 namespace metawarenn {
