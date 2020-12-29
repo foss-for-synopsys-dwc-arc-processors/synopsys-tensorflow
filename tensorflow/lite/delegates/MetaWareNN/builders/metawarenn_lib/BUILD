@@ -12,15 +12,21 @@ cc_library(
         "metawarenn_graph.cc",
         "metawarenn_tensor.cc",
         "metawarenn_node.cc",
+        "metawarenn_value_info.cc",
     ],
     hdrs = [
         "metawarenn_model.h",
         "metawarenn_graph.h",
         "metawarenn_tensor.h",
         "metawarenn_node.h",
+        "metawarenn_element.h",
+        "metawarenn_value_info.h",
     ],
     tags = [
         "manual",
         "nobuilder",
+    ],
+    deps = [
+        "//tensorflow/lite/c:common",
     ],
 )

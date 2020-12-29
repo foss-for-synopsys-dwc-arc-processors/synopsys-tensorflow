@@ -59,7 +59,29 @@ IOpBuilder* ModelBuilder::GetOpBuilder(int32_t op_type) {
 TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
   std::cout<<"\nAddOperations!!\n"<<std::endl;
   std::cout << "\n----------------------------------------------------------------------------------------------------------------\n";
-  std::cout << "\n MWNN Graph Name : " << mwnn_graph_.get_name();
+  std::cout << "\n MWNN Graph Name : " << mwnn_graph_.get_name() << "with size as " << subgraph_nodes_.size() << " nodes";
+
+  TfLiteNode* node;
+  TfLiteRegistration* reg;
+
+  //Set Graph Input Node
+  context->GetNodeAndRegistration(context, 0, &node, &reg);
+  int tensor_id = node->inputs->data[0];
+  const auto& input_tensor = context->tensors[tensor_id];
+  std::vector<int> dims_ip_vec(input_tensor.dims->data, input_tensor.dims->data + input_tensor.dims->size);
+  ::metawarenn::MWNNValueInfo mwnn_input(input_tensor.name, dims_ip_vec, input_tensor.type);
+  mwnn_graph_.set_graph_inputs(mwnn_input);
+  mwnn_graph_.set_graph_ip_name(input_tensor.name);
+
+  //Set Graph Output Node
+  context->GetNodeAndRegistration(context, (subgraph_nodes_.size() - 1), &node, &reg);
+  tensor_id = node->outputs->data[0];
+  const auto& output_tensor = context->tensors[tensor_id];
+  std::vector<int> dims_op_vec(output_tensor.dims->data, output_tensor.dims->data + output_tensor.dims->size);
+  ::metawarenn::MWNNValueInfo mwnn_output(output_tensor.name, dims_op_vec, output_tensor.type);
+  mwnn_graph_.set_graph_outputs(mwnn_output);
+  mwnn_graph_.set_graph_op_name(output_tensor.name);
+
   for (size_t node_index = 0; node_index < subgraph_nodes_.size(); node_index++) {
     TfLiteNode* node;
     TfLiteRegistration* reg;
@@ -115,7 +137,6 @@ TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
       const int tensor_id = node->outputs->data[i];
       node_outputs.emplace_back(context->tensors[tensor_id].name);
     }
-
     ::metawarenn::MWNNNode mwnn_node(node_name, node_op_type, node_inputs, node_outputs);
     mwnn_graph_.set_graph_nodes(mwnn_node);
 
@@ -127,8 +148,12 @@ TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
           std::vector<int> dims_vec(input_tensor.dims->data, input_tensor.dims->data + input_tensor.dims->size);
           auto num_tensor_elements = std::accumulate(begin(dims_vec), end(dims_vec), 1, std::multiplies<int>());
           std::vector<float> tensor_vec(input_tensor.data.f, input_tensor.data.f + num_tensor_elements);
+
           ::metawarenn::MWNNTensor mwnn_tensor(input_tensor.name, dims_vec,  tensor_vec);
           mwnn_graph_.set_graph_initializers(mwnn_tensor);
+
+          ::metawarenn::MWNNValueInfo mwnn_input(input_tensor.name, dims_vec, input_tensor.type);
+          mwnn_graph_.set_graph_inputs(mwnn_input);
       }
     }
 
