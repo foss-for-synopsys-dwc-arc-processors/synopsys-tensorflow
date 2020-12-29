@@ -6,6 +6,20 @@ package(
 )
 
 cc_library(
+    name = "metawarenn_element",
+    hdrs = [
+        "metawarenn_element.h",
+    ],
+    tags = [
+        "manual",
+        "nobuilder",
+    ],
+    deps = [
+        "//tensorflow/lite/c:common",
+    ],
+)
+
+cc_library(
     name = "metawarenn_lib",
     srcs = [
         "metawarenn_model.cc",
@@ -19,7 +33,6 @@ cc_library(
         "metawarenn_graph.h",
         "metawarenn_tensor.h",
         "metawarenn_node.h",
-        "metawarenn_element.h",
         "metawarenn_value_info.h",
     ],
     tags = [
@@ -27,7 +40,7 @@ cc_library(
         "nobuilder",
     ],
     deps = [
-        "//tensorflow/lite/c:common",
+        "metawarenn_element",
         "//tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/op:metawarenn_ops",
     ],
 )

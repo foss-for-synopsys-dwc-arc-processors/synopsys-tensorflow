@@ -8,7 +8,6 @@
 #include "op/avg_pool.h"
 #include "op/reshape.h"
 #include "op/softmax.h"
-#include <memory>
 
 namespace metawarenn {
 

@@ -3,6 +3,7 @@
 
 #include "metawarenn_model.h"
 #include "metawarenn_element.h"
+#include "op/input_data.h"
 
 namespace metawarenn {
 
@@ -12,6 +13,9 @@ class MWNNValueInfo {
     std::string get_name() { return name; }
     int get_type() { return tf_type; }
     std::vector<int> get_dims() { return dims; }
+    std::shared_ptr<op::Node> get_node() {
+      return std::make_shared<op::InputData>(name, dims, t_type);
+    }
   private:
     std::string name;
     int tf_type;

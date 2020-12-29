@@ -73,6 +73,9 @@ TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
   mwnn_graph_.set_graph_inputs(mwnn_input);
   mwnn_graph_.set_graph_ip_name(input_tensor.name);
 
+  auto ip_node = mwnn_input.get_node();
+  mwnn_graph_.mwnn_graph_nodes[mwnn_input.get_name()] = std::move(*ip_node);
+
   //Set Graph Output Node
   context->GetNodeAndRegistration(context, (subgraph_nodes_.size() - 1), &node, &reg);
   tensor_id = node->outputs->data[0];
@@ -137,10 +140,6 @@ TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
       const int tensor_id = node->outputs->data[i];
       node_outputs.emplace_back(context->tensors[tensor_id].name);
     }
-    ::metawarenn::MWNNNode mwnn_node(node_name, node_op_type, node_inputs, node_outputs);
-    mwnn_graph_.set_graph_nodes(mwnn_node);
-    auto op_node = mwnn_node.get_node();
-    mwnn_graph_.mwnn_graph_nodes[mwnn_node.get_name()] = std::move(*op_node);
 
     for (int i = 0; i < node->inputs->size; ++i) {
       const int tensor_id = node->inputs->data[i];
@@ -151,14 +150,22 @@ TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
           auto num_tensor_elements = std::accumulate(begin(dims_vec), end(dims_vec), 1, std::multiplies<int>());
           std::vector<float> tensor_vec(input_tensor.data.f, input_tensor.data.f + num_tensor_elements);
 
-          ::metawarenn::MWNNTensor mwnn_tensor(input_tensor.name, dims_vec,  tensor_vec);
+          ::metawarenn::MWNNTensor mwnn_tensor(input_tensor.name, dims_vec, input_tensor.type, tensor_vec);
           mwnn_graph_.set_graph_initializers(mwnn_tensor);
+
+          auto const_node = mwnn_tensor.get_constant_node();
+          mwnn_graph_.mwnn_graph_nodes[mwnn_tensor.get_name()] = std::move(*const_node);
 
           ::metawarenn::MWNNValueInfo mwnn_input(input_tensor.name, dims_vec, input_tensor.type);
           mwnn_graph_.set_graph_inputs(mwnn_input);
           mwnn_graph_.mwnn_initializer_names.insert(input_tensor.name);
       }
     }
+
+    ::metawarenn::MWNNNode mwnn_node(node_name, node_op_type, node_inputs, node_outputs);
+    mwnn_graph_.set_graph_nodes(mwnn_node);
+    auto op_node = mwnn_node.get_node();
+    mwnn_graph_.mwnn_graph_nodes[mwnn_node.get_name()] = std::move(*op_node);
 
     if (auto* op_builder = GetOpBuilder(op_type)) {
       TF_LITE_ENSURE_STATUS(op_builder->AddToModelBuilder(*this, op_type));

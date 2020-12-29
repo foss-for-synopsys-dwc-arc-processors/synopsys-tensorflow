@@ -10,7 +10,9 @@ cc_library(
     srcs = [
         "add.cc",
         "avg_pool.cc",
+        "constant.cc",
         "conv.cc",
+        "input_data.cc",
         "node.cc",
         "relu.cc",
         "reshape.cc",
@@ -19,7 +21,9 @@ cc_library(
     hdrs = [
         "add.h",
         "avg_pool.h",
+        "constant.h",
         "conv.h",
+        "input_data.h",
         "node.h",
         "relu.h",
         "reshape.h",
@@ -28,5 +32,8 @@ cc_library(
     tags = [
         "manual",
         "nobuilder",
+    ],
+    deps = [
+        "//tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib:metawarenn_element",
     ],
 )
