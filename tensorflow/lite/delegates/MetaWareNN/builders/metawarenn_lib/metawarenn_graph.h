@@ -5,6 +5,9 @@
 #include "metawarenn_tensor.h"
 #include "metawarenn_node.h"
 #include "metawarenn_value_info.h"
+#include "op/node.h"
+#include <set>
+#include <map>
 
 namespace metawarenn {
 
@@ -33,6 +36,8 @@ class MWNNGraph {
     void set_graph_outputs(MWNNValueInfo m_valueinfo) { mwnn_outputs.emplace_back(m_valueinfo); }
     std::vector<MWNNValueInfo> get_graph_outputs() { return mwnn_outputs; }
 
+    std::set<std::string> mwnn_initializer_names;
+    std::map<std::string, op::Node> mwnn_graph_nodes;
   private:
     MWNNModel mwnn_model;
     std::string name;

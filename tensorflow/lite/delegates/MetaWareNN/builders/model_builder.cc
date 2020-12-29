@@ -139,6 +139,8 @@ TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
     }
     ::metawarenn::MWNNNode mwnn_node(node_name, node_op_type, node_inputs, node_outputs);
     mwnn_graph_.set_graph_nodes(mwnn_node);
+    auto op_node = mwnn_node.get_node();
+    mwnn_graph_.mwnn_graph_nodes[mwnn_node.get_name()] = std::move(*op_node);
 
     for (int i = 0; i < node->inputs->size; ++i) {
       const int tensor_id = node->inputs->data[i];
@@ -154,6 +156,7 @@ TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
 
           ::metawarenn::MWNNValueInfo mwnn_input(input_tensor.name, dims_vec, input_tensor.type);
           mwnn_graph_.set_graph_inputs(mwnn_input);
+          mwnn_graph_.mwnn_initializer_names.insert(input_tensor.name);
       }
     }
 
