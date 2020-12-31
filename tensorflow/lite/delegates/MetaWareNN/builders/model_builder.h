@@ -2,12 +2,14 @@
 #include <unordered_map>
 #include <memory>
 #include <numeric>
+#include <cmath>
 #include "tensorflow/lite/c/common.h"
 
 #include "metawarenn_lib/metawarenn_model.h"
 #include "metawarenn_lib/metawarenn_graph.h"
 #include "metawarenn_lib/metawarenn_tensor.h"
 #include "metawarenn_lib/metawarenn_node.h"
+#include "metawarenn_lib/metawarenn_attribute.h"
 
 #include "metawarenn_lib/optimizer/pass_manager.h"
 #include "metawarenn_lib/optimizer/metawarenn_optimizer.h"

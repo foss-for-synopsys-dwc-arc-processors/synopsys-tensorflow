@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <memory>
+#include <algorithm>
 
 namespace metawarenn {
 

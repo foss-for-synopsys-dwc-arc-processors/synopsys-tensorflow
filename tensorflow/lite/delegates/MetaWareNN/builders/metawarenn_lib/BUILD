@@ -27,6 +27,7 @@ cc_library(
         "metawarenn_tensor.cc",
         "metawarenn_node.cc",
         "metawarenn_value_info.cc",
+        "metawarenn_attribute.cc",
     ],
     hdrs = [
         "metawarenn_model.h",
@@ -34,6 +35,7 @@ cc_library(
         "metawarenn_tensor.h",
         "metawarenn_node.h",
         "metawarenn_value_info.h",
+        "metawarenn_attribute.h",
     ],
     tags = [
         "manual",
