@@ -19,6 +19,17 @@ class MWNNNode {
     std::string get_op_type() { return op_type; }
     std::vector<std::string> get_inputs() { return inputs; }
     std::vector<std::string> get_outputs() { return outputs; }
+    std::vector<MWNNAttribute> get_attributes() { return mwnn_attributes; }
+    std::vector<int> get_attribute_value(std::string name) {
+      auto it = std::find_if(
+      std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
+          return attribute.get_name() == name;
+      });
+      if (it == std::end(mwnn_attributes)) {
+          std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name;
+      }
+      return it->get_data();
+  }
     std::shared_ptr<op::Node> get_node() {
     if(op_type == "Conv") {
       return std::make_shared<op::Conv>(name, inputs, outputs);
@@ -40,17 +51,6 @@ class MWNNNode {
       }
     else
       return NULL;
-  }
-  std::vector<MWNNAttribute> get_attributes() { return mwnn_attributes; }
-  std::vector<int> get_attribute_value(std::string name) {
-    auto it = std::find_if(
-    std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
-        return attribute.get_name() == name;
-    });
-    if (it == std::end(mwnn_attributes)) {
-        std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name;
-    }
-    return it->get_data();
   }
   private:
     std::string name;

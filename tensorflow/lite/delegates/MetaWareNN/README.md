@@ -38,7 +38,7 @@
 
 5. Build MetaWareNN and its dependent libraries
 ```
-    bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib:MetaWareNN_implementation //tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/op:metawarenn_ops //tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib:metawarenn_lib //tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/optimizer:metawarenn_optimizer //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
+    bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/op:metawarenn_ops //tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib:metawarenn_lib //tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/optimizer:metawarenn_optimizer //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
 ```
 
 
@@ -71,7 +71,7 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
 5. Compile the inference script
   Note: we suggest to use g++ 7 to avoid possible errors.
 ```
-    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib -lMetaWareNN_implementation -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib -lmetawarenn_lib -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/optimizer -lmetawarenn_optimizer -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/op -lmetawarenn_ops
+    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib -lmetawarenn_lib -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/optimizer -lmetawarenn_optimizer -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/op -lmetawarenn_ops
 ```
 
 6. Run the object file

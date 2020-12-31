@@ -43,6 +43,8 @@ cc_library(
     ],
     deps = [
         "metawarenn_element",
+        "//tensorflow/lite:util",
+        "//tensorflow/lite/c:common",
         "//tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/op:metawarenn_ops",
     ],
 )
