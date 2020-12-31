@@ -24,8 +24,6 @@ class MetaWareNNDelegateKernel {
 
  private:
 
-  const MetaWareNN* metawarenn_ = nullptr;
-
   //Create model builder
   std::unique_ptr<delegates::metawarenn::ModelBuilder> model_builder_;
 

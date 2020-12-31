@@ -1,5 +1,5 @@
-#include "model.h"
 #include <unordered_map>
+#include <iostream>
 #include <memory>
 #include <numeric>
 #include <cmath>
@@ -35,17 +35,11 @@ class ModelBuilder {
   TfLiteStatus MetaWareNNCompile();
 
  private:
-  const MetaWareNN* metawarenn_{nullptr};
   std::vector<int> subgraph_nodes_;
-  std::unique_ptr<Model> metawarenn_model_;
-  std::unordered_map<std::int32_t, std::shared_ptr<IOpBuilder>> op_builders_;
-
-  TfLiteStatus AddOperations(TfLiteContext* context) ;
-
-  IOpBuilder* GetOpBuilder(int32_t op_type);
-
+  TfLiteStatus AddOperations(TfLiteContext* context);
   ::metawarenn::MWNNModel mwnn_model_;
   ::metawarenn::MWNNGraph mwnn_graph_;
+
 };
 
 } // namespace metaware

@@ -1,26 +1,19 @@
-#include <iostream>
-
 #include "model_builder.h"
-#include "op_builder.h"
-#include "helper.h"
 #include "tensorflow/lite/context_util.h"
-#include "tensorflow/lite/delegates/MetaWareNN/MetaWareNN_lib/MetaWareNN_implementation.h" //To access MetawareNN APIs from shared library
 #include "tensorflow/lite/builtin_ops.h"
 #include "tensorflow/lite/c/builtin_op_data.h"
 
 namespace tflite {
 namespace delegates {
-namespace metawarenn{
+namespace metawarenn {
 
 ModelBuilder::ModelBuilder(std::vector<int> nodes)
-    : metawarenn_(MetaWareNNImplementation()), subgraph_nodes_(nodes) {
-  op_builders_ = CreateOpBuilders();
+    : subgraph_nodes_(nodes) {
+
 }
 
 TfLiteStatus ModelBuilder::BuildGraph(TfLiteContext* context) {
   std::cout<<"\nBuildGraph!!"<<std::endl;
-  metawarenn_model_ = std::unique_ptr<delegates::metawarenn::Model>
-                      (new delegates::metawarenn::Model());
   mwnn_graph_.set_name("MetaWareNN_NodeSubSet_1");
   /* Create and Populate the metawarenn_model_ by adding ops and operands using MetaWareNN API */
   TF_LITE_ENSURE_STATUS(AddOperations(context));
@@ -48,12 +41,6 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile() {
   manager.register_pass(d_pass4);
   manager.run_passes();
   return kTfLiteOk;
-}
-
-IOpBuilder* ModelBuilder::GetOpBuilder(int32_t op_type) {
-  if (!Contains(op_builders_, op_type))
-    return nullptr;
-  return op_builders_[op_type].get();
 }
 
 TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
@@ -297,9 +284,6 @@ TfLiteStatus ModelBuilder::AddOperations(TfLiteContext* context) {
     auto op_node = mwnn_node.get_node();
     mwnn_graph_.mwnn_graph_nodes[mwnn_node.get_name()] = std::move(*op_node);
 
-    if (auto* op_builder = GetOpBuilder(op_type)) {
-      TF_LITE_ENSURE_STATUS(op_builder->AddToModelBuilder(*this, op_type));
-    }
   }
   std::cout << "\n----------------------------------------------------------------------------------------------------------------\n";
   /*for (auto& it : mwnn_graph_.get_graph_initializers()) {
