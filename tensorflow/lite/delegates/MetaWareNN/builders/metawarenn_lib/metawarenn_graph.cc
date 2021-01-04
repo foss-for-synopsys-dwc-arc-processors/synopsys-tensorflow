@@ -101,7 +101,7 @@ namespace metawarenn {
         std::cout << "\n Conv dilation_height_factor : " << conv_params->dilation_height_factor;*/
       }
       else if (op_type == kTfLiteBuiltinDepthwiseConv2d) {
-        node_op_type = "Conv";
+        node_op_type = "DepthwiseConv";
         node_name = node_op_type + std::to_string(node_index);
         const TfLiteDepthwiseConvParams* depthwise_conv_params = reinterpret_cast<const TfLiteDepthwiseConvParams*>(node->builtin_data);
 

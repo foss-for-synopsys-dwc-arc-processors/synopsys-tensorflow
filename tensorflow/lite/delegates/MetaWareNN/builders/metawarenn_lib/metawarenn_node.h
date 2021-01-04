@@ -9,6 +9,7 @@
 #include "op/avg_pool.h"
 #include "op/reshape.h"
 #include "op/softmax.h"
+#include "op/depthwise_conv.h"
 
 namespace metawarenn {
 
@@ -33,6 +34,9 @@ class MWNNNode {
     std::shared_ptr<op::Node> get_node() {
     if(op_type == "Conv") {
       return std::make_shared<op::Conv>(name, inputs, outputs);
+    }
+    else if(op_type == "DepthwiseConv") {
+      return std::make_shared<op::DepthwiseConv>(name, inputs, outputs);
     }
     else if(op_type == "Relu") {
       return std::make_shared<op::Relu>(name, inputs, outputs);
