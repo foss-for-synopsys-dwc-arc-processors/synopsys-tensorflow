@@ -10,7 +10,7 @@ using namespace std;
 
 int main(){
 
-    std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile("/home/mcw/sowmya/pytorch/tf/mobilenet_v2_1.0_224/mobilenet_v2_1.0_224.tflite");  
+    std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile("/path/to/mobilenet_v2_1.0_224.tflite");
     if(!model){
         printf("Failed to mmap model\n");
         exit(0);
