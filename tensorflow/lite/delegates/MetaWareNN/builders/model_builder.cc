@@ -7,13 +7,13 @@ namespace metawarenn {
 ModelBuilder::ModelBuilder(std::vector<int> nodes)
     : subgraph_nodes_(nodes) {}
 
-TfLiteStatus ModelBuilder::BuildGraph(TfLiteContext* context) {
+::metawarenn::MWNNGraph ModelBuilder::BuildGraph(TfLiteContext* context) {
   std::cout<<"\nBuildGraph!!"<<std::endl;
 
   /*Create MetaWareNN High Level Graph Representation from TFLite SubGraph Nodes*/
   ::metawarenn::MWNNModel mwnn_model_();
   ::metawarenn::MWNNGraph mwnn_graph_(context, subgraph_nodes_);
-  return kTfLiteOk;
+  return mwnn_graph_;
 }
 
 /* TODO: High Level Graph to MetaWareNN Graph Representation,

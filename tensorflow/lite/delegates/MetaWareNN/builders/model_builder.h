@@ -3,6 +3,7 @@
 #include "metawarenn_lib/metawarenn_tensor.h"
 #include "metawarenn_lib/metawarenn_node.h"
 #include "metawarenn_lib/metawarenn_attribute.h"
+#include "metawarenn_lib/metawarenn_utils.h"
 
 #include "metawarenn_lib/optimizer/pass_manager.h"
 #include "metawarenn_lib/optimizer/metawarenn_optimizer.h"
@@ -20,7 +21,7 @@ class ModelBuilder {
  public:
   ModelBuilder(std::vector<int> nodes);
   ~ModelBuilder() = default;
-  TfLiteStatus BuildGraph(TfLiteContext* context);
+  ::metawarenn::MWNNGraph BuildGraph(TfLiteContext* context);
   TfLiteStatus MetaWareNNCompile();
 
  private:

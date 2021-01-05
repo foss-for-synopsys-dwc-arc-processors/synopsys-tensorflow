@@ -20,7 +20,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Init(TfLiteContext* context,
   }
   model_builder_ = std::unique_ptr<delegates::metawarenn::ModelBuilder>
                    (new delegates::metawarenn::ModelBuilder(nodes_));
-  model_builder_->BuildGraph(context);
+  mwnn_graph_ = model_builder_->BuildGraph(context);
   return kTfLiteOk;
 }
 
@@ -37,6 +37,8 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
 TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Invoke!!!"<<std::endl;
+
+  //convert_to_mwnn_format(mwnn_graph_);
 
   return kTfLiteOk;
 }

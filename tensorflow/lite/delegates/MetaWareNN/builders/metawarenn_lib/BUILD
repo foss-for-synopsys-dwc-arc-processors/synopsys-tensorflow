@@ -28,6 +28,7 @@ cc_library(
         "metawarenn_node.cc",
         "metawarenn_value_info.cc",
         "metawarenn_attribute.cc",
+        "metawarenn_utils.cc"
     ],
     hdrs = [
         "metawarenn_model.h",
@@ -36,6 +37,7 @@ cc_library(
         "metawarenn_node.h",
         "metawarenn_value_info.h",
         "metawarenn_attribute.h",
+        "metawarenn_utils.h",
     ],
     tags = [
         "manual",
@@ -46,5 +48,6 @@ cc_library(
         "//tensorflow/lite:util",
         "//tensorflow/lite/c:common",
         "//tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/op:metawarenn_ops",
+        "//tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/kernels:metawarenn_kernels",
     ],
 )
