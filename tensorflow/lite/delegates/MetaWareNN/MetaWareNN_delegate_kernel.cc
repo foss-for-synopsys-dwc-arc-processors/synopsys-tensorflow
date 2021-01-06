@@ -38,7 +38,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Invoke!!!"<<std::endl;
 
-  //convert_to_mwnn_format(mwnn_graph_);
+  convert_to_mwnn_format(mwnn_graph_);
 
   return kTfLiteOk;
 }

@@ -185,7 +185,6 @@ MLI_FORCE_INLINE void depthwise_convolution2D(
                                                in.row_mem_stride * dilation_height);
 
                 const int out_ch_idx = in_ch_idx;
-                const int wt = *weights.ptr;
                 const MLI_PTR(w_T) w_ptr = weights.ptr
                         + weights.row_mem_stride * comp.top
                         + weights.col_mem_stride * comp.left

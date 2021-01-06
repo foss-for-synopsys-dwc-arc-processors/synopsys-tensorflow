@@ -19,13 +19,8 @@ void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, s
   mwnn_initalizer->el_params.fx.frac_bits = mwnn_initalizer->el_type - (int)ceil(log2(max)) - 1;
   int wt_buf_size = 1;
   uint8_t i;
-  if (dims.size() > 1)
-  {
-    *ch = op_type == "Conv" ? (int)dims[0] : op_type == "DepthwiseConv" ? (int)dims[FMAP_C_DIM_HWC+1] : 0;
-    *k_height = (int)dims[FMAP_H_DIM_HWC+1];
-    *k_width = (int)dims[FMAP_W_DIM_HWC+1];
-  }
-  std::cout << "\nDimension size: ";
+
+  std::cout << "\nDimension ssize: ";
   for (i = 0; i < dims.size(); i++)
   {
     mwnn_initalizer->mem_stride[i] = 0;
@@ -38,8 +33,47 @@ void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, s
   {
     buffer[j++] = (int16_t)(*it * (1 << (mwnn_initalizer->el_params.fx.frac_bits)) + ((*it >= 0)? 0.5f: -0.5f));
   }
+  if (dims.size() > 1) //To handle weights
+  {
+    if(op_type == "DepthwiseConv") // To handle DepthwiseConv weights
+    {
+      // Data layout conversion from CHWN to NHWC
+      int16_t *new_wt_buf = (int16_t*)malloc(wt_buf_size * sizeof(int16_t));
+      int channel = dims[3];
+      int width = dims[1];
+      int height = dims[2];
+      new_wt_buf = (int16_t*)malloc(wt_buf_size * sizeof(int16_t));
+
+      for(int i = 0; i < height; i++) {
+        for(int j = 0; j < width; j++) {
+          for(int k = 0; k < channel; k++) {
+            new_wt_buf[(i * width) + (j) +(k * height * width)] = (int16_t)(buffer[(i * width * channel) + (j * channel) + k]);
+          }
+        }
+      }
+      // shape conversion for DepthwiseConv weightds
+      int temp = mwnn_initalizer->shape[0];
+      mwnn_initalizer->shape[0] = dims[3];
+      mwnn_initalizer->shape[3] = dims[0];
+
+      mwnn_initalizer->data.capacity = sizeof(new_wt_buf);
+      mwnn_initalizer->data.mem.void_p = (void *)new_wt_buf;
+    }
+    else // To handle conv weights
+    {
+      mwnn_initalizer->data.capacity = sizeof(buffer);
+      mwnn_initalizer->data.mem.void_p = (void *)buffer;
+    }
+    *ch = mwnn_initalizer->shape[KRNL_C_DIM_HWC];
+    *k_height = (int)mwnn_initalizer->shape[KRNL_H_DIM_HWC];
+    *k_width = (int)mwnn_initalizer->shape[KRNL_W_DIM_HWC];
+  }
+  else // To handle bias
+  {
   mwnn_initalizer->data.capacity = sizeof(buffer);
   mwnn_initalizer->data.mem.void_p = (void *)buffer;
+  }
+
 
   std::cout << "\nMax of tensor: " << max;
   std::cout << "\nInt bits : " << (int)ceil(log2(max));
