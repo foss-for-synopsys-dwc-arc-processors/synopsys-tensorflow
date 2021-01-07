@@ -19,6 +19,7 @@ class DepthwiseConv : public Node {
     std::vector<int> dilations;
     std::vector<int> strides;
     std::vector<int> pads;
+    std::vector<int> activation;
 };
 
 } //namespace op

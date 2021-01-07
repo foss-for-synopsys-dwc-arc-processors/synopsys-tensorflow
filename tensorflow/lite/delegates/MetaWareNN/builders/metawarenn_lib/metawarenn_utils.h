@@ -4,6 +4,7 @@
 #include "kernels/mli_krn_convolution_ref.h"
 #include "kernels/mli_krn_avepool_hwc.h"
 #include "kernels/mli_krn_eltwise_ref.h"
+#include "tensorflow/lite/schema/schema_generated.h"
 #include <cmath>
 
 

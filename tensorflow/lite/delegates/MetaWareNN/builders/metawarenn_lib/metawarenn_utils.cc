@@ -42,7 +42,6 @@ void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, s
       int channel = dims[3];
       int width = dims[1];
       int height = dims[2];
-      new_wt_buf = (int16_t*)malloc(wt_buf_size * sizeof(int16_t));
 
       for(int i = 0; i < height; i++) {
         for(int j = 0; j < width; j++) {
@@ -143,6 +142,13 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       conv_cfg.padding_right = pads[3];
       conv_cfg.dilation_height = dilations[0];
       conv_cfg.dilation_width = dilations[1];
+      auto activation = g_n.get_attribute_value("activation")[0];
+      if(activation == ::tflite::ActivationFunctionType_NONE)
+        conv_cfg.relu.type = MLI_RELU_NONE;
+      else if(activation == ::tflite::ActivationFunctionType_RELU)
+        conv_cfg.relu.type = MLI_RELU_GEN;
+      else if(activation == ::tflite::ActivationFunctionType_RELU6)
+        conv_cfg.relu.type = MLI_RELU_6;
       std::cout << "\n\nConfig params:";
       std::cout << "\nstride_height : " << (int)conv_cfg.stride_height;
       std::cout << "\nstride_width : " << (int)conv_cfg.stride_width;
@@ -152,18 +158,6 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       std::cout << "\npadding_right : " << (int)conv_cfg.padding_right;
       std::cout << "\ndilation_height : " << (int)conv_cfg.dilation_height;
       std::cout << "\ndilation_width : " << (int)conv_cfg.dilation_width;
-      // Get the next relu node to fuse with conv+BN and update the output_name to fetch as i/p for next conv node
-      auto next_node = node_list[node_idx+1];
-      if (next_node.get_op_type() == "Relu")
-      {
-        output_name = next_node.get_name();
-        conv_cfg.relu.type = MLI_RELU_GEN;
-      }
-      else
-      {
-        output_name = g_n.get_outputs()[0];
-        conv_cfg.relu.type = MLI_RELU_NONE;
-      }
       mli_tensor input_tensor;
       mli_tensor conv_wt;
       mli_tensor conv_bias;
@@ -209,8 +203,8 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
           &conv_cfg, &output_tensor);
       }
       output_tensor.shape[3] = 1;
-      std::cout << "\nOutput key in tensor map: " << output_name;
-      tensor_map.insert(std::pair<std::string, mli_tensor>(output_name, output_tensor)); // Store the output tensor to tensor map
+      std::cout << "\nOutput key in tensor map: " << g_n.get_outputs()[0];
+      tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], output_tensor)); // Store the output tensor to tensor map
     }
     else if (op_type =="Add")
     {

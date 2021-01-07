@@ -53,6 +53,8 @@ namespace metawarenn {
         node_attributes.emplace_back(mwnn_attr_dilate);
         ::metawarenn::MWNNAttribute mwnn_attr_stride("strides", {conv_params->stride_height, conv_params->stride_width});
         node_attributes.emplace_back(mwnn_attr_stride);
+        ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {conv_params->activation});
+        node_attributes.emplace_back(mwnn_attr_activation);
 
         if(conv_params->padding == kTfLitePaddingSame) {
           const int input_tensor_id = node->inputs->data[0];
@@ -109,6 +111,8 @@ namespace metawarenn {
         node_attributes.emplace_back(mwnn_attr_dilate);
         ::metawarenn::MWNNAttribute mwnn_attr_stride("strides", {depthwise_conv_params->stride_height, depthwise_conv_params->stride_width});
         node_attributes.emplace_back(mwnn_attr_stride);
+        ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {depthwise_conv_params->activation});
+        node_attributes.emplace_back(mwnn_attr_activation);
 
         if(depthwise_conv_params->padding == kTfLitePaddingSame) {
           const int input_tensor_id = node->inputs->data[0];
