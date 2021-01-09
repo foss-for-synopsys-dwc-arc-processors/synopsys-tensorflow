@@ -15,11 +15,14 @@ namespace metawarenn {
 
 class MWNNNode {
   public:
+    MWNNNode() = default;
     MWNNNode(std::string m_name, std::string m_op_type, std::vector<MWNNAttribute> m_mwnn_attributes, std::vector<std::string> m_inputs,  std::vector<std::string> m_outputs);
     std::string get_name() { return name; }
     std::string get_op_type() { return op_type; }
     std::vector<std::string> get_inputs() { return inputs; }
     std::vector<std::string> get_outputs() { return outputs; }
+    void set_inputs(std::string name, int index) { inputs[index] = name; }
+    void set_outputs(std::string name, int index) { outputs[index] = name; }
     std::vector<MWNNAttribute> get_attributes() { return mwnn_attributes; }
     std::vector<int> get_attribute_value(std::string name) {
       auto it = std::find_if(
@@ -31,6 +34,16 @@ class MWNNNode {
       }
       return it->get_data();
   }
+    void update_attribute_value(std::string name, int value) {
+      auto it = std::find_if(
+      std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
+          return attribute.get_name() == name;
+      });
+      if (it == std::end(mwnn_attributes)) {
+          std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name << " while updating its value!!!";
+      }
+      return it->set_data(value);
+    }
     std::shared_ptr<op::Node> get_node() {
     if(op_type == "Conv") {
       return std::make_shared<op::Conv>(name, inputs, outputs,

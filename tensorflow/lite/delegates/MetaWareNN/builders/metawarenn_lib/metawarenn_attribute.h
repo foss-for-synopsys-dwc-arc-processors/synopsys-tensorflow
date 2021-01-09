@@ -10,6 +10,7 @@ class MWNNAttribute {
     MWNNAttribute(std::string m_name, std::vector<int> m_data);
     std::string get_name() { return name; }
     std::vector<int> get_data() { return data; }
+    void set_data(int m_data);
   private:
     std::string name;
     std::vector<int> data;

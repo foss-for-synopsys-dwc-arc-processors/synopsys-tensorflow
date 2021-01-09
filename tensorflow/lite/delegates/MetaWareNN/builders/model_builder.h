@@ -8,8 +8,8 @@
 #include "metawarenn_lib/optimizer/pass_manager.h"
 #include "metawarenn_lib/optimizer/metawarenn_optimizer.h"
 #include "metawarenn_lib/optimizer/dummy_pass_1.h"
-#include "metawarenn_lib/optimizer/dummy_pass_2.h"
-#include "metawarenn_lib/optimizer/dummy_pass_3.h"
+#include "metawarenn_lib/optimizer/remove_reshape.h"
+
 
 namespace tflite {
 namespace delegates {
@@ -22,7 +22,7 @@ class ModelBuilder {
   ModelBuilder(std::vector<int> nodes);
   ~ModelBuilder() = default;
   ::metawarenn::MWNNGraph BuildGraph(TfLiteContext* context);
-  TfLiteStatus MetaWareNNCompile();
+  TfLiteStatus MetaWareNNCompile(::metawarenn::MWNNGraph *mwnn_graph);
 
  private:
   std::vector<int> subgraph_nodes_;

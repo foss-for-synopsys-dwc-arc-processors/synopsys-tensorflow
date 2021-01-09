@@ -10,19 +10,22 @@ cc_library(
     srcs = [
         "metawarenn_optimizer.cc",
         "dummy_pass_1.cc",
-        "dummy_pass_2.cc",
-        "dummy_pass_3.cc",
+        "remove_reshape.cc",
+        "fuse_relu.cc",
         "pass_manager.cc",
     ],
     hdrs = [
         "metawarenn_optimizer.h",
         "dummy_pass_1.h",
-        "dummy_pass_2.h",
-        "dummy_pass_3.h",
+        "remove_reshape.h",
+        "fuse_relu.h",
         "pass_manager.h",
     ],
     tags = [
         "manual",
         "nobuilder",
+    ],
+    deps = [
+        "//tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib:metawarenn_lib",
     ],
 )

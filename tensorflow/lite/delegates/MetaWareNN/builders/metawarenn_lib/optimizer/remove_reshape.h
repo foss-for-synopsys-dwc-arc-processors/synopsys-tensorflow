@@ -6,13 +6,11 @@ namespace metawarenn {
 
 namespace optimizer {
 
-class DummyPass3 : public MWNNOptimizer {
+class RemoveReshape : public MWNNOptimizer {
   public:
-    DummyPass3();
-    DummyPass3(int val);
-    int get_value() { return value; }
-  private:
-    int value = 30;
+    RemoveReshape();
+    RemoveReshape(MWNNGraph* mwnn_graph, MWNNNode mwnn_node);
+    void RunPass() override;
 };
 
 } //namespace optimizer

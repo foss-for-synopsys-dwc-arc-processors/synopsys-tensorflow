@@ -28,7 +28,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Prepare!!"<<std::endl;
 
-  if(model_builder_->MetaWareNNCompile()) {
+  if(model_builder_->MetaWareNNCompile(&mwnn_graph_)) {
     graph_prepared_ = true;
   }
   return kTfLiteOk;

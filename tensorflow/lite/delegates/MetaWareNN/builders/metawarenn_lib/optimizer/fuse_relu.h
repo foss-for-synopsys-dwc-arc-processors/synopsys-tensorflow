@@ -6,12 +6,11 @@ namespace metawarenn {
 
 namespace optimizer {
 
-class DummyPass2 : public MWNNOptimizer {
+class FuseRelu : public MWNNOptimizer {
   public:
-    DummyPass2();
-    int get_value() { return value; }
-  private:
-    int value = 20;
+    FuseRelu();
+    FuseRelu(MWNNGraph* mwnn_graph, MWNNNode mwnn_node);
+    void RunPass() override;
 };
 
 } //namespace optimizer
