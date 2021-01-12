@@ -19,7 +19,7 @@ namespace metawarenn {
     ip_name = input_tensor.name;
 
     auto ip_node = mwnn_input.get_node();
-    mwnn_graph_nodes[mwnn_input.get_name()] = std::move(*ip_node);
+    mwnn_graph_nodes[mwnn_input.get_name()] = std::move(ip_node);
 
     //Set Graph Output Node
     context->GetNodeAndRegistration(context, (subgraph_nodes_.size() - 1), &node, &reg);
@@ -233,7 +233,7 @@ namespace metawarenn {
             mwnn_initializer_tensors.emplace_back(mwnn_tensor);
 
             auto const_node = mwnn_tensor.get_constant_node();
-            mwnn_graph_nodes[mwnn_tensor.get_name()] = std::move(*const_node);
+            mwnn_graph_nodes[mwnn_tensor.get_name()] = std::move(const_node);
 
             ::metawarenn::MWNNValueInfo mwnn_input(input_tensor.name, dims_vec, input_tensor.type);
             mwnn_inputs.emplace_back(mwnn_input);
@@ -244,7 +244,7 @@ namespace metawarenn {
       ::metawarenn::MWNNNode mwnn_node(node_name, node_op_type, node_attributes, node_inputs, node_outputs);
       mwnn_nodes.emplace_back(mwnn_node);
       auto op_node = mwnn_node.get_node();
-      mwnn_graph_nodes[mwnn_node.get_name()] = std::move(*op_node);
+      mwnn_graph_nodes[mwnn_node.get_name()] = std::move(op_node);
 
     }
     std::cout << "\n----------------------------------------------------------------------------------------------------------------\n";

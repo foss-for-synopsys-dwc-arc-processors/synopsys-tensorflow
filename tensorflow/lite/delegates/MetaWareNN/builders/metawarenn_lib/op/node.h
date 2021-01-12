@@ -11,6 +11,7 @@ class Node {
   public:
     Node();
     Node(std::string n_name, std::string n_type);
+    virtual ~Node() {}
     std::string name;
     std::string type;
 };

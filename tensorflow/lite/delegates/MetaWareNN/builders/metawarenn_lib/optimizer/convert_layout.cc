@@ -42,6 +42,11 @@ void ConvertLayout::RunPass() {
         }
       }
       graph->update_initializer_tensors(tensor.get_name(), new_dims, new_data);
+      auto& node = graph->mwnn_graph_nodes[tensor.get_name()];
+      if (auto constant_node = std::dynamic_pointer_cast<::metawarenn::op::Constant>(node)) {
+        constant_node->shape = new_dims;
+        constant_node->data = new_data;
+      }
     }
     else if(HWC_to_CHW) {
       std::vector<int> dims = tensor.get_dims();
@@ -60,6 +65,11 @@ void ConvertLayout::RunPass() {
         }
       }
       graph->update_initializer_tensors(tensor.get_name(), new_dims, new_data);
+      auto& node = graph->mwnn_graph_nodes[tensor.get_name()];
+      if (auto constant_node = std::dynamic_pointer_cast<::metawarenn::op::Constant>(node)) {
+        constant_node->shape = new_dims;
+        constant_node->data = new_data;
+      }
     }
   }
   else if(is_value_info) {
@@ -67,11 +77,17 @@ void ConvertLayout::RunPass() {
       std::vector<int> dims = value_info.get_dims();
       std::vector<int> new_dims{dims[0], dims[2], dims[3], dims[1]};
       graph->update_inputs(value_info.get_name(), new_dims);
+      auto& node = graph->mwnn_graph_nodes[value_info.get_name()];
+      if (auto input_data_node = std::dynamic_pointer_cast<::metawarenn::op::InputData>(node))
+        input_data_node->shape = new_dims;
     }
     else if(HWC_to_CHW) {
       std::vector<int> dims = value_info.get_dims();
       std::vector<int> new_dims{dims[0], dims[3], dims[1], dims[2]};
       graph->update_inputs(value_info.get_name(), new_dims);
+      auto& node = graph->mwnn_graph_nodes[value_info.get_name()];
+      if (auto input_data_node = std::dynamic_pointer_cast<::metawarenn::op::InputData>(node))
+        input_data_node->shape = new_dims;
     }
   }
   }
