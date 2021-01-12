@@ -9,12 +9,16 @@ namespace metawarenn {
 
 class MWNNValueInfo {
   public:
+    MWNNValueInfo() = default;
     MWNNValueInfo(std::string m_name, std::vector<int> m_dims, int m_tf_type);
     std::string get_name() { return name; }
     int get_type() { return tf_type; }
     std::vector<int> get_dims() { return dims; }
     std::shared_ptr<op::Node> get_node() {
       return std::make_shared<op::InputData>(name, dims, t_type);
+    }
+    void update_dims(std::vector<int> n_dims) {
+      dims = n_dims;
     }
   private:
     std::string name;

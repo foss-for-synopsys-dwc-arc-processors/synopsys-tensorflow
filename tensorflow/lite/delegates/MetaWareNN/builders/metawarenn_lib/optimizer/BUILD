@@ -9,16 +9,16 @@ cc_library(
     name = "metawarenn_optimizer",
     srcs = [
         "metawarenn_optimizer.cc",
-        "dummy_pass_1.cc",
         "remove_reshape.cc",
         "fuse_relu.cc",
+        "convert_layout.cc",
         "pass_manager.cc",
     ],
     hdrs = [
         "metawarenn_optimizer.h",
-        "dummy_pass_1.h",
         "remove_reshape.h",
         "fuse_relu.h",
+        "convert_layout.h",
         "pass_manager.h",
     ],
     tags = [

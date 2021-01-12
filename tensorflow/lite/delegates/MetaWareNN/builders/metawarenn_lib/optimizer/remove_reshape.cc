@@ -22,7 +22,7 @@ void RemoveReshape::RunPass() {
     //To get consumer of current op
     for(int i = 0; i < (g_n.get_inputs()).size(); i++) {
       if(node.get_outputs()[0] == g_n.get_inputs()[i]) {
-        graph->update_inputs(g_n.get_name(), node.get_inputs()[0], i);
+        graph->update_node_inputs(g_n.get_name(), node.get_inputs()[0], i);
         consumers.insert(g_n.get_name());
       }
     }

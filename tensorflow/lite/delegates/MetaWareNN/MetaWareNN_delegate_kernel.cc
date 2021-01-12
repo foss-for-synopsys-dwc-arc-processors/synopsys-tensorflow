@@ -37,8 +37,8 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
 TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Invoke!!!"<<std::endl;
-
-  convert_to_mwnn_format(mwnn_graph_);
+  int is_HWC = HWC_TO_CHW ? 0 : 1;
+  convert_to_mwnn_format(mwnn_graph_, is_HWC) ;
 
   return kTfLiteOk;
 }

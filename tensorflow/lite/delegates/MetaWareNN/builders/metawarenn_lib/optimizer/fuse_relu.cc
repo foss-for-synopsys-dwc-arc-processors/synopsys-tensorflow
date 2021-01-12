@@ -23,7 +23,7 @@ void FuseRelu::RunPass() {
     //To get producer of current op
     for(int i = 0; i < (g_n.get_outputs()).size(); i++) {
       if(node.get_inputs()[0] == g_n.get_outputs()[i]) {
-        graph->update_outputs(g_n.get_name(), node.get_name(), i);
+        graph->update_node_outputs(g_n.get_name(), node.get_name(), i);
         producers.insert(g_n.get_name());
         if(g_n.get_op_type() == "Conv" or g_n.get_op_type() == "DepthwiseConv") {
           g_n.update_attribute_value("activation", 1);

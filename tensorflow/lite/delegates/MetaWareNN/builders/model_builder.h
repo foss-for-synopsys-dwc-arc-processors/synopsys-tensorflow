@@ -7,9 +7,10 @@
 
 #include "metawarenn_lib/optimizer/pass_manager.h"
 #include "metawarenn_lib/optimizer/metawarenn_optimizer.h"
-#include "metawarenn_lib/optimizer/dummy_pass_1.h"
 #include "metawarenn_lib/optimizer/remove_reshape.h"
+#include "metawarenn_lib/optimizer/convert_layout.h"
 
+#define HWC_TO_CHW 1
 
 namespace tflite {
 namespace delegates {

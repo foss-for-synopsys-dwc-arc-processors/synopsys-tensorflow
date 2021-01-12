@@ -9,6 +9,7 @@ namespace metawarenn {
 
 class MWNNTensor {
   public:
+    MWNNTensor() = default;
     MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_tf_type, std::vector<float> m_tensor);
     std::string get_name() { return name; }
     int get_type() { return tf_type; }
@@ -16,6 +17,10 @@ class MWNNTensor {
     std::vector<float> get_tensor() { return tensor; }
     std::shared_ptr<op::Node> get_constant_node() {
       return std::make_shared<op::Constant>(name, dims, tensor, t_type);
+    }
+    void update_tensor(std::vector<int> n_dims, std::vector<float> n_tensor) {
+      dims = n_dims;
+      tensor = n_tensor;
     }
   private:
     std::string name;
