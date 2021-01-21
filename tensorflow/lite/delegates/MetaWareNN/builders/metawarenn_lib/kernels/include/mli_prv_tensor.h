@@ -11,7 +11,6 @@
 #define _MLI_PRV_TENSOR_H_
 
 #include <assert.h>
-#include <iostream>
 
 #include "mli_check.h"
 #include "mli_debug.h"
