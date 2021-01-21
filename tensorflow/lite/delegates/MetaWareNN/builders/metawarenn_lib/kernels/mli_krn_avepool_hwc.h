@@ -363,7 +363,6 @@ static MLI_FORCE_INLINE void mli_krn_avepool_hwc_pad(
 template <typename io_T, typename acc_T, int fixed_kernel_size>
 static void mli_krn_avepool_hwc(const mli_tensor * in, const mli_pool_cfg * cfg, mli_tensor * out) {
     // Extract general avepool parameters
-    std::cout<< "\nInside Avepool!";
     int32_t stride_width = cfg->stride_width;
     int32_t stride_height = cfg->stride_height;
     int32_t padding_top = cfg->padding_top;

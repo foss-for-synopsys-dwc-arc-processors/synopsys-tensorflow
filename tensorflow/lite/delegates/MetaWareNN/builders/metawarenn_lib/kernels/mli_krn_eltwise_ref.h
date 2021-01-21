@@ -78,8 +78,6 @@ static MLI_FORCE_INLINE void eltwise_op_basic(
         const int mul_out_shift,
         const struct s8asym_quant_params *in_quant_params,
         const struct s8asym_quant_params *out_quant_params) {
-    std::cout << "\nInside eltwise add!";
-
 
     MLI_PRINTF_FUNC();
 

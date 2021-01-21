@@ -176,7 +176,6 @@ MLI_FORCE_INLINE void depthwise_convolution2D(
                         + in.ch_mem_stride * in_ch_idx;
 
                 acc_T other_additives = mli_math_mul_fx<io_T, acc_T>(0, 0);
-
                 other_additives  = mli::krn::zp_additive(&quant_params, other_additives,
                                                clmns * rows);
                 other_additives  = mli::krn::in_additive(in_ptr, other_additives, &quant_params,
@@ -190,24 +189,20 @@ MLI_FORCE_INLINE void depthwise_convolution2D(
                         + weights.col_mem_stride * comp.left
                         + weights.in_ch_mem_stride * 0
                         + weights.out_ch_mem_stride * out_ch_idx;
-
                 mli::krn::adjust_quant_params(&quant_params, out_ch_idx);
 
                 // Convolution core. Here calculations performes in a unfolded expression way:
                 // out_val = (x-x_zp)*(w) + b) = -sum_i(w*x_zp) + sum(x*w) + b
                 //============================================
                 acc_T accu = other_additives;//mli_math_mul_fx<io_T, acc_T>(0, 0);
-
                 accu = mli::krn::dotprod2D(in_ptr, w_ptr, accu, clmns, rows,
                                     in.col_mem_stride * dilation_width, in.row_mem_stride * dilation_height,
                                     weights.col_mem_stride,
                                     weights.row_mem_stride);
-
                 accu = mli::krn::ref::weights_additive(w_ptr, accu, &quant_params, clmns, rows,
                                         weights.col_mem_stride,
                                         weights.row_mem_stride);
                 accu = mli::krn::bias_additive(&biases[out_ch_idx], accu, &quant_params);
-
                 //accu = mli_math_add(accu, other_additives);
 
                 // Cast result to output type, apply built-in ReLU Applying and write result
@@ -219,13 +214,10 @@ MLI_FORCE_INLINE void depthwise_convolution2D(
                         + out.row_mem_stride * H_idx
                         + out.col_mem_stride * W_idx
                         + out.ch_mem_stride * out_ch_idx;
-
                 *out_ptr = out_val;
-
             } // for in_ch_idx
         } // for W_idx
     } // for H_idx
-
     std::cout << "\n\nDepthwise Convolution kernel executed successfully!\n";
 }
 
