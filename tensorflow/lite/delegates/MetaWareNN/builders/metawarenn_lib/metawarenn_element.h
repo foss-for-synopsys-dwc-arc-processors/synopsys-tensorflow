@@ -30,7 +30,7 @@ class ElementType {
           dynamic_
       };
 
-    static element_type get_mwnn_type(int tf_type) {
+    static element_type get_mwnn_type_tf(int tf_type) {
         switch (tf_type) {
             case kTfLiteBool:
                 return element_type::boolean_;
@@ -60,6 +60,12 @@ class ElementType {
                 return element_type::dynamic_;
         }
     }
+};
+
+enum ActivationType {
+  Activation_None = 0,
+  Activation_Relu = 1,
+  Activation_Relu6 = 2,
 };
 
 } //namespace metawarenn
