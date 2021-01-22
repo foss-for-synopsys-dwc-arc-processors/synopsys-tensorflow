@@ -4,8 +4,10 @@
 #include "metawarenn_model.h"
 #include "metawarenn_tensor.h"
 #include "metawarenn_node.h"
+#include "metawarenn_element.h"
 #include "metawarenn_value_info.h"
 #include "op/node.h"
+#include "tensorflow/lite/schema/schema_generated.h"
 
 namespace metawarenn {
 

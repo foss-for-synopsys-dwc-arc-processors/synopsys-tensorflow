@@ -3,12 +3,12 @@
 
 #include "metawarenn_model.h"
 #include "metawarenn_attribute.h"
+#include "op/add.h"
 #include "op/conv.h"
 #include "op/relu.h"
-#include "op/add.h"
-#include "op/avg_pool.h"
 #include "op/reshape.h"
 #include "op/softmax.h"
+#include "op/avg_pool.h"
 #include "op/depthwise_conv.h"
 
 namespace metawarenn {
@@ -33,7 +33,7 @@ class MWNNNode {
           std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name;
       }
       return it->get_data();
-  }
+    }
     void update_attribute_value(std::string name, int value) {
       auto it = std::find_if(
       std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
@@ -45,36 +45,36 @@ class MWNNNode {
       return it->set_data(value);
     }
     std::shared_ptr<op::Node> get_node() {
-    if(op_type == "Conv") {
-      return std::make_shared<op::Conv>(name, inputs, outputs,
-                                        get_attribute_value("dilations"),
-                                        get_attribute_value("strides"),
-                                        get_attribute_value("pads"));
-    }
-    else if(op_type == "DepthwiseConv") {
-      return std::make_shared<op::DepthwiseConv>(name, inputs, outputs,
-                                                 get_attribute_value("dilations"),
-                                                 get_attribute_value("strides"),
-                                                 get_attribute_value("pads"));
-    }
-    else if(op_type == "Relu") {
-      return std::make_shared<op::Relu>(name, inputs, outputs);
-    }
-    else if(op_type == "Add") {
-      return std::make_shared<op::Add>(name, inputs, outputs);
-    }
-    else if(op_type == "GlobalAveragePool") {
-      return std::make_shared<op::AvgPool>(name, inputs, outputs);
-    }
-    else if(op_type == "Reshape") {
-      return std::make_shared<op::Reshape>(name, inputs, outputs);
+      if(op_type == "Conv") {
+        return std::make_shared<op::Conv>(name, inputs, outputs,
+                                          get_attribute_value("dilations"),
+                                          get_attribute_value("strides"),
+                                          get_attribute_value("pads"));
       }
-    else if(op_type == "Softmax") {
-      return std::make_shared<op::Softmax>(name, inputs, outputs);
+      else if(op_type == "DepthwiseConv") {
+        return std::make_shared<op::DepthwiseConv>(name, inputs, outputs,
+                                                   get_attribute_value("dilations"),
+                                                   get_attribute_value("strides"),
+                                                   get_attribute_value("pads"));
       }
-    else
-      return NULL;
-  }
+      else if(op_type == "Relu") {
+        return std::make_shared<op::Relu>(name, inputs, outputs);
+      }
+      else if(op_type == "Add") {
+        return std::make_shared<op::Add>(name, inputs, outputs);
+      }
+      else if(op_type == "GlobalAveragePool") {
+        return std::make_shared<op::AvgPool>(name, inputs, outputs);
+      }
+      else if(op_type == "Reshape") {
+        return std::make_shared<op::Reshape>(name, inputs, outputs);
+      }
+      else if(op_type == "Softmax") {
+        return std::make_shared<op::Softmax>(name, inputs, outputs);
+      }
+      else
+        return NULL;
+    }
   private:
     std::string name;
     std::string op_type;

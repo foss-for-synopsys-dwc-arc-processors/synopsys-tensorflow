@@ -53,7 +53,16 @@ namespace metawarenn {
         node_attributes.emplace_back(mwnn_attr_dilate);
         ::metawarenn::MWNNAttribute mwnn_attr_stride("strides", {conv_params->stride_height, conv_params->stride_width});
         node_attributes.emplace_back(mwnn_attr_stride);
-        ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {conv_params->activation});
+
+        int activation_type;
+        if(conv_params->activation == ::tflite::ActivationFunctionType_NONE)
+          activation_type = ActivationType::Activation_None;
+        else if(conv_params->activation == ::tflite::ActivationFunctionType_RELU)
+          activation_type = ActivationType::Activation_Relu;
+        else if(conv_params->activation == ::tflite::ActivationFunctionType_RELU6)
+          activation_type = ActivationType::Activation_Relu6;
+
+        ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {activation_type});
         node_attributes.emplace_back(mwnn_attr_activation);
 
         if(conv_params->padding == kTfLitePaddingSame) {
@@ -66,9 +75,6 @@ namespace metawarenn {
           int in_width = input_tensor.dims->data[2];
           int filter_height = weight_tensor.dims->data[1];
           int filter_width = weight_tensor.dims->data[2];
-
-          //int out_height = ceil(in_height/conv_params->stride_height);
-          //int out_width = ceil(in_width/conv_params->stride_width);
           int total_height_pad, total_width_pad;
           int pad_top, pad_bottom, pad_left, pad_right;
 
@@ -94,13 +100,6 @@ namespace metawarenn {
           ::metawarenn::MWNNAttribute mwnn_attr_pad("pads", {0, 0, 0, 0});
           node_attributes.emplace_back(mwnn_attr_pad);
         }
-        /*std::cout << "\n ----------------------------------Attribute Conv params-----------------------------------";
-        std::cout << "\n Conv stride height : " << conv_params->stride_height;
-        std::cout << "\n Conv stride width : " << conv_params->stride_width;
-        std::cout << "\n Conv padding : " << conv_params->padding;
-        std::cout << "\n Conv activation : " << conv_params->activation;
-        std::cout << "\n Conv dilation_width_factor : " << conv_params->dilation_width_factor;
-        std::cout << "\n Conv dilation_height_factor : " << conv_params->dilation_height_factor;*/
       }
       else if (op_type == kTfLiteBuiltinDepthwiseConv2d) {
         node_op_type = "DepthwiseConv";
@@ -111,7 +110,16 @@ namespace metawarenn {
         node_attributes.emplace_back(mwnn_attr_dilate);
         ::metawarenn::MWNNAttribute mwnn_attr_stride("strides", {depthwise_conv_params->stride_height, depthwise_conv_params->stride_width});
         node_attributes.emplace_back(mwnn_attr_stride);
-        ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {depthwise_conv_params->activation});
+
+        int activation_type;
+        if(depthwise_conv_params->activation == ::tflite::ActivationFunctionType_NONE)
+          activation_type = ActivationType::Activation_None;
+        else if(depthwise_conv_params->activation == ::tflite::ActivationFunctionType_RELU)
+          activation_type = ActivationType::Activation_Relu;
+        else if(depthwise_conv_params->activation == ::tflite::ActivationFunctionType_RELU6)
+          activation_type = ActivationType::Activation_Relu6;
+
+        ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {activation_type});
         node_attributes.emplace_back(mwnn_attr_activation);
 
         if(depthwise_conv_params->padding == kTfLitePaddingSame) {
@@ -124,9 +132,6 @@ namespace metawarenn {
           int in_width = input_tensor.dims->data[2];
           int filter_height = weight_tensor.dims->data[1];
           int filter_width = weight_tensor.dims->data[2];
-
-          //int out_height = ceil(in_height/depthwise_conv_params->stride_height);
-          //int out_width = ceil(in_width/depthwise_conv_params->stride_width);
           int total_height_pad, total_width_pad;
           int pad_top, pad_bottom, pad_left, pad_right;
 
@@ -152,37 +157,14 @@ namespace metawarenn {
           ::metawarenn::MWNNAttribute mwnn_attr_pad("pads", {0, 0, 0, 0});
           node_attributes.emplace_back(mwnn_attr_pad);
         }
-        /*std::cout << "\n ----------------------------------Attribute DepthWiseConv params-----------------------------------";
-        std::cout << "\n DepthWiseConv stride height : " << depthwise_conv_params->stride_height;
-        std::cout << "\n DepthWiseConv stride width : " << depthwise_conv_params->stride_width;
-        std::cout << "\n DepthWiseConv padding : " << depthwise_conv_params->padding;
-        std::cout << "\n DepthWiseConv activation : " << depthwise_conv_params->activation;
-        std::cout << "\n DepthWiseConv dilation_width_factor : " << depthwise_conv_params->dilation_width_factor;
-        std::cout << "\n DepthWiseConv dilation_height_factor : " << depthwise_conv_params->dilation_height_factor;
-        std::cout << "\n DepthwiseConv depth_multiplier : " << depthwise_conv_params->depth_multiplier;*/
       }
       else if (op_type == kTfLiteBuiltinAveragePool2d) {
         node_op_type = "GlobalAveragePool";
         node_name = node_op_type + std::to_string(node_index);
-        /*const TfLitePoolParams* pool_params = reinterpret_cast<const TfLitePoolParams*>(node->builtin_data);
-        std::cout << "\n ----------------------------------Attribute Average_Pool params-----------------------------------";
-        std::cout << "\n Global Average Pool padding : " << pool_params->padding;
-        std::cout << "\n Global Average Pool stride_width : " << pool_params->stride_width;
-        std::cout << "\n Global Average Pool stride_height : " << pool_params->stride_height;
-        std::cout << "\n Global Average Pool filter_width : " << pool_params->filter_width;
-        std::cout << "\n Global Average Pool filter_height : " << pool_params->filter_height;
-        std::cout << "\n Global Average Pool activation : " << pool_params->activation;
-        std::cout << "\n Global Average Pool computed->padding->width : " << pool_params->computed.padding.width;
-        std::cout << "\n Global Average Pool computed->padding->height : " << pool_params->computed.padding.height;
-        std::cout << "\n Global Average Pool computed->padding->width_offset : " << pool_params->computed.padding.width_offset;
-        std::cout << "\n Global Average Pool computed->padding->height_offset : " << pool_params->computed.padding.height_offset;*/
       }
       else if (op_type == kTfLiteBuiltinAdd) {
         node_op_type = "Add";
         node_name = node_op_type + std::to_string(node_index);
-        /*const TfLiteAddParams* add_params = reinterpret_cast<const TfLiteAddParams*>(node->builtin_data);
-        std::cout << "\n ----------------------------------Attribute Add params-----------------------------------";
-        std::cout << "\n Add activation : " << add_params->activation;*/
       }
       else if (op_type == kTfLiteBuiltinRelu) {
         node_op_type = "Relu";
@@ -191,19 +173,10 @@ namespace metawarenn {
       else if (op_type == kTfLiteBuiltinReshape) {
         node_op_type = "Reshape";
         node_name = node_op_type + std::to_string(node_index);
-        /*const TfLiteReshapeParams* reshape_params = reinterpret_cast<const TfLiteReshapeParams*>(node->builtin_data);
-        std::cout << "\n ----------------------------------Attribute Reshape params-----------------------------------";
-        std::cout << "\n Reshape num_dimensions: " << reshape_params->num_dimensions;
-        for (int i = 0; i < 8; i++) {
-          std::cout << "\n Reshape shape : " << reshape_params->shape[i];
-        }*/
       }
       else if (op_type == kTfLiteBuiltinSoftmax) {
         node_op_type = "Softmax";
         node_name = node_op_type + std::to_string(node_index);
-        /*const TfLiteSoftmaxParams* softmax_params = reinterpret_cast<const TfLiteSoftmaxParams*>(node->builtin_data);
-        std::cout << "\n ----------------------------------Attribute Softmax params-----------------------------------";
-        std::cout << "\n Softmax beta: " << softmax_params->beta;*/
       }
       else {
         std::cout << "\n Unsupported op_type: " << op_type;
@@ -240,19 +213,10 @@ namespace metawarenn {
             mwnn_initializer_names.insert(input_tensor.name);
         }
       }
-
       ::metawarenn::MWNNNode mwnn_node(node_name, node_op_type, node_attributes, node_inputs, node_outputs);
       mwnn_nodes.emplace_back(mwnn_node);
       auto op_node = mwnn_node.get_node();
       mwnn_graph_nodes[mwnn_node.get_name()] = std::move(op_node);
-
     }
-    std::cout << "\n----------------------------------------------------------------------------------------------------------------\n";
-    /*for (auto& it : get_graph_initializers()) {
-      std::cout << "\n Tensor Name: " << it.get_name();
-    }
-    for (auto& it : get_graph_nodes()) {
-      std::cout << "\n Node Name: " << it.get_name();
-    }*/
   }
 } //namespace metawarenn

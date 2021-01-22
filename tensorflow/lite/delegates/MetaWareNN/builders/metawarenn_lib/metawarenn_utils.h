@@ -2,11 +2,8 @@
 #include "kernels/include/mli_types.h"
 #include "kernels/include/api/mli_kernels_api.h"
 #include "kernels/mli_krn_convolution_ref.h"
-#include "kernels/mli_krn_avepool_hwc.h"
 #include "kernels/mli_krn_eltwise_ref.h"
-#include "tensorflow/lite/schema/schema_generated.h"
-#include <cmath>
-
+#include "kernels/mli_krn_avepool_hwc.h"
 
 namespace metawarenn {
 
