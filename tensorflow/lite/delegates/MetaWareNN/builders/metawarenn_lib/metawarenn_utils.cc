@@ -202,6 +202,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
       {
         buf_size = buf_size * shape[i];
       }
+
       // To change data layout from CHW to NCHW
       int temp = (tensor_map.find(input[0]))->second.shape[rank - 1];
       for(int i = (tensor_map.find(input[0]))->second.rank - 1; i > 0; i--)
@@ -230,7 +231,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
       mli_tensor input_tensor = (tensor_map.find(input[0]))->second;
       int16_t *input_buf, *new_input_buf;
       int channel, width, height;
-      if(!is_HWC) //CHW
+      if(!(is_HWC)) //CHW
       {
         // Data layout conversion from CHW to HWC
         input_buf = (int16_t *)(tensor_map.find(input[0]))->second.data.mem.void_p;//chw
@@ -264,6 +265,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
       pool_cfg.padding_right = 0;
 
       mli::krn::mli_krn_avepool_hwc<int16_t, mli_fx16_accu_t, 0>(&(tensor_map.find(input[0]))->second, &pool_cfg, &output_tensor);
+
       if(!is_HWC) //CHW
       {
       // Data layout conversion from HWC to CHW

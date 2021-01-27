@@ -16,6 +16,7 @@ namespace metawarenn {
 class MWNNNode {
   public:
     MWNNNode() = default;
+    MWNNNode(NodeProto& onnx_node_proto);
     MWNNNode(std::string m_name, std::string m_op_type, std::vector<MWNNAttribute> m_mwnn_attributes, std::vector<std::string> m_inputs,  std::vector<std::string> m_outputs);
     std::string get_name() { return name; }
     std::string get_op_type() { return op_type; }
@@ -24,6 +25,7 @@ class MWNNNode {
     void set_inputs(std::string name, int index) { inputs[index] = name; }
     void set_outputs(std::string name, int index) { outputs[index] = name; }
     std::vector<MWNNAttribute> get_attributes() { return mwnn_attributes; }
+
     std::vector<int> get_attribute_value(std::string name) {
       auto it = std::find_if(
       std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
@@ -76,6 +78,7 @@ class MWNNNode {
         return NULL;
     }
   private:
+    NodeProto node_proto;
     std::string name;
     std::string op_type;
     std::vector<std::string> inputs;

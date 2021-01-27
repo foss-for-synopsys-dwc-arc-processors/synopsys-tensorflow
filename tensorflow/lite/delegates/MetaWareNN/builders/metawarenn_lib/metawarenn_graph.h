@@ -14,6 +14,7 @@ namespace metawarenn {
 class MWNNGraph {
   public:
     MWNNGraph() = default;
+    MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model);
     MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_);
     std::string get_name() { return name; }
     std::string get_graph_ip_name() { return ip_name; }
@@ -112,6 +113,7 @@ class MWNNGraph {
     std::set<std::string> mwnn_initializer_names;
     std::map<std::string, std::shared_ptr<op::Node>> mwnn_graph_nodes;
   private:
+    GraphProto graph_proto;
     MWNNModel mwnn_model;
     std::string name;
     std::string ip_name;

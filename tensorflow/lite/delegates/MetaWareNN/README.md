@@ -56,7 +56,7 @@
     
 2.  Set up environment paths with generated MetawareNN dependent libs
 ```
-   export LD_LIBRARY_PATH=/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders:$LD_LIBRARY_PATH
+   export LD_LIBRARY_PATH=/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN:/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders:/usr/local/lib:$LD_LIBRARY_PATH
 ```
 
 3. Download MobileNet v2 TFlite model
@@ -68,11 +68,29 @@
 4. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
 Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the downloaded MobileNet v2 TFlite model path
 
-5. Compile the inference script
-  Note: we suggest to use g++ 7 to avoid possible errors.
+5. Check the Protobuf Version to be 3.11.3 (With respect to ONNX headers included from ONNXRuntime for attaining Common Metawarenn_lib files)
+   Steps to install Protobuf 3.11.3:
+    Download the Protobuf package from  https://github.com/protocolbuffers/protobuf/releases/download/v3.11.3/protobuf-all-3.11.3.tar.gz
 ```
-    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder
+    tar -xf protobuf-all-3.11.3.tar.gz
+    cd protobuf-3.11.3
+    ./configure
+    make
+    make check
+    sudo make install
+    cd ./python
+    python3 setup.py build
+    python3 setup.py test
+    sudo python3 setup.py install
+    sudo ldconfig
 ```
 
-6. Run the object file
+6. Compile the inference script
+  Note: we suggest to use g++ 7 to avoid possible errors.
+
+```
+    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/local/lib -lprotobuf-lite
+```
+
+7. Run the object file
 `./inference`

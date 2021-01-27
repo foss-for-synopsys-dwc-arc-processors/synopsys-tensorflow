@@ -10,6 +10,7 @@ namespace metawarenn {
 class MWNNValueInfo {
   public:
     MWNNValueInfo() = default;
+    MWNNValueInfo(ValueInfoProto& onnx_value_info_proto);
     MWNNValueInfo(std::string m_name, std::vector<int> m_dims, int m_type);
     std::string get_name() { return name; }
     int get_type() { return in_type; }
@@ -21,6 +22,7 @@ class MWNNValueInfo {
       dims = n_dims;
     }
   private:
+    ValueInfoProto value_info_proto;
     std::string name;
     int in_type;
     ElementType::element_type t_type;

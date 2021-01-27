@@ -7,10 +7,18 @@
 
 namespace metawarenn {
 
+ template <typename T, typename Container>
+inline std::vector<T> get_data(const Container& container)
+{
+  return std::vector<T>(std::begin(container), std::end(container));
+}
+
 class MWNNTensor {
   public:
     MWNNTensor() = default;
+    MWNNTensor(TensorProto& onnx_tensor_proto);
     MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, std::vector<float> m_tensor);
+    void set_tensor();
     std::string get_name() { return name; }
     int get_type() { return in_type; }
     std::vector<int> get_dims() { return dims; }
@@ -23,6 +31,7 @@ class MWNNTensor {
       tensor = n_tensor;
     }
   private:
+    TensorProto tensor_proto;
     std::string name;
     int in_type;
     ElementType::element_type t_type;

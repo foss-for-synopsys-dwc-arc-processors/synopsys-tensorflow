@@ -1,7 +1,11 @@
 #ifndef METAWARENN_ELEMENT_H_
 #define METAWARENN_ELEMENT_H_
 
+#include "onnx/onnx-ml.pb.h"
+
 #include "tensorflow/lite/c/common.h"
+
+using namespace onnx;
 
 namespace metawarenn {
 
@@ -29,6 +33,39 @@ class ElementType {
           //Common ONNX & TF Types
           dynamic_
       };
+
+    static element_type get_mwnn_type_onnx(int onnx_type) {
+        switch (onnx_type) {
+            case onnx::TensorProto_DataType_BOOL:
+                return element_type::boolean_;
+            case onnx::TensorProto_DataType_DOUBLE:
+                return element_type::double_;
+            case onnx::TensorProto_DataType_FLOAT16:
+                return element_type::float16_;
+            case onnx::TensorProto_DataType_FLOAT:
+                return element_type::float_;
+            case onnx::TensorProto_DataType_INT8:
+                return element_type::int8_;
+            case onnx::TensorProto_DataType_INT16:
+                return element_type::int16_;
+            case onnx::TensorProto_DataType_INT32:
+                return element_type::int32_;
+            case onnx::TensorProto_DataType_INT64:
+                return element_type::int64_;
+            case onnx::TensorProto_DataType_UINT8:
+                return element_type::uint8_;
+            case onnx::TensorProto_DataType_UINT16:
+                return element_type::uint16_;
+            case onnx::TensorProto_DataType_UINT32:
+                return element_type::uint32_;
+            case onnx::TensorProto_DataType_UINT64:
+                return element_type::uint64_;
+            case onnx::TensorProto_DataType_UNDEFINED:
+                return element_type::dynamic_;
+            default:
+                return element_type::dynamic_;
+        }
+    }
 
     static element_type get_mwnn_type_tf(int tf_type) {
         switch (tf_type) {

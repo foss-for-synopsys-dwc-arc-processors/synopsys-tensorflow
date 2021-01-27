@@ -32,9 +32,11 @@ cc_library(
         "metawarenn_lib/optimizer/fuse_relu.cc",
         "metawarenn_lib/optimizer/convert_layout.cc",
         "metawarenn_lib/optimizer/pass_manager.cc",
+        "metawarenn_lib/onnx/onnx-ml.pb.cc",
     ],
     hdrs = [
         "model_builder.h",
+        "metawarenn_lib/onnx/onnx-ml.pb.h",
         "metawarenn_lib/metawarenn_model.h",
         "metawarenn_lib/metawarenn_graph.h",
         "metawarenn_lib/metawarenn_tensor.h",
@@ -93,14 +95,17 @@ cc_library(
         "metawarenn_lib/optimizer/fuse_relu.h",
         "metawarenn_lib/optimizer/convert_layout.h",
         "metawarenn_lib/optimizer/pass_manager.h",
+        "metawarenn_lib/tensorflow/lite/c/builtin_op_data.h",
+        "metawarenn_lib/tensorflow/lite/c/common.h",
+        "metawarenn_lib/tensorflow/lite/schema/schema_generated.h",
+        "metawarenn_lib/tensorflow/lite/schema/flatbuffers/base.h",
+        "metawarenn_lib/tensorflow/lite/schema/flatbuffers/flatbuffers.h",
+        "metawarenn_lib/tensorflow/lite/schema/flatbuffers/stl_emulation.h",
+        "metawarenn_lib/tensorflow/lite/builtin_op_data.h",
+        "metawarenn_lib/tensorflow/lite/builtin_ops.h"
     ],
     tags = [
         "manual",
         "nobuilder",
-    ],
-    deps = [
-        "//tensorflow/lite:kernel_api",
-        "//tensorflow/lite:util",
-        "//tensorflow/lite/c:common",
     ],
 )
