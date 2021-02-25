@@ -5,8 +5,22 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+cc_import(
+  name = "onnx_protobuf",
+  hdrs = ["metawarenn_lib/onnx/onnx-ml.pb.h"],
+  shared_library = "libprotobuf-lite.so",
+)
+
+cc_binary(
+    name="model_builder",
+    deps=[":onnx_protobuf",
+          ":model_builder_lib"],
+    visibility=["//visibility:public"],
+    linkshared = 1,
+)
+
 cc_library(
-    name = "model_builder",
+    name = "model_builder_lib",
     srcs = [
         "model_builder.cc",
         "metawarenn_lib/metawarenn_model.cc",
