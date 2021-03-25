@@ -8,7 +8,14 @@
 #include "metawarenn_value_info.h"
 #include "op/node.h"
 #include "tensorflow/lite/schema/schema_generated.h"
+#include <boost/serialization/string.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/streams/bufferstream.hpp>
+#include <boost/serialization/vector.hpp>
 namespace metawarenn {
 
 class MWNNGraph {
@@ -34,7 +41,8 @@ class MWNNGraph {
     void remove_initializer_names(std::string name){
       std::cout << "\n mwnn_initializer_names size before: " << mwnn_initializer_names.size();
       auto it = mwnn_initializer_names.find(name);
-      mwnn_initializer_names.erase(it);
+      if(it != mwnn_initializer_names.end())
+        mwnn_initializer_names.erase(it);
       std::cout << "\n mwnn_initializer_names size after: " << mwnn_initializer_names.size();
     }
     void remove_initializer_tensor(std::string name){
@@ -122,6 +130,8 @@ class MWNNGraph {
     std::vector<MWNNNode> mwnn_nodes;
     std::vector<MWNNValueInfo> mwnn_inputs;
     std::vector<MWNNValueInfo> mwnn_outputs;
+    friend class boost::serialization::access;
+    template <typename Ar> void serialize(Ar& ar, unsigned) { ar & name & ip_name & op_name & mwnn_nodes & mwnn_initializer_tensors & mwnn_inputs & mwnn_outputs; }
 };
 
 } //namespace metawarenn

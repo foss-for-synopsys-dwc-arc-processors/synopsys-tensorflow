@@ -40,6 +40,13 @@ void convert_CHWN_to_NHWC(::metawarenn::MWNNGraph *mwnn_graph, std::string initi
          Generate Low Level Graph to run on devices*/
 TfLiteStatus ModelBuilder::MetaWareNNCompile(::metawarenn::MWNNGraph *mwnn_graph) {
   std::cout << "\n In MetaWareNNCompile !!! ";
+  namespace bip = boost::interprocess;
+  bip::shared_memory_object shm(bip::create_only, "SharedMemoryFile", bip::read_write);
+  shm.truncate(60u<<20); // 60MiB
+  bip::mapped_region region(shm, bip::read_write);
+  bip::bufferstream bs(std::ios::out);
+  bs.buffer(reinterpret_cast<char*>(region.get_address()), region.get_size());
+  boost::archive::text_oarchive oa(bs);
   //Call Passes
   ::metawarenn::optimizer::PassManager manager;
   for (auto node : mwnn_graph->get_graph_nodes())
@@ -88,6 +95,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(::metawarenn::MWNNGraph *mwnn_graph
     }
   }
   manager.run_passes();
+  oa << *mwnn_graph;
   return kTfLiteOk;
   }
 } // namespace metawarenn

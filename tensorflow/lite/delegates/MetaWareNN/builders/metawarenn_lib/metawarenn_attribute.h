@@ -2,11 +2,19 @@
 #define METAWARENN_ATTRIBUTE_H_
 
 #include "metawarenn_model.h"
+#include <boost/serialization/string.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/streams/bufferstream.hpp>
+#include <boost/serialization/vector.hpp>
 namespace metawarenn {
 
 class MWNNAttribute {
   public:
+    MWNNAttribute() = default;
     MWNNAttribute(AttributeProto& onnx_attribute_proto);
     MWNNAttribute(std::string m_name, std::vector<int> m_data);
     void set_data();
@@ -21,6 +29,8 @@ class MWNNAttribute {
     int type;
     std::vector<int> data;
     std::vector<std::string> string_data;
+    friend class boost::serialization::access;
+    template <typename Ar> void serialize(Ar& ar, unsigned) { ar & name & type & data & string_data; }
     //TODO : Handle the Tensor and Graph Datatypes
   public:
     enum class Type {

@@ -38,7 +38,16 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Invoke!!!"<<std::endl;
   int is_HWC = HWC_TO_CHW ? 0 : 1;
-  convert_to_mwnn_format(mwnn_graph_, is_HWC) ;
+  namespace bip = boost::interprocess;
+  bip::shared_memory_object shm(bip::open_only, "SharedMemoryFile", bip::read_only);
+  bip::mapped_region region(shm, bip::read_only);
+  bip::bufferstream bs(std::ios::in);
+  bs.buffer(reinterpret_cast<char*>(region.get_address()), region.get_size());
+  boost::archive::text_iarchive ia(bs);
+  ::metawarenn::MWNNGraph mwnn_graph;
+  ia >> mwnn_graph;
+  convert_to_mwnn_format(mwnn_graph, is_HWC) ;
+  bip::shared_memory_object::remove("SharedMemoryFile");
 
   return kTfLiteOk;
 }

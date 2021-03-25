@@ -4,6 +4,14 @@
 #include "metawarenn_model.h"
 #include "metawarenn_element.h"
 #include "op/input_data.h"
+#include <boost/serialization/string.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/streams/bufferstream.hpp>
+#include <boost/serialization/vector.hpp>
 
 namespace metawarenn {
 
@@ -27,6 +35,8 @@ class MWNNValueInfo {
     int in_type;
     ElementType::element_type t_type;
     std::vector<int> dims;
+    friend class boost::serialization::access;
+    template <typename Ar> void serialize(Ar& ar, unsigned) { ar & name & in_type & t_type & dims; }
 };
 
 } //namespace metawarenn
