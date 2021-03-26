@@ -1,7 +1,6 @@
 #ifndef METAWARENN_NODE_H_
 #define METAWARENN_NODE_H_
 
-#include "metawarenn_model.h"
 #include "metawarenn_attribute.h"
 #include "op/add.h"
 #include "op/conv.h"
@@ -10,6 +9,7 @@
 #include "op/softmax.h"
 #include "op/avg_pool.h"
 #include "op/depthwise_conv.h"
+#include "op/transpose.h"
 
 namespace metawarenn {
 

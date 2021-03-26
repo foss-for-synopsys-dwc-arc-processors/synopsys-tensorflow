@@ -74,7 +74,7 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
   Note: we suggest to use g++ 7 to avoid possible errors.
 
 ```
-    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder
+    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/local/lib -lprotobuf-lite -L/usr/lib/x86_64-linux-gnu -lboost_serialization -L/usr/lib/x86_64-linux-gnu -lrt
 ```
 
 7. Run the object file

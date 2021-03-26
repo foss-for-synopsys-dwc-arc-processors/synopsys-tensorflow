@@ -10,7 +10,7 @@ MWNNAttribute::MWNNAttribute(AttributeProto& onnx_attribute_proto) {
   set_data();
 }
 
-//TFConstructor
+//TFConstructor & GLOWConstructor
 MWNNAttribute::MWNNAttribute(std::string m_name, std::vector<int> m_data) {
   name = m_name;
   type = AttributeProto_AttributeType_INT;

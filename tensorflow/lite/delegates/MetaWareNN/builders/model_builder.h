@@ -1,4 +1,4 @@
-#include "metawarenn_lib/metawarenn_model.h"
+#include "metawarenn_lib/metawarenn_common.h"
 #include "metawarenn_lib/metawarenn_graph.h"
 #include "metawarenn_lib/metawarenn_tensor.h"
 #include "metawarenn_lib/metawarenn_node.h"

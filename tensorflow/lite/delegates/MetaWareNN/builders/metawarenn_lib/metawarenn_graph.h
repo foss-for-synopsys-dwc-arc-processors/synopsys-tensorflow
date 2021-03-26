@@ -1,28 +1,27 @@
 #ifndef METAWARENN_GRAPH_H_
 #define METAWARENN_GRAPH_H_
 
-#include "metawarenn_model.h"
+#include "metawarenn_common.h"
 #include "metawarenn_tensor.h"
 #include "metawarenn_node.h"
 #include "metawarenn_element.h"
 #include "metawarenn_value_info.h"
 #include "op/node.h"
 #include "tensorflow/lite/schema/schema_generated.h"
-#include <boost/serialization/string.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#if GLOW
+#include "Glow/Graph/Utils.h"
+#endif
 
-#include <boost/interprocess/shared_memory_object.hpp>
-#include <boost/interprocess/mapped_region.hpp>
-#include <boost/interprocess/streams/bufferstream.hpp>
-#include <boost/serialization/vector.hpp>
 namespace metawarenn {
 
 class MWNNGraph {
   public:
     MWNNGraph() = default;
-    MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model);
+    MWNNGraph(GraphProto& onnx_graph_proto);
     MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_);
+    #if GLOW
+    MWNNGraph(Function *F);
+    #endif
     std::string get_name() { return name; }
     std::string get_graph_ip_name() { return ip_name; }
     std::string get_graph_op_name() { return op_name; }
@@ -121,8 +120,6 @@ class MWNNGraph {
     std::set<std::string> mwnn_initializer_names;
     std::map<std::string, std::shared_ptr<op::Node>> mwnn_graph_nodes;
   private:
-    GraphProto graph_proto;
-    MWNNModel mwnn_model;
     std::string name;
     std::string ip_name;
     std::string op_name;

@@ -1,17 +1,9 @@
 #ifndef METAWARENN_VALUE_INFO_H_
 #define METAWARENN_VALUE_INFO_H_
 
-#include "metawarenn_model.h"
+#include "metawarenn_common.h"
 #include "metawarenn_element.h"
 #include "op/input_data.h"
-#include <boost/serialization/string.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
-#include <boost/interprocess/shared_memory_object.hpp>
-#include <boost/interprocess/mapped_region.hpp>
-#include <boost/interprocess/streams/bufferstream.hpp>
-#include <boost/serialization/vector.hpp>
 
 namespace metawarenn {
 
@@ -20,6 +12,9 @@ class MWNNValueInfo {
     MWNNValueInfo() = default;
     MWNNValueInfo(ValueInfoProto& onnx_value_info_proto);
     MWNNValueInfo(std::string m_name, std::vector<int> m_dims, int m_type);
+    #if GLOW
+    MWNNValueInfo(std::string m_name, std::vector<int> m_dims, ElemKind m_type);
+    #endif
     std::string get_name() { return name; }
     int get_type() { return in_type; }
     std::vector<int> get_dims() { return dims; }

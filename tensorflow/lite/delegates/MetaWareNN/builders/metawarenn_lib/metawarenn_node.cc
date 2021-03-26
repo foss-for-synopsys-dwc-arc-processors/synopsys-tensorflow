@@ -27,7 +27,7 @@ MWNNNode::MWNNNode(NodeProto& onnx_node_proto) {
   }
 }
 
-//TFConstructor
+//TFConstructor & GLOWConstructor
 MWNNNode::MWNNNode(std::string m_name, std::string m_op_type, std::vector<MWNNAttribute> m_mwnn_attributes, std::vector<std::string> m_inputs, std::vector<std::string> m_outputs) {
   name = m_name;
   op_type = m_op_type;

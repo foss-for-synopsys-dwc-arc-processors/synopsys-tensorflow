@@ -17,6 +17,9 @@ void PassManager::run_passes() {
     else if (auto convert_layout_pass = std::dynamic_pointer_cast<ConvertLayout>(pass)) {
       convert_layout_pass->RunPass();
     }
+    else if (auto remove_transpose_pass = std::dynamic_pointer_cast<RemoveTranspose>(pass)) {
+      remove_transpose_pass->RunPass();
+    }
   }
 }
 

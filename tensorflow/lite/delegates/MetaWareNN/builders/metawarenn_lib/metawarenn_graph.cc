@@ -3,9 +3,8 @@
 namespace metawarenn {
 
 //ONNXConstructor
-MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model) {
-  graph_proto = onnx_graph_proto;
-  mwnn_model = model;
+MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto) {
+  GraphProto graph_proto = onnx_graph_proto;
   name = graph_proto.name();
 
   for (auto tensor_proto : graph_proto.initializer()) {
@@ -258,4 +257,218 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
     mwnn_graph_nodes[mwnn_node.get_name()] = std::move(op_node);
   }
 }
+#if GLOW
+//GLOWConstructor
+MWNNGraph::MWNNGraph(Function *F) {
+  name = std::string(F->getName());
+  LOG(INFO) << "Function name: " << name;
+  GraphPostOrderVisitor visitor(*F);
+  auto node_list = visitor.getPostOrder();
+  for (auto *node : node_list) {
+      LOG(INFO) << "==============================================================================================================";
+      std::string node_name;
+      std::string node_op_type;
+      std::vector<std::string> node_inputs;
+      std::vector<std::string> node_outputs;
+      std::vector<::metawarenn::MWNNAttribute> node_attributes;
+      node_name = std::string(node->getName());
+      auto kind = node->getKindName();
+      LOG(INFO) << "Node Name: " << node_name << "\tOp type: " << node->getKindName();
+      std::vector<std::string> non_op_types;
+      non_op_types = {"Constant", "Placeholder", "Save"};
+      if((std::count(non_op_types.begin(), non_op_types.end(), kind)) < 1)
+      {
+      switch (node->getKind())
+      {
+        case Kinded::Kind::ConvolutionNodeKind:
+        {
+            node_op_type = "Conv";
+            auto *conv_node = llvm::cast<ConvolutionNode>(node);
+            auto input_node = conv_node->getInput();
+            auto input_name = input_node.generateNodeOutputName(true);
+            node_inputs.emplace_back(input_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto filter_node_value = conv_node->getFilter();
+            auto filter_name = filter_node_value.generateNodeOutputName(true);
+            LOG(INFO) << "filter_name: " << filter_name;
+            node_inputs.emplace_back(filter_name);
+            mwnn_initializer_names.insert(filter_name);
+            auto *filter_constant = llvm::dyn_cast<glow::Constant>(filter_node_value.getNode());
+            glow::Tensor filter_tensor = filter_constant->getPayload().clone();
+            auto type = filter_tensor.getType();
+            glow::ElemKind data_type = type.getElementType();
+            ShapeNHWC filterDims(filter_node_value.dims());
+            size_t wt_size = filterDims.n * filterDims.h * filterDims.w * filterDims.c;
+            std::vector<float> weights(wt_size);
+            std::vector<int> weight_dims(4);
+            weight_dims[0] = filterDims.n;
+            weight_dims[1] = filterDims.h;
+            weight_dims[2] = filterDims.w;
+            weight_dims[3] = filterDims.c;
+            auto handle = filter_tensor.getHandle<float>();
+            int i = 0;
+            for (auto elem : handle)
+            {
+                weights[i++] = elem;
+            }
+            metawarenn::MWNNTensor mwnn_weight_tensor(filter_name, weight_dims, data_type, weights);
+            mwnn_initializer_tensors.emplace_back(mwnn_weight_tensor);
+            auto bias_node_value = conv_node->getBias();
+            auto bias_name = bias_node_value.generateNodeOutputName(true);
+            LOG(INFO) << "bias_name: " << bias_name;
+            node_inputs.emplace_back(bias_name);
+            mwnn_initializer_names.insert(bias_name);
+            auto *bias_constant = llvm::dyn_cast<glow::Constant>(bias_node_value.getNode());
+            glow::Tensor bias_tensor = bias_constant->getPayload().clone();
+            auto handle1 = bias_tensor.getHandle<float>();
+            auto base1 = handle1.getElementPtr({static_cast<unsigned long>(0)});
+            std::vector<float> bias(filterDims.n);
+            std::vector<int> bias_dims(1);
+            bias_dims[0] = filterDims.n;
+            i = 0;
+            for (auto elem : handle1)
+            {
+                bias[i++] = elem;
+            }
+            type = bias_tensor.getType();
+            data_type = type.getElementType();
+            metawarenn::MWNNTensor mwnn_bias_tensor(bias_name, bias_dims, data_type, bias);
+            mwnn_initializer_tensors.emplace_back(mwnn_bias_tensor);
+            auto dilations = conv_node->getDilation();
+            auto strides = conv_node->getStrides();
+            auto pads = conv_node->getPads();
+            auto group = conv_node->getGroup();
+            metawarenn::MWNNAttribute mwnn_attr_dilate("dilations", {int(dilations[0]), int(dilations[1])});
+            node_attributes.emplace_back(mwnn_attr_dilate);
+            metawarenn::MWNNAttribute mwnn_attr_stride("strides", {int(strides[0]), int(strides[0])});
+            node_attributes.emplace_back(mwnn_attr_stride);
+            metawarenn::MWNNAttribute mwnn_attr_pad("pads", {int(pads[0]), int(pads[1]), int(pads[2]), int(pads[3])});
+            node_attributes.emplace_back(mwnn_attr_pad);
+            metawarenn::MWNNAttribute mwnn_attr_group("group", {int(group)});
+            node_attributes.emplace_back(mwnn_attr_group);
+            metawarenn::MWNNAttribute mwnn_attribute("activation", {0});
+            node_attributes.emplace_back(mwnn_attribute);
+            auto output_name = conv_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::ReluNodeKind:
+        {
+            node_op_type = "Relu";
+            auto *relu_node = llvm::cast<ReluNode>(node);
+            auto input_name = relu_node->getInput().generateNodeOutputName(true);
+            node_inputs.emplace_back(input_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto output_name = relu_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::AvgPoolNodeKind:
+        {
+            node_op_type = "GlobalAveragePool";
+            auto *avgpool_node = llvm::cast<AvgPoolNode>(node);
+            auto input_name = avgpool_node->getInput().generateNodeOutputName(true);
+            node_inputs.emplace_back(input_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto output_name = avgpool_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::AddNodeKind:
+        {
+            node_op_type = "Add";
+            auto *add_node = llvm::cast<AddNode>(node);
+            auto input1 = add_node->getLHS().generateNodeOutputName(true);
+            LOG(INFO) << "input_name 1: " << input1;
+            auto input2 = add_node->getRHS().generateNodeOutputName(true);
+            LOG(INFO) << "input_name 2: " << input2;
+            node_inputs.emplace_back(input1);
+            node_inputs.emplace_back(input2);
+            auto output_name = add_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::TransposeNodeKind:
+        {
+            node_op_type = "Transpose";
+            auto *transpose_node = llvm::cast<TransposeNode>(node);
+            auto input_name = transpose_node->getInput().generateNodeOutputName(true);
+            node_inputs.emplace_back(input_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto output_name = transpose_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::ReshapeNodeKind:
+        {
+            node_op_type = "Reshape";
+            auto *reshape_node = llvm::cast<ReshapeNode>(node);
+            auto input_name = reshape_node->getInput().generateNodeOutputName(true);
+            std::string initializer_name = std::string(node_name + "shape");
+            auto dims = reshape_node->getDims();
+            std::vector<float> dims_vec(dims.size());
+            std::vector<int> dims_(dims.size());
+            int i = 0;
+            for(auto dim: dims){
+              dims_vec[i] = dim;
+              dims_[i++] = dim;
+            }
+            metawarenn::MWNNTensor mwnn_reshape_tensor(initializer_name, dims_, ElemKind::Int32ITy, dims_vec);
+            mwnn_initializer_tensors.emplace_back(mwnn_reshape_tensor);
+            node_inputs.emplace_back(input_name);
+            node_inputs.emplace_back(initializer_name);
+            mwnn_initializer_names.insert(initializer_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto output_name = reshape_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        default:
+            break;
+        }
+        metawarenn::MWNNNode mwnn_node(node_name, node_op_type, node_attributes, node_inputs, node_outputs);
+        mwnn_nodes.emplace_back(mwnn_node);
+        auto op_node = mwnn_node.get_node();
+        mwnn_graph_nodes[mwnn_node.get_name()] = std::move(op_node);
+      }
+  }
+  // Graph input and output handling
+  auto &nodes = F->getNodes();
+  auto &first_node = nodes.front();
+  auto &last_node = nodes.back();
+  auto input_name = std::string(first_node.getNthInput(0).getNode()->getName());
+  auto output_name = std::string(last_node.getNthResult(0).getNode()->getName());
+  ip_name = input_name;
+  op_name = output_name;
+  for (auto *v : F->getParent()->getPlaceholders()) {
+    auto glow_dims = v->getType()->dims();
+    auto data_type = v->getType()->getElementType();
+    int size = glow_dims.size();
+    std::vector<int> dims(size);
+    for(int i = 0; i < size; i++)
+    {
+      dims[i] = int(glow_dims[i]);
+    }
+    if(v->getName().equals(input_name))
+    {
+      metawarenn::MWNNValueInfo mwnn_input(input_name, dims, data_type);
+      mwnn_inputs.emplace_back(mwnn_input);
+      mwnn_initializer_names.insert(input_name);
+    }
+    else
+    {
+      metawarenn::MWNNValueInfo mwnn_output(input_name, dims, data_type);
+      mwnn_outputs.emplace_back(mwnn_output);
+      mwnn_initializer_names.insert(output_name);
+    }
+  }
+}
+#endif
+
 } //namespace metawarenn

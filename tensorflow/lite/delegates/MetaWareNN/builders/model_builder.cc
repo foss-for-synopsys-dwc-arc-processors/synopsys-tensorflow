@@ -11,7 +11,6 @@ ModelBuilder::ModelBuilder(std::vector<int> nodes)
   std::cout<<"\nBuildGraph!!"<<std::endl;
 
   /*Create MetaWareNN High Level Graph Representation from TFLite SubGraph Nodes*/
-  ::metawarenn::MWNNModel mwnn_model_();
   ::metawarenn::MWNNGraph mwnn_graph_(context, subgraph_nodes_);
   return mwnn_graph_;
 }
@@ -41,6 +40,7 @@ void convert_CHWN_to_NHWC(::metawarenn::MWNNGraph *mwnn_graph, std::string initi
 TfLiteStatus ModelBuilder::MetaWareNNCompile(::metawarenn::MWNNGraph *mwnn_graph) {
   std::cout << "\n In MetaWareNNCompile !!! ";
   namespace bip = boost::interprocess;
+  bip::shared_memory_object::remove("SharedMemoryFile");
   bip::shared_memory_object shm(bip::create_only, "SharedMemoryFile", bip::read_write);
   shm.truncate(60u<<20); // 60MiB
   bip::mapped_region region(shm, bip::read_write);

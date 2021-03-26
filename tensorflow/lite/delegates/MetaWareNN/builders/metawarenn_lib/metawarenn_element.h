@@ -97,6 +97,30 @@ class ElementType {
                 return element_type::dynamic_;
         }
     }
+    #if GLOW
+    static element_type get_mwnn_type_glow(ElemKind glow_type) {
+        switch (glow_type) {
+            case ElemKind::BoolTy:
+                return element_type::boolean_;
+            case ElemKind::Float16Ty:
+                return element_type::float16_;
+            case ElemKind::FloatTy:
+                return element_type::float_;
+            case ElemKind::Int8QTy:
+                return element_type::int8_;
+            case ElemKind::Int16QTy:
+                return element_type::int16_;
+            case ElemKind::Int32QTy:
+                return element_type::int32_;
+            case ElemKind::Int64ITy:
+                return element_type::int64_;
+            case ElemKind::UInt8QTy:
+                return element_type::uint8_;
+            default:
+                return element_type::dynamic_;
+        }
+    }
+    #endif
 };
 
 enum ActivationType {
