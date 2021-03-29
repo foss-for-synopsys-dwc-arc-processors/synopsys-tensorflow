@@ -2,54 +2,48 @@
 
 namespace metawarenn {
 
+
 //ONNXConstructor
+#if ONNX
 MWNNAttribute::MWNNAttribute(AttributeProto& onnx_attribute_proto) {
-  attribute_proto = onnx_attribute_proto;
-  name = attribute_proto.name();
-  type = attribute_proto.type();
-  set_data();
+  name = onnx_attribute_proto.name();
+  type = onnx_attribute_proto.type();
+  set_data(onnx_attribute_proto);
 }
 
-//TFConstructor & GLOWConstructor
-MWNNAttribute::MWNNAttribute(std::string m_name, std::vector<int> m_data) {
-  name = m_name;
-  type = AttributeProto_AttributeType_INT;
-  data = m_data;
-}
-
-void MWNNAttribute::set_data() {
-  switch(get_t_type()) {
-    case Type::float_point:
-      data.push_back(get_float());
+void MWNNAttribute::set_data(AttributeProto& onnx_attribute_proto) {
+  switch(onnx_attribute_proto.type()) {
+    case AttributeProto_AttributeType_FLOAT:
+      data.push_back(onnx_attribute_proto.f());
       break;
-    case Type::integer:
-      data.push_back(get_int());
+    case AttributeProto_AttributeType_INT:
+      data.push_back(onnx_attribute_proto.i());
       break;
-    case Type::string:
-      string_data.push_back(get_string());
+    case AttributeProto_AttributeType_STRING:
+      string_data.push_back(onnx_attribute_proto.s());
       break;
-    case Type::tensor:
+    case AttributeProto_AttributeType_TENSOR:
       std::cout << "\n AttributeProto_AttributeType_TENSOR : Exiting Code Due to Nosupport";
       exit(1);
       break;
-    case Type::graph:
+    case AttributeProto_AttributeType_GRAPH:
       std::cout << "\n AttributeProto_AttributeType_GRAPH : Exiting Code Due to Nosupport";
       exit(1);
       break;
-    case Type::float_point_array:
-      data = get_float_array();
+    case AttributeProto_AttributeType_FLOATS:
+      data.assign(std::begin(onnx_attribute_proto.floats()), std::end(onnx_attribute_proto.floats()));
       break;
-    case Type::integer_array:
-      data = get_integer_array();
+    case AttributeProto_AttributeType_INTS:
+      data.assign(std::begin(onnx_attribute_proto.ints()), std::end(onnx_attribute_proto.ints()));
       break;
-    case Type::string_array:
-      string_data = get_string_array();
+    case AttributeProto_AttributeType_STRINGS:
+      string_data.assign(std::begin(onnx_attribute_proto.strings()), std::end(onnx_attribute_proto.strings()));
       break;
-    case Type::tensor_array:
+    case AttributeProto_AttributeType_TENSORS:
       std::cout << "\n AttributeProto_AttributeType_TENSORS : Exiting Code Due to Nosupport";
       exit(1);
       break;
-    case Type::graph_array:
+    case AttributeProto_AttributeType_GRAPHS:
       std::cout << "\n AttributeProto_AttributeType_GRAPHS : Exiting Code Due to Nosupport";
       exit(1);
       break;
@@ -58,6 +52,14 @@ void MWNNAttribute::set_data() {
       exit(1);
       break;
   }
+}
+#endif
+
+//TFConstructor & GLOWConstructor
+MWNNAttribute::MWNNAttribute(std::string m_name, std::vector<int> m_data) {
+  name = m_name;
+  type = 2;//Value of AttributeProto_AttributeType_INT(From ONNX), maintaining a integer type!!
+  data = m_data;
 }
 void MWNNAttribute::set_data(int m_data) {
     data.clear();

@@ -5,22 +5,8 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
-cc_import(
-  name = "onnx_protobuf",
-  hdrs = ["metawarenn_lib/onnx/onnx-ml.pb.h"],
-  shared_library = "libprotobuf-lite.so",
-)
-
-cc_binary(
-    name="model_builder",
-    deps=[":onnx_protobuf",
-          ":model_builder_lib"],
-    visibility=["//visibility:public"],
-    linkshared = 1,
-)
-
 cc_library(
-    name = "model_builder_lib",
+    name = "model_builder",
     srcs = [
         "model_builder.cc",
         "metawarenn_lib/metawarenn_graph.cc",
@@ -47,11 +33,9 @@ cc_library(
         "metawarenn_lib/optimizer/convert_layout.cc",
         "metawarenn_lib/optimizer/remove_transpose.cc",
         "metawarenn_lib/optimizer/pass_manager.cc",
-        "metawarenn_lib/onnx/onnx-ml.pb.cc",
     ],
     hdrs = [
         "model_builder.h",
-        "metawarenn_lib/onnx/onnx-ml.pb.h",
         "metawarenn_lib/metawarenn_graph.h",
         "metawarenn_lib/metawarenn_tensor.h",
         "metawarenn_lib/metawarenn_node.h",

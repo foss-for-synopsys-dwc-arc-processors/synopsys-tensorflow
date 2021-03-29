@@ -1,12 +1,17 @@
 #ifndef METAWARENN_COMMON_H_
 #define METAWARENN_COMMON_H_
 
+#define ONNX 0
+#define TFLITE 1
 #define GLOW 0
 
 //ONNXRuntime
+#if ONNX
 #include "onnx/onnx-ml.pb.h"
+#endif
 
 //TFLite
+#if TFLITE
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -14,9 +19,11 @@
 #include <numeric>
 #include <set>
 #include <map>
+#include "tensorflow/lite/c/common.h"
 #include "tensorflow/lite/builtin_ops.h"
 #include "tensorflow/lite/c/builtin_op_data.h"
 #include "tensorflow/lite/schema/schema_generated.h"
+#endif
 
 //GLOW
 #if GLOW
@@ -33,7 +40,9 @@
 #include <boost/interprocess/streams/bufferstream.hpp>
 #include <boost/serialization/vector.hpp>
 
+#if ONNX
 using namespace onnx;
+#endif
 #if GLOW
 using namespace glow;
 #endif

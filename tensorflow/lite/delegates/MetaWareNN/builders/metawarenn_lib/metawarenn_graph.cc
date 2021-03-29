@@ -3,24 +3,24 @@
 namespace metawarenn {
 
 //ONNXConstructor
+#if ONNX
 MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto) {
-  GraphProto graph_proto = onnx_graph_proto;
-  name = graph_proto.name();
+  name = onnx_graph_proto.name();
 
-  for (auto tensor_proto : graph_proto.initializer()) {
+  for (auto tensor_proto : onnx_graph_proto.initializer()) {
     MWNNTensor mwnn_tensor(tensor_proto);
     mwnn_initializer_tensors.emplace_back(mwnn_tensor);
     mwnn_initializer_names.insert(mwnn_tensor.get_name());
     auto const_node = mwnn_tensor.get_constant_node();
     mwnn_graph_nodes[mwnn_tensor.get_name()] = std::move(const_node);
   }
-  for (auto node_proto : graph_proto.node()) {
+  for (auto node_proto : onnx_graph_proto.node()) {
     MWNNNode mwnn_node(node_proto);
     mwnn_nodes.emplace_back(mwnn_node);
     auto node = mwnn_node.get_node();
     mwnn_graph_nodes[mwnn_node.get_name()] = std::move(node);
   }
-  for (auto ip_value_info_proto : graph_proto.input()) {
+  for (auto ip_value_info_proto : onnx_graph_proto.input()) {
     MWNNValueInfo mwnn_input(ip_value_info_proto);
     mwnn_inputs.emplace_back(mwnn_input);
     if(mwnn_initializer_names.count(mwnn_input.get_name()))
@@ -31,13 +31,15 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto) {
       mwnn_graph_nodes[ip_name] = std::move(ip_node);
     }
   }
-  for (auto op_value_info_proto : graph_proto.output()) {
+  for (auto op_value_info_proto : onnx_graph_proto.output()) {
     MWNNValueInfo mwnn_output(op_value_info_proto);
     mwnn_outputs.emplace_back(mwnn_output);
     op_name = mwnn_output.get_name();
   }
 }
+#endif
 
+#if TFLITE
 //TFConstructor
 MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
   name = "MetaWareNN_NodeSubSet_1";
@@ -257,6 +259,8 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
     mwnn_graph_nodes[mwnn_node.get_name()] = std::move(op_node);
   }
 }
+#endif
+
 #if GLOW
 //GLOWConstructor
 MWNNGraph::MWNNGraph(Function *F) {

@@ -36,14 +36,6 @@
     # Note: 36 could be other numbers if you use other python version
 ```
 
-5. Build MetaWareNN and its dependent libraries
-```
-    * Download protobuf library version 3.11.3 from the egnyte link https://multicorewareinc.egnyte.com/dl/uJfeAwJU88
-    * Move the "libprotobuf-lite.so" to "/path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/"
-    * bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
-```
-
-
 ## Run the Inference using MetaWareNN Delegate
 
 1.  Install flatbuffers and set up the include path
@@ -74,7 +66,7 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
   Note: we suggest to use g++ 7 to avoid possible errors.
 
 ```
-    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/local/lib -lprotobuf-lite -L/usr/lib/x86_64-linux-gnu -lboost_serialization -L/usr/lib/x86_64-linux-gnu -lrt
+    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lboost_serialization -L/usr/lib/x86_64-linux-gnu -lrt
 ```
 
 7. Run the object file

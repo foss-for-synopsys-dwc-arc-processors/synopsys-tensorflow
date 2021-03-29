@@ -7,18 +7,18 @@
 #include "metawarenn_element.h"
 #include "metawarenn_value_info.h"
 #include "op/node.h"
-#include "tensorflow/lite/schema/schema_generated.h"
-#if GLOW
-#include "Glow/Graph/Utils.h"
-#endif
 
 namespace metawarenn {
 
 class MWNNGraph {
   public:
     MWNNGraph() = default;
+    #if ONNX
     MWNNGraph(GraphProto& onnx_graph_proto);
+    #endif
+    #if TFLITE
     MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_);
+    #endif
     #if GLOW
     MWNNGraph(Function *F);
     #endif

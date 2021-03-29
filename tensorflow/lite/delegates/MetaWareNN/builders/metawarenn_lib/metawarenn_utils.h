@@ -1,3 +1,4 @@
+#include <cmath>
 #include "metawarenn_graph.h"
 #include "kernels/include/mli_types.h"
 #include "kernels/include/api/mli_kernels_api.h"

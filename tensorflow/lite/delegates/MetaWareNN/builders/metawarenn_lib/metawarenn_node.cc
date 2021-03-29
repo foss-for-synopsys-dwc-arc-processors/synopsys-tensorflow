@@ -3,17 +3,17 @@
 namespace metawarenn {
 
 //ONNXConstructor
+#if ONNX
 MWNNNode::MWNNNode(NodeProto& onnx_node_proto) {
-  node_proto = onnx_node_proto;
-  name = node_proto.name();
-  op_type = node_proto.op_type();
-  for (auto input : node_proto.input()) {
+  name = onnx_node_proto.name();
+  op_type = onnx_node_proto.op_type();
+  for (auto input : onnx_node_proto.input()) {
     inputs.emplace_back(input);
   }
-  for (auto output : node_proto.output()) {
+  for (auto output : onnx_node_proto.output()) {
     outputs.emplace_back(output);
   }
-  for (auto attribute_proto : node_proto.attribute()) {
+  for (auto attribute_proto : onnx_node_proto.attribute()) {
     MWNNAttribute mwnn_attribute(attribute_proto);
     mwnn_attributes.emplace_back(mwnn_attribute);
     if(mwnn_attribute.get_name() == "group")
@@ -26,6 +26,7 @@ MWNNNode::MWNNNode(NodeProto& onnx_node_proto) {
     mwnn_attributes.emplace_back(mwnn_attribute);
   }
 }
+#endif
 
 //TFConstructor & GLOWConstructor
 MWNNNode::MWNNNode(std::string m_name, std::string m_op_type, std::vector<MWNNAttribute> m_mwnn_attributes, std::vector<std::string> m_inputs, std::vector<std::string> m_outputs) {

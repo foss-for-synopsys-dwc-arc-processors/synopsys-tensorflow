@@ -10,8 +10,12 @@ namespace metawarenn {
 class MWNNValueInfo {
   public:
     MWNNValueInfo() = default;
+    #if ONNX
     MWNNValueInfo(ValueInfoProto& onnx_value_info_proto);
+    #endif
+    #if TFLITE
     MWNNValueInfo(std::string m_name, std::vector<int> m_dims, int m_type);
+    #endif
     #if GLOW
     MWNNValueInfo(std::string m_name, std::vector<int> m_dims, ElemKind m_type);
     #endif
@@ -25,7 +29,6 @@ class MWNNValueInfo {
       dims = n_dims;
     }
   private:
-    ValueInfoProto value_info_proto;
     std::string name;
     int in_type;
     ElementType::element_type t_type;

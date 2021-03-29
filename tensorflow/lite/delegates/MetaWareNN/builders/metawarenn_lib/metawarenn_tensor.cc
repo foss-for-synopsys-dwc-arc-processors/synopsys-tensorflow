@@ -3,17 +3,32 @@
 namespace metawarenn {
 
 //ONNXConstructor
+#if ONNX
 MWNNTensor::MWNNTensor(TensorProto& onnx_tensor_proto) {
-  tensor_proto = onnx_tensor_proto;
-  name = tensor_proto.name();
-  in_type = tensor_proto.data_type();
+  name = onnx_tensor_proto.name();
+  in_type = onnx_tensor_proto.data_type();
   t_type = ElementType::get_mwnn_type_onnx(in_type);
-  for(auto dim : tensor_proto.dims()) {
+  for(auto dim : onnx_tensor_proto.dims()) {
     dims.emplace_back(dim);
   }
-  set_tensor();
+  set_tensor(onnx_tensor_proto);
 }
 
+void MWNNTensor::set_tensor(TensorProto& onnx_tensor_proto) {
+  switch (in_type) {
+    case onnx::TensorProto_DataType_FLOAT:
+      tensor = get_data<float>(onnx_tensor_proto.float_data());
+      break;
+    case onnx::TensorProto_DataType_INT64:
+      tensor = get_data<float>(onnx_tensor_proto.int64_data());
+      break;
+    default:
+      break;
+  }
+}
+#endif
+
+#if TFLITE
 //TFConstructor
 MWNNTensor::MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, std::vector<float> m_tensor) {
     name = m_name;
@@ -23,6 +38,7 @@ MWNNTensor::MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, 
     tensor = m_tensor;
     for (auto& it : dims) { std::cout << it << ' '; }
 }
+#endif
 
 #if GLOW
 //GlowConstructor
@@ -34,17 +50,4 @@ MWNNTensor::MWNNTensor(std::string m_name, std::vector<int> m_dims, ElemKind m_t
     for (auto& it : dims) { std::cout << it << ' '; }
 }
 #endif
-
-void MWNNTensor::set_tensor() {
-  switch (in_type) {
-    case onnx::TensorProto_DataType_FLOAT:
-      tensor = get_data<float>(tensor_proto.float_data());
-      break;
-    case onnx::TensorProto_DataType_INT64:
-      tensor = get_data<float>(tensor_proto.int64_data());
-      break;
-    default:
-      break;
-  }
-}
 } //namespace metawarenn

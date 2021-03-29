@@ -16,12 +16,16 @@ inline std::vector<T> get_data(const Container& container)
 class MWNNTensor {
   public:
     MWNNTensor() = default;
+    #if ONNX
     MWNNTensor(TensorProto& onnx_tensor_proto);
+    void set_tensor(TensorProto& onnx_tensor_proto);
+    #endif
+    #if TFLITE
     MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, std::vector<float> m_tensor);
+    #endif
     #if GLOW
     MWNNTensor(std::string m_name, std::vector<int> m_dims, ElemKind m_type, std::vector<float> m_tensor);
     #endif
-    void set_tensor();
     std::string get_name() { return name; }
     int get_type() { return in_type; }
     std::vector<int> get_dims() { return dims; }
@@ -34,7 +38,6 @@ class MWNNTensor {
       tensor = n_tensor;
     }
   private:
-    TensorProto tensor_proto;
     std::string name;
     int in_type;
     ElementType::element_type t_type;

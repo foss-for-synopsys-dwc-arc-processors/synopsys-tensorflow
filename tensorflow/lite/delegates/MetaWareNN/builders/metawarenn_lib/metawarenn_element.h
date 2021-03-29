@@ -1,11 +1,11 @@
 #ifndef METAWARENN_ELEMENT_H_
 #define METAWARENN_ELEMENT_H_
 
-#include "onnx/onnx-ml.pb.h"
+#include "metawarenn_common.h"
 
-#include "tensorflow/lite/c/common.h"
-
+#if ONNX
 using namespace onnx;
+#endif
 
 namespace metawarenn {
 
@@ -34,6 +34,7 @@ class ElementType {
           dynamic_
       };
 
+    #if ONNX
     static element_type get_mwnn_type_onnx(int onnx_type) {
         switch (onnx_type) {
             case onnx::TensorProto_DataType_BOOL:
@@ -66,7 +67,9 @@ class ElementType {
                 return element_type::dynamic_;
         }
     }
+    #endif
 
+    #if TFLITE
     static element_type get_mwnn_type_tf(int tf_type) {
         switch (tf_type) {
             case kTfLiteBool:
@@ -97,6 +100,8 @@ class ElementType {
                 return element_type::dynamic_;
         }
     }
+    #endif
+
     #if GLOW
     static element_type get_mwnn_type_glow(ElemKind glow_type) {
         switch (glow_type) {
