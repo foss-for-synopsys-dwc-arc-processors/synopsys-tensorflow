@@ -10,7 +10,10 @@
 #include "metawarenn_lib/optimizer/remove_reshape.h"
 #include "metawarenn_lib/optimizer/convert_layout.h"
 
+#include "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h"
+
 #define HWC_TO_CHW 1
+#define INVOKE_NNAC 1
 
 namespace tflite {
 namespace delegates {

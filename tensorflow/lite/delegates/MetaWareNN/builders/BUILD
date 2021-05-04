@@ -5,8 +5,22 @@ package(
     licenses = ["notice"],  # Apache 2.0
 )
 
+cc_import(
+  name = "mwnn_protobuf",
+  hdrs = ["metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h"],
+  shared_library = "libprotobuf.so",
+)
+
+cc_binary(
+    name="model_builder",
+    deps=[":mwnn_protobuf",
+          ":model_builder_lib"],
+    visibility=["//visibility:public"],
+    linkshared = 1,
+)
+
 cc_library(
-    name = "model_builder",
+    name = "model_builder_lib",
     srcs = [
         "model_builder.cc",
         "metawarenn_lib/metawarenn_graph.cc",
@@ -33,6 +47,7 @@ cc_library(
         "metawarenn_lib/optimizer/convert_layout.cc",
         "metawarenn_lib/optimizer/remove_transpose.cc",
         "metawarenn_lib/optimizer/pass_manager.cc",
+        "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.cc",
     ],
     hdrs = [
         "model_builder.h",
@@ -104,6 +119,7 @@ cc_library(
         "metawarenn_lib/tensorflow/lite/builtin_op_data.h",
         "metawarenn_lib/tensorflow/lite/builtin_ops.h",
         "metawarenn_lib/metawarenn_common.h",
+        "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h",
     ],
     tags = [
         "manual",

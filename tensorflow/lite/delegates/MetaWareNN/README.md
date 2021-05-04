@@ -62,7 +62,23 @@
 4. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
 Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the downloaded MobileNet v2 TFlite model path
 
-5. Compile the inference script
+5. Modify below mentioned files:
+    I. Update "/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/model_builder.cc" file
+        i. Set the Path to store serialized "mobilenetv2-7_graphproto.bin" in line no:179
+        ii. Update the path to synopsys-tensorflow in line no:185
+    II. Update "/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh" file
+        i. Set the $EV_CNNMODELS_HOME path in line no:3
+        ii. Set the absolute path for ARC/setup.sh file in line no: 4
+        iii. Update the path to synopsys tensorflow, path to serialized mobilenetv2-7_graphproto.bin, path to store nnac output in line no:5
+
+6. Build MetaWareNN and its dependent libraries
+```
+    * Download protobuf library version 3.11.3 from the egnyte link https://multicorewareinc.egnyte.com/dl/FjljPlgjlI
+    * Unzip and move the "libprotobuf.so" to "/path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/"
+    * bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
+```
+
+7. Compile the inference script
   Note: we suggest to use g++ 7 to avoid possible errors.
 
 ```

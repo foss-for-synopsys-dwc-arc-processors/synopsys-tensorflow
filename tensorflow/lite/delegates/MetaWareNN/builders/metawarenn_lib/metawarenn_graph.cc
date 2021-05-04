@@ -88,11 +88,14 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
       node_op_type = "Conv";
       node_name = node_op_type + std::to_string(node_index);
       const TfLiteConvParams* conv_params = reinterpret_cast<const TfLiteConvParams*>(node->builtin_data);
-
+      const int weight_tensor_id = node->inputs->data[1];
+      const auto& weight_tensor = context->tensors[weight_tensor_id];
       ::metawarenn::MWNNAttribute mwnn_attr_dilate("dilations", {conv_params->dilation_height_factor, conv_params->dilation_width_factor});
       node_attributes.emplace_back(mwnn_attr_dilate);
       ::metawarenn::MWNNAttribute mwnn_attr_stride("strides", {conv_params->stride_height, conv_params->stride_width});
       node_attributes.emplace_back(mwnn_attr_stride);
+      ::metawarenn::MWNNAttribute mwnn_attr_kernel_shape("kernel_shape", {weight_tensor.dims->data[1], weight_tensor.dims->data[2]});
+      node_attributes.emplace_back(mwnn_attr_kernel_shape);
 
       int activation_type;
       if(conv_params->activation == ::tflite::ActivationFunctionType_NONE)
@@ -108,8 +111,6 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
       if(conv_params->padding == kTfLitePaddingSame) {
         const int input_tensor_id = node->inputs->data[0];
         const auto& input_tensor = context->tensors[input_tensor_id];
-        const int weight_tensor_id = node->inputs->data[1];
-        const auto& weight_tensor = context->tensors[weight_tensor_id];
 
         int in_height = input_tensor.dims->data[1];
         int in_width = input_tensor.dims->data[2];
@@ -145,12 +146,17 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
       node_op_type = "DepthwiseConv";
       node_name = node_op_type + std::to_string(node_index);
       const TfLiteDepthwiseConvParams* depthwise_conv_params = reinterpret_cast<const TfLiteDepthwiseConvParams*>(node->builtin_data);
+      const int weight_tensor_id = node->inputs->data[1];
+      const auto& weight_tensor = context->tensors[weight_tensor_id];
 
       ::metawarenn::MWNNAttribute mwnn_attr_dilate("dilations", {depthwise_conv_params->dilation_height_factor, depthwise_conv_params->dilation_width_factor});
       node_attributes.emplace_back(mwnn_attr_dilate);
       ::metawarenn::MWNNAttribute mwnn_attr_stride("strides", {depthwise_conv_params->stride_height, depthwise_conv_params->stride_width});
       node_attributes.emplace_back(mwnn_attr_stride);
-
+      ::metawarenn::MWNNAttribute mwnn_attr_kernel_shape("kernel_shape", {weight_tensor.dims->data[1], weight_tensor.dims->data[2]});
+      node_attributes.emplace_back(mwnn_attr_kernel_shape);
+      ::metawarenn::MWNNAttribute mwnn_attr_group("group", {weight_tensor.dims->data[3]});
+      node_attributes.emplace_back(mwnn_attr_group);
       int activation_type;
       if(depthwise_conv_params->activation == ::tflite::ActivationFunctionType_NONE)
         activation_type = ActivationType::Activation_None;
