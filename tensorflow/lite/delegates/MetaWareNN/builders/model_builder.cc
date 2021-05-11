@@ -28,7 +28,7 @@ void convert_CHWN_to_NHWC(::metawarenn::MWNNGraph *mwnn_graph, std::string initi
   for(int i = 0; i < height; i++) {
     for(int j = 0; j < width; j++) {
       for(int k = 0; k < channel; k++) {
-        new_wt_buf[(i * width) + (j) +(k * height * width)] = (int16_t)(tensor[(i * width * channel) + (j * channel) + k]);
+        new_wt_buf[(i * width) + (j) +(k * height * width)] = tensor[(i * width * channel) + (j * channel) + k];
       }
     }
   }
@@ -62,11 +62,15 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(::metawarenn::MWNNGraph *mwnn_graph
     for (auto g_t : mwnn_graph->get_graph_initializers()) {
       if(g_t.get_dims().size() == 4) {
         std::cout << "\n Name : " << g_t.get_name();
-        std::cout << "\t Dims : ";
-        for (auto dim : g_t.get_dims())
-          std::cout << dim << ",";
-        ::metawarenn::optimizer::ConvertLayout cl(mwnn_graph, g_t, 0, HWC_TO_CHW);
-        manager.register_pass(cl);
+        for(auto node: mwnn_graph->get_graph_nodes()) {
+          if(g_t.get_name() == node.get_inputs()[1] && node.get_op_type() == "Conv") {
+            std::cout << "\t Dims : ";
+            for (auto dim : g_t.get_dims())
+              std::cout << dim << ",";
+            ::metawarenn::optimizer::ConvertLayout cl(mwnn_graph, g_t, 0, HWC_TO_CHW);
+            manager.register_pass(cl);
+          }
+        }
       }
     }
     for (auto g_t : mwnn_graph->get_graph_inputs()) {

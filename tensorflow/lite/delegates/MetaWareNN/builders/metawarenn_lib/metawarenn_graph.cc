@@ -219,10 +219,16 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
     else if (op_type == kTfLiteBuiltinReshape) {
       node_op_type = "Reshape";
       node_name = node_op_type + std::to_string(node_index);
+      const TfLiteReshapeParams* reshape_params = reinterpret_cast<const TfLiteReshapeParams*>(node->builtin_data);
+      ::metawarenn::MWNNAttribute mwnn_attr_shape("shape", {reshape_params->shape[0], reshape_params->shape[1]});
+      node_attributes.emplace_back(mwnn_attr_shape);
     }
     else if (op_type == kTfLiteBuiltinSoftmax) {
       node_op_type = "Softmax";
       node_name = node_op_type + std::to_string(node_index);
+      const TfLiteSoftmaxParams* softmax_params = reinterpret_cast<const TfLiteSoftmaxParams*>(node->builtin_data);
+      ::metawarenn::MWNNAttribute mwnn_attr_beta("beta", {(int32_t)softmax_params->beta});
+      node_attributes.emplace_back(mwnn_attr_beta);
     }
     else {
       std::cout << "\n Unsupported op_type: " << op_type;

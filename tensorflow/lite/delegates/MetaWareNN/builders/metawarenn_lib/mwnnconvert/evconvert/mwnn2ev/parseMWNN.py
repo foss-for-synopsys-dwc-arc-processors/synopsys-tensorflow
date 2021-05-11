@@ -99,22 +99,21 @@ class ConverterRegistry(object):
         try:
             # Handles Conv, fused Conv+Relu
             if(node.op_type == "Conv"):
-                conv_output = node_name+"_out"
-                cls.caffe_network[conv_output] = cls.registry_[node.op_type](
-                    model, node, node_name, inputs, outputs, **kwargs)            
-                count = 0
                 activation_valid = False
                 for attr in node.attribute:
                     # Checks for valid activation
                     if(attr.name == "activation" and attr.ints[0] != 0):
                         activation_valid = True
-                        relu_node_name = "relu"+str(count)
-                        count = count + 1
+                        conv_output = []
+                        conv_output.append(node_name+"_out")
+                        cls.caffe_network[conv_output[0]] = cls.registry_[node.op_type](
+                            model, node, node_name, inputs, conv_output, **kwargs)
+                        relu_node_name = node_name+"_relu"
                         relu_inputs = []
                         relu_outputs = []
-                        relu_inputs.append(conv_output)
-                        relu_outputs.append(node_name+"_relu_out")
-                        caffe_layer = init_node(model, node_name+"_Relu", relu_inputs, relu_outputs)
+                        relu_inputs.append(conv_output[0])
+                        relu_outputs.append(outputs[0])
+                        caffe_layer = init_node(model, relu_node_name, relu_inputs, relu_outputs)
                         # Adds separate caffe layer for Relu
                         if(attr.ints[0] == 1):
                             caffe_layer['functions'] = '{output_name} = L.ReLU({input_names})\n'.format(
@@ -124,7 +123,7 @@ class ConverterRegistry(object):
                             caffe_layer['functions'] = '{output_name} = L.ReLU({input_names}relu6=True)\n'.format(
                                 **caffe_layer)
                         cls.caffe_network[outputs[0]] = caffe_layer
-                        print(cls.caffe_network[conv_output]['functions'])
+                        print(cls.caffe_network[conv_output[0]]['functions'])
                 # If no valid activation, then add caffe layer for Conv node
                 if(not activation_valid):
                     cls.caffe_network[outputs[0]] = cls.registry_[node.op_type](
@@ -132,7 +131,7 @@ class ConverterRegistry(object):
             # Handles Op types other than Relu
             else:
                 cls.caffe_network[outputs[0]] = cls.registry_[node.op_type](
-                    model, node, node_name, inputs, outputs, **kwargs) 
+                    model, node, node_name, inputs, outputs, **kwargs)
             print(cls.caffe_network[outputs[0]]['functions'])
         except KeyError as err:
             # raise KeyError('No translator registered for layer: %s yet.' %
@@ -536,5 +535,17 @@ def parse_Reshape(graphproto, node, node_name, inputs, outputs):
     else:
         caffe_layer['functions'] += "{} = L.Reshape({}reshape_param={{'shape':{{'dim':{}}}}})\n".format(
             caffe_layer['output_name'], caffe_layer['input_names'], shape)
+
+    return caffe_layer
+
+@ConverterRegistry.Register('Softmax')
+def parse_Softmax(model, node, node_name, inputs, outputs):
+    caffe_layer = init_node(model, node_name, inputs, outputs)
+    axis = 1
+    for attr in node.attribute:
+        if attr.name == 'beta':
+            axis = attr.ints[0]
+    caffe_layer['functions'] = '{} = L.Softmax({}axis={})\n'.format(
+        caffe_layer['output_name'], caffe_layer['input_names'], axis)
 
     return caffe_layer

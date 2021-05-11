@@ -33,11 +33,15 @@ void ConvertLayout::RunPass() {
       int channel = dims[1];
       int height = dims[2];
       int width = dims[3];
+      int num_output = dims[0];
       // Data layout conversion from CHW to HWC
-      for(int i = 0; i < height; i++) {
-        for(int j = 0; j < width; j++) {
-          for(int k = 0; k < channel; k++) {
-            new_data[(i * width * channel) + (j * channel) + k] = data[(k * height * width) + (i * width) + (j)];
+
+      for(int n = 0; n < num_output; n++) {
+        for(int i = 0; i < height; i++) {
+          for(int j = 0; j < width; j++) {
+            for(int k = 0; k < channel; k++) {
+              new_data[(n * height * width * channel) + (i * width * channel) + (j * channel) + k] = data[(n * height * width * channel) + (k * height * width) + (i * width) + (j)];
+            }
           }
         }
       }
@@ -58,11 +62,14 @@ void ConvertLayout::RunPass() {
       int channel = dims[3];
       int height = dims[1];
       int width = dims[2];
+      int num_output = dims[0];
       // Data layout conversion from HWC to CHW
-      for(int i = 0; i < height; i++) {
-        for(int j = 0; j < width; j++) {
-          for(int k = 0; k < channel; k++) {
-            new_data[(k * height * width) + (i * width) + j] = data[(i * width * channel) + (j * channel) + k];
+      for(int n = 0; n < num_output; n++) {
+        for(int i = 0; i < height; i++) {
+          for(int j = 0; j < width; j++) {
+            for(int k = 0; k < channel; k++) {
+              new_data[(n * height * width * channel) + (k * height * width) + (i * width) + j] = data[(n * height * width * channel) + (i * width * channel) + (j * channel) + k];
+            }
           }
         }
       }
