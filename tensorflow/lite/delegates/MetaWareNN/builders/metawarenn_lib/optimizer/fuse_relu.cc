@@ -7,7 +7,7 @@ namespace optimizer {
 FuseRelu::FuseRelu() {
   set_name("FuseRelu");
 }
-FuseRelu::FuseRelu(MWNNGraph* mwnn_graph, MWNNNode mwnn_node) {
+FuseRelu::FuseRelu(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNNode mwnn_node) {
   set_name("FuseRelu");
   graph = mwnn_graph;
   node = mwnn_node;

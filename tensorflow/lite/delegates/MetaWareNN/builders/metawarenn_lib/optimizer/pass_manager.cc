@@ -4,7 +4,7 @@ namespace metawarenn {
 
 namespace optimizer {
 
-PassManager::PassManager() { std::cout << "\n In PassManager Constructor!!"; }
+PassManager::PassManager() { /*std::cout << "\n In PassManager Constructor!!";*/ }
 void PassManager::run_passes() {
   for (auto& pass : pass_list) {
     std::cout  << "\n PassName : " << pass->get_name();

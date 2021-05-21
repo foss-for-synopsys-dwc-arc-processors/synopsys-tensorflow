@@ -9,7 +9,7 @@ namespace optimizer {
 class RemoveTranspose : public MWNNOptimizer {
   public:
     RemoveTranspose();
-    RemoveTranspose(MWNNGraph* mwnn_graph, MWNNNode mwnn_node);
+    RemoveTranspose(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNNode mwnn_node);
     void RunPass() override;
 };
 

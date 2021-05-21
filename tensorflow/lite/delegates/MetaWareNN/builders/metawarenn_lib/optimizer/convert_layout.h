@@ -9,8 +9,8 @@ namespace optimizer {
 class ConvertLayout : public MWNNOptimizer {
   public:
     ConvertLayout();
-    ConvertLayout(MWNNGraph* mwnn_graph, MWNNTensor mwnn_tensor, bool to_hwc, bool to_chw);
-    ConvertLayout(MWNNGraph* mwnn_graph, MWNNValueInfo mwnn_value_info, bool to_hwc, bool to_chw);
+    ConvertLayout(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNTensor mwnn_tensor, bool to_hwc, bool to_chw);
+    ConvertLayout(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNValueInfo mwnn_value_info, bool to_hwc, bool to_chw);
     void RunPass() override;
   private:
     bool CHW_to_HWC = 0;

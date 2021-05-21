@@ -7,7 +7,7 @@ namespace optimizer {
 RemoveReshape::RemoveReshape() {
   set_name("RemoveReshape");
 }
-RemoveReshape::RemoveReshape(MWNNGraph* mwnn_graph, MWNNNode mwnn_node) {
+RemoveReshape::RemoveReshape(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNNode mwnn_node) {
   set_name("RemoveReshape");
   graph = mwnn_graph;
   node = mwnn_node;

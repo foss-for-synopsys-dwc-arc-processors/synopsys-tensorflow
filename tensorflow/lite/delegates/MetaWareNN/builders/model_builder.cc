@@ -7,15 +7,15 @@ namespace metawarenn {
 ModelBuilder::ModelBuilder(std::vector<int> nodes)
     : subgraph_nodes_(nodes) {}
 
-::metawarenn::MWNNGraph ModelBuilder::BuildGraph(TfLiteContext* context) {
+std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext* context) {
   std::cout<<"\nBuildGraph!!"<<std::endl;
 
   /*Create MetaWareNN High Level Graph Representation from TFLite SubGraph Nodes*/
-  ::metawarenn::MWNNGraph mwnn_graph_(context, subgraph_nodes_);
-  return mwnn_graph_;
+  std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph_ptr = std::make_shared<::metawarenn::MWNNGraph>(context, subgraph_nodes_);
+  return mwnn_graph_ptr;
 }
 
-void convert_CHWN_to_NHWC(::metawarenn::MWNNGraph *mwnn_graph, std::string initializer_name)
+void convert_CHWN_to_NHWC(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph, std::string initializer_name)
 {
   auto weight = mwnn_graph->get_initializer_tensor(initializer_name);
   auto dims = weight.get_dims();
@@ -37,7 +37,7 @@ void convert_CHWN_to_NHWC(::metawarenn::MWNNGraph *mwnn_graph, std::string initi
 /* TODO: High Level Graph to MetaWareNN Graph Representation,
          Apply Passes on MetaWareNN Graph,
          Generate Low Level Graph to run on devices*/
-TfLiteStatus ModelBuilder::MetaWareNNCompile(::metawarenn::MWNNGraph *mwnn_graph) {
+TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph) {
   std::cout << "\n In MetaWareNNCompile !!! ";
   namespace bip = boost::interprocess;
   bip::shared_memory_object::remove("SharedMemoryFile");
@@ -187,10 +187,10 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(::metawarenn::MWNNGraph *mwnn_graph
 
     std::cout << "\n\n==============Initiating NNAC python script through shell script=========================\n";
     system("bash /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh");
-    exit(1);
+    //exit(1);
   #endif
 
-  oa << *mwnn_graph;
+  //oa << *mwnn_graph;*/
   return kTfLiteOk;
   }
 } // namespace metawarenn

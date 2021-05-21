@@ -7,7 +7,7 @@ namespace optimizer {
 ConvertLayout::ConvertLayout() {
   set_name("ConvertLayout");
 }
-ConvertLayout::ConvertLayout(MWNNGraph* mwnn_graph, MWNNTensor mwnn_tensor, bool to_hwc, bool to_chw) {
+ConvertLayout::ConvertLayout(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNTensor mwnn_tensor, bool to_hwc, bool to_chw) {
   set_name("ConvertLayout");
   graph = mwnn_graph;
   tensor = mwnn_tensor;
@@ -15,7 +15,7 @@ ConvertLayout::ConvertLayout(MWNNGraph* mwnn_graph, MWNNTensor mwnn_tensor, bool
   HWC_to_CHW = to_chw;
   is_tensor = true;
 }
-ConvertLayout::ConvertLayout(MWNNGraph* mwnn_graph, MWNNValueInfo mwnn_value_info, bool to_hwc, bool to_chw) {
+ConvertLayout::ConvertLayout(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNValueInfo mwnn_value_info, bool to_hwc, bool to_chw) {
   set_name("ConvertLayout");
   graph = mwnn_graph;
   value_info = mwnn_value_info;

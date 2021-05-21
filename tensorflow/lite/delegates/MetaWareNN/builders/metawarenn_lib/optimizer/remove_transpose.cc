@@ -7,7 +7,7 @@ namespace optimizer {
 RemoveTranspose::RemoveTranspose() {
   set_name("RemoveTranspose");
 }
-RemoveTranspose::RemoveTranspose(MWNNGraph* mwnn_graph, MWNNNode mwnn_node) {
+RemoveTranspose::RemoveTranspose(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNNode mwnn_node) {
   set_name("RemoveTranspose");
   graph = mwnn_graph;
   node = mwnn_node;

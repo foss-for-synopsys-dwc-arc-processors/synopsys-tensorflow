@@ -17,7 +17,7 @@ class MWNNOptimizer {
   private:
     std::string pass_name;
   protected:
-    MWNNGraph *graph;
+    std::shared_ptr<metawarenn::MWNNGraph> graph;
     MWNNNode node;
     MWNNTensor tensor;
     MWNNValueInfo value_info;

@@ -9,7 +9,7 @@ namespace optimizer {
 class RemoveReshape : public MWNNOptimizer {
   public:
     RemoveReshape();
-    RemoveReshape(MWNNGraph* mwnn_graph, MWNNNode mwnn_node);
+    RemoveReshape(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNNode mwnn_node);
     void RunPass() override;
 };
 

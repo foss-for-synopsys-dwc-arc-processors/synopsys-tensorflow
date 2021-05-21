@@ -9,7 +9,7 @@ namespace optimizer {
 class FuseRelu : public MWNNOptimizer {
   public:
     FuseRelu();
-    FuseRelu(MWNNGraph* mwnn_graph, MWNNNode mwnn_node);
+    FuseRelu(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNNode mwnn_node);
     void RunPass() override;
 };
 

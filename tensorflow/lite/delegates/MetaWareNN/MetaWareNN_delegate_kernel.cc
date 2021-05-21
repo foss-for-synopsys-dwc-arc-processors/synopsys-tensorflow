@@ -27,10 +27,10 @@ TfLiteStatus MetaWareNNDelegateKernel::Init(TfLiteContext* context,
 TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Prepare!!"<<std::endl;
-
-  if(model_builder_->MetaWareNNCompile(&mwnn_graph_)) {
+  if(model_builder_->MetaWareNNCompile(mwnn_graph_)) {
     graph_prepared_ = true;
   }
+  std::cout << "\n In MWNN Kernel Prepare : " << mwnn_graph_->get_graph_nodes().size() << "  Graph Name : " << mwnn_graph_->get_name();
   return kTfLiteOk;
 }
 
@@ -38,7 +38,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Invoke!!!"<<std::endl;
   int is_HWC = HWC_TO_CHW ? 0 : 1;
-  namespace bip = boost::interprocess;
+  /*namespace bip = boost::interprocess;
   bip::shared_memory_object shm(bip::open_only, "SharedMemoryFile", bip::read_only);
   bip::mapped_region region(shm, bip::read_only);
   bip::bufferstream bs(std::ios::in);
@@ -47,7 +47,10 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
   ::metawarenn::MWNNGraph mwnn_graph;
   ia >> mwnn_graph;
   convert_to_mwnn_format(mwnn_graph, is_HWC) ;
-  bip::shared_memory_object::remove("SharedMemoryFile");
+  bip::shared_memory_object::remove("SharedMemoryFile");*/
+
+  std::cout << "\n In MWNN Kernel Invoke : " << mwnn_graph_->get_graph_nodes().size() << "  Graph Name : " << mwnn_graph_->get_name();
+  convert_to_mwnn_format(*mwnn_graph_, is_HWC);
 
   return kTfLiteOk;
 }

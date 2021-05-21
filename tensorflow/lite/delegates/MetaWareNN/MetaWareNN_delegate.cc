@@ -79,7 +79,7 @@ bool IsNodeSupportedByMetaWareNN(const TfLiteRegistration* registration,
     case kTfLiteBuiltinAdd:
     case kTfLiteBuiltinConv2d:
     case kTfLiteBuiltinDepthwiseConv2d:
-    case kTfLiteBuiltinAveragePool2d:
+    //case kTfLiteBuiltinAveragePool2d:
     case kTfLiteBuiltinRelu:
     case kTfLiteBuiltinReshape:
     case kTfLiteBuiltinSoftmax:
@@ -120,14 +120,12 @@ TfLiteStatus DelegatePrepare(TfLiteContext* context, TfLiteDelegate* delegate) {
 TfLiteDelegate* CreateDelegate(const TfLiteMetaWareNNDelegateOptions* params) {
   TfLiteDelegate* delegate = new MetaWareNNDelegate(params);
   std::cout<<"\nInside CreateDelegate"<<std::endl;
-
   delegate->data_ = static_cast<MetaWareNNDelegate*>(delegate)->params();
   delegate->flags = kTfLiteDelegateFlagsAllowDynamicTensors;
   delegate->Prepare = &DelegatePrepare;
   delegate->CopyFromBufferHandle = nullptr;
   delegate->CopyToBufferHandle = nullptr;
   delegate->FreeBufferHandle = nullptr;
-
   return delegate;
 }
 
