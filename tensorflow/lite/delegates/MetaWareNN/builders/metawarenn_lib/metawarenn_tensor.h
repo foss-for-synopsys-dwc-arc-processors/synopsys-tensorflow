@@ -22,6 +22,7 @@ class MWNNTensor {
     #endif
     #if TFLITE
     MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, std::vector<float> m_tensor);
+    MWNNTensor(std::string t_name, std::vector<int> t_shape);
     #endif
     #if GLOW
     MWNNTensor(std::string m_name, std::vector<int> m_dims, ElemKind m_type, std::vector<float> m_tensor);

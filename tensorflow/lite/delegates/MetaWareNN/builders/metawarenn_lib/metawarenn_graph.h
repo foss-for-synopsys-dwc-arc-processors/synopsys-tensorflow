@@ -99,12 +99,43 @@ class MWNNGraph {
       });
       return it->set_outputs(op_name, index);
     }
+    void update_node_attribute(std::string node_name, std::string attr_name, int value) {
+      auto it = std::find_if(
+      std::begin(mwnn_nodes), std::end(mwnn_nodes), [&](MWNNNode& node) {
+          return node.get_name() == node_name;
+      });
+      return it->update_attribute_value(attr_name, value);
+    }
     void update_initializer_tensors(std::string tensor_name, std::vector<int> n_dims, std::vector<float> n_tensor) {
       auto it = std::find_if(
       std::begin(mwnn_initializer_tensors), std::end(mwnn_initializer_tensors), [&](MWNNTensor& tensor) {
           return tensor.get_name() == tensor_name;
       });
       return it->update_tensor(n_dims, n_tensor);
+    }
+    void update_input_tensors(std::unordered_map<std::string, float*> graph_inputs) {
+      for (auto it = mwnn_graph_ip_tensors.begin(); it != mwnn_graph_ip_tensors.end(); ++it) {
+        auto name = it->get_name();
+        if(graph_inputs.count(name)) {
+          float* arr_tensor = graph_inputs[name];
+          std::vector<int> dims = it->get_dims();
+          int num_elements = std::accumulate(std::begin(dims), std::end(dims), 1, std::multiplies<double>());
+          std::vector<float> vec_tensor(arr_tensor, arr_tensor + num_elements);
+          return it->update_tensor(dims, vec_tensor);
+        }
+      }
+    }
+    void update_output_tensors(std::unordered_map<std::string, float*> graph_outputs) {
+      for (auto it = mwnn_graph_op_tensors.begin(); it != mwnn_graph_op_tensors.end(); ++it) {
+        auto name = it->get_name();
+        if(graph_outputs.count(name)) {
+          float* arr_tensor = graph_outputs[name];
+          std::vector<int> dims = it->get_dims();
+          int num_elements = std::accumulate(std::begin(dims), std::end(dims), 1, std::multiplies<double>());
+          std::vector<float> vec_tensor(arr_tensor, arr_tensor + num_elements);
+          return it->update_tensor(dims, vec_tensor);
+        }
+      }
     }
     void update_inputs(std::string value_info_name, std::vector<int> n_dims) {
       auto it = std::find_if(
@@ -116,7 +147,8 @@ class MWNNGraph {
     std::vector<MWNNNode> get_graph_nodes() { return mwnn_nodes; }
     std::vector<MWNNValueInfo> get_graph_inputs() { return mwnn_inputs; }
     std::vector<MWNNValueInfo> get_graph_outputs() { return mwnn_outputs; }
-
+    std::vector <MWNNTensor> get_graph_ip_tensor() { return mwnn_graph_ip_tensors; }
+    std::vector <MWNNTensor> get_graph_op_tensor() { return mwnn_graph_op_tensors; }
     std::set<std::string> mwnn_initializer_names;
     std::map<std::string, std::shared_ptr<op::Node>> mwnn_graph_nodes;
   private:
@@ -124,6 +156,8 @@ class MWNNGraph {
     std::string ip_name;
     std::string op_name;
     std::vector<MWNNTensor> mwnn_initializer_tensors;
+    std::vector<MWNNTensor> mwnn_graph_ip_tensors;
+    std::vector<MWNNTensor> mwnn_graph_op_tensors;
     std::vector<MWNNNode> mwnn_nodes;
     std::vector<MWNNValueInfo> mwnn_inputs;
     std::vector<MWNNValueInfo> mwnn_outputs;

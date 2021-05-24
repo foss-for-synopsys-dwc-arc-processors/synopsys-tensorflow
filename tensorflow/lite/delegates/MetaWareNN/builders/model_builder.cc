@@ -47,6 +47,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
   bip::bufferstream bs(std::ios::out);
   bs.buffer(reinterpret_cast<char*>(region.get_address()), region.get_size());
   boost::archive::text_oarchive oa(bs);
+  bip::shared_memory_object::remove("SharedMemoryFile");
   //Call Passes
   ::metawarenn::optimizer::PassManager manager;
   for (auto node : mwnn_graph->get_graph_nodes())
@@ -61,12 +62,12 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
   {
     for (auto g_t : mwnn_graph->get_graph_initializers()) {
       if(g_t.get_dims().size() == 4) {
-        std::cout << "\n Name : " << g_t.get_name();
+        //std::cout << "\n Name : " << g_t.get_name();
         for(auto node: mwnn_graph->get_graph_nodes()) {
           if(g_t.get_name() == node.get_inputs()[1] && node.get_op_type() == "Conv") {
-            std::cout << "\t Dims : ";
+            /*std::cout << "\t Dims : ";
             for (auto dim : g_t.get_dims())
-              std::cout << dim << ",";
+              std::cout << dim << ",";*/
             ::metawarenn::optimizer::ConvertLayout cl(mwnn_graph, g_t, 0, HWC_TO_CHW);
             manager.register_pass(cl);
           }
@@ -75,10 +76,10 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
     }
     for (auto g_t : mwnn_graph->get_graph_inputs()) {
       if(g_t.get_dims().size() == 4) {
-        std::cout << "\n Name : " << g_t.get_name();
+        /*std::cout << "\n Name : " << g_t.get_name();
         std::cout << "\t Dims : ";
         for (auto dim : g_t.get_dims())
-          std::cout << dim << ",";
+          std::cout << dim << ",";*/
         ::metawarenn::optimizer::ConvertLayout cl(mwnn_graph, g_t, 0, HWC_TO_CHW);
         manager.register_pass(cl);
       }
@@ -99,7 +100,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
     }
   }
   manager.run_passes();
-  #if INVOKE_NNAC
+  /*#if INVOKE_NNAC
     std::cout << "\n ---------------------------Graph----------------------------- \n";
     std::cout << "\n Graph Name : " << mwnn_graph->get_name();
     ::MWNN::MWNNGraphProto mwnn_graph_proto;

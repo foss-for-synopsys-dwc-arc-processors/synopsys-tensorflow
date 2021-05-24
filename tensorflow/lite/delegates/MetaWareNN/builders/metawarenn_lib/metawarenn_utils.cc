@@ -25,11 +25,11 @@ void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, m
     *k_width = is_HWC ? dims[2] : dims[3];
   }
 
-  std::cout << "\nDimension size: ";
+  //std::cout << "\nDimension size: ";
   for (i = 0; i < dims.size(); i++)
   {
     mwnn_initalizer->mem_stride[i] = 0;
-    std::cout << dims[i] << ", ";
+    //std::cout << dims[i] << ", ";
     wt_buf_size = wt_buf_size * dims[i];
   }
   int16_t *buffer = (int16_t*)malloc(wt_buf_size * sizeof(int16_t));
@@ -41,14 +41,14 @@ void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, m
   mwnn_initalizer->data.capacity = sizeof(buffer);
   mwnn_initalizer->data.mem.void_p = (void *)buffer;
 
-  std::cout << "\nMax of tensor: " << max;
+  /*std::cout << "\nMax of tensor: " << max;
   std::cout << "\nInt bits : " << (int)ceil(log2(max));
   std::cout << "\nFractional bits : " << (int)mwnn_initalizer->el_params.fx.frac_bits;
   std::cout << "\nInitializer element type : " << mwnn_initalizer->el_type;
-  std::cout << "\nInitializer rank : " << mwnn_initalizer->rank;
+  std::cout << "\nInitializer rank : " << mwnn_initalizer->rank;*/
 }
 
-void fill_mwnn_tensor_input(MWNNValueInfo input, mli_tensor *mwnn_tensor)
+void fill_mwnn_tensor_input(MWNNTensor input, mli_tensor *mwnn_tensor)
 {
   auto dims = input.get_dims();
   mwnn_tensor->rank = dims.size();
@@ -57,16 +57,19 @@ void fill_mwnn_tensor_input(MWNNValueInfo input, mli_tensor *mwnn_tensor)
   mwnn_tensor->el_type = MLI_EL_FX_16;
   mwnn_tensor->el_params.fx.frac_bits = 8;
   uint8_t i;
+  int total_size = 1;
   for (i = 0; i < dims.size(); i++)
   {
+    total_size = total_size * dims[i];
     mwnn_tensor->mem_stride[i] = 0;
   }
-  int16_t *input_buffer = (int16_t*)malloc(MAX_INPUT_BUF_SIZE * sizeof(int16_t));
-  for(int i = 0; i < MAX_INPUT_BUF_SIZE; i++)
+  auto ip_tensor = input.get_tensor();
+  int16_t *input_buffer = (int16_t*)malloc(total_size * sizeof(int16_t));
+  for(int i = 0; i < total_size; i++)
   {
-    input_buffer[i] = (int16_t)5;
+    input_buffer[i] = ip_tensor[i];
   }
-  mwnn_tensor->data.capacity = MAX_INPUT_BUF_SIZE * sizeof(int16_t);
+  mwnn_tensor->data.capacity = total_size * sizeof(int16_t);
   mwnn_tensor->data.mem.void_p = (void *)input_buffer;
   std::cout << "\nInput's data capacity: " << mwnn_tensor->data.capacity;
 }
@@ -82,11 +85,14 @@ void create_mwnn_tensor_output(mli_tensor *mwnn_tensor, long int buf_size)
   std::cout << "\nOutput's data capacity: " << mwnn_tensor->data.capacity;
 }
 
-void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
+void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string, float*> &graph_inputs, std::unordered_map<std::string, float*> &graph_outputs, int is_HWC)
 {
   std::map<std::string, mli_tensor> tensor_map;
+  //Fill the MWNNGraph ip tensor
+  mwnn_graph.update_input_tensors(graph_inputs);
   std::cout << "\n======================================================================================================================= \n";
   std::cout << "\n --------------------------------- Conversion to MetaWareNN High Level Graph Format -----------------------------------\n";
+  std::cout << "\n --------------Graph Name : " << mwnn_graph.get_name();
   auto node_list = mwnn_graph.get_graph_nodes();
   for (int node_idx = 0; node_idx < mwnn_graph.get_graph_nodes().size() ; node_idx++) {
     std::cout << "\n======================================================================================================================= \n";
@@ -116,7 +122,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
         conv_cfg.relu.type = MLI_RELU_GEN;
       else if(activation == ActivationType::Activation_Relu6)
         conv_cfg.relu.type = MLI_RELU_6;
-      std::cout << "\n\nConfig params:";
+      /*std::cout << "\n\nConfig params:";
       std::cout << "\nstride_height : " << (int)conv_cfg.stride_height;
       std::cout << "\nstride_width : " << (int)conv_cfg.stride_width;
       std::cout << "\npadding_top : " << (int)conv_cfg.padding_top;
@@ -124,7 +130,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
       std::cout << "\npadding_bottom : " << (int)conv_cfg.padding_bottom;
       std::cout << "\npadding_right : " << (int)conv_cfg.padding_right;
       std::cout << "\ndilation_height : " << (int)conv_cfg.dilation_height;
-      std::cout << "\ndilation_width : " << (int)conv_cfg.dilation_width;
+      std::cout << "\ndilation_width : " << (int)conv_cfg.dilation_width;*/
       mli_tensor input_tensor;
       mli_tensor conv_wt;
       mli_tensor conv_bias;
@@ -137,7 +143,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
       // Handles the initial graph input to the first conv node and updates tensor map
       if(input == mwnn_graph.get_graph_ip_name())
       {
-        fill_mwnn_tensor_input(mwnn_graph.get_graph_inputs()[0], &input_tensor);
+        fill_mwnn_tensor_input(mwnn_graph.get_graph_ip_tensor()[0], &input_tensor);
         tensor_map.insert(std::pair<std::string, mli_tensor>(input, input_tensor));
       }
       input_tensor = (tensor_map.find(input))->second;
@@ -193,8 +199,8 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
     {
       mli_tensor output_tensor;
       auto input = g_n.get_inputs();
-      std::cout << "\nInput node 1: " << input[0];
-      std::cout << "\nInput node 2: " << input[1];
+      /*std::cout << "\nInput node 1: " << input[0];
+      std::cout << "\nInput node 2: " << input[1];*/
       auto shape = (tensor_map.find(input[0]))->second.shape;
       int buf_size = 1;
       int rank = (tensor_map.find(input[0]))->second.rank;
@@ -300,6 +306,18 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
       tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], (tensor_map.find(input[0]))->second));
     }
   }
+  //To fill the graph output layer value in the passed argument
+  for (auto g_op : graph_outputs) {
+    for (auto t_map : tensor_map) {
+      if(t_map.first == g_op.first) {
+        float *op = (float *)((t_map.second).data.mem.void_p);
+        graph_outputs[g_op.first] = op;
+        break;
+      }
+    }
+  }
+  //Fill the MWNNGraph op tensor
+  mwnn_graph.update_output_tensors(graph_outputs);
 }
 
 } //namespace metawarenn

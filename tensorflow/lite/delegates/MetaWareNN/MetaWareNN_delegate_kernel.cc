@@ -1,6 +1,5 @@
 #include <vector>
 #include <iostream>
-
 #include "tensorflow/lite/builtin_ops.h"
 #include "tensorflow/lite/c/builtin_op_data.h"
 #include "tensorflow/lite/c/common.h"
@@ -14,7 +13,6 @@ namespace tflite {
 TfLiteStatus MetaWareNNDelegateKernel::Init(TfLiteContext* context,
                                          const TfLiteDelegateParams* params) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Init!!"<<std::endl;
-
   for (auto node_index : TfLiteIntArrayView(params->nodes_to_replace)) {
     nodes_.push_back(node_index);
   }
@@ -38,6 +36,29 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Invoke!!!"<<std::endl;
   int is_HWC = HWC_TO_CHW ? 0 : 1;
+
+  //Fills the graph_inputs with input data pointer using indexes
+  std::unordered_map<std::string, float*> graph_inputs;
+  std::unordered_map<std::string, float*> graph_outputs;
+
+  for (int input_idx = 0; input_idx < node->inputs->size; ++input_idx) {
+    const auto tensor_index = node->inputs->data[input_idx];
+    TfLiteTensor* tensor = &context->tensors[tensor_index];
+    if (tensor->allocation_type == kTfLiteArenaRw && tensor->data.f != nullptr) { //Input - Data
+      graph_inputs[tensor->name] = tensor->data.f;
+    }
+    else if(tensor->allocation_type == kTfLiteMmapRo && tensor->data.f != nullptr) { //Weights, Biases etc.,
+      graph_inputs[tensor->name] = tensor->data.f;
+    }
+  }
+  for (int output_idx = 0; output_idx < node->outputs->size; ++output_idx) {
+    const auto tensor_index = node->outputs->data[output_idx];
+    TfLiteTensor* tensor = &context->tensors[tensor_index];
+    if (tensor->allocation_type == kTfLiteArenaRw && tensor->data.f != nullptr) { //Output - Data
+      graph_outputs[tensor->name] = tensor->data.f;
+    }
+  }
+
   /*namespace bip = boost::interprocess;
   bip::shared_memory_object shm(bip::open_only, "SharedMemoryFile", bip::read_only);
   bip::mapped_region region(shm, bip::read_only);
@@ -50,7 +71,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
   bip::shared_memory_object::remove("SharedMemoryFile");*/
 
   std::cout << "\n In MWNN Kernel Invoke : " << mwnn_graph_->get_graph_nodes().size() << "  Graph Name : " << mwnn_graph_->get_name();
-  convert_to_mwnn_format(*mwnn_graph_, is_HWC);
+  convert_to_mwnn_format(*mwnn_graph_, graph_inputs, graph_outputs, is_HWC);
 
   return kTfLiteOk;
 }

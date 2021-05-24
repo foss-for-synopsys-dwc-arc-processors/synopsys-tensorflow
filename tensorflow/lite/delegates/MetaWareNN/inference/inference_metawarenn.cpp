@@ -24,7 +24,6 @@ int main(){
     // NEW: Prepare MetaWareNN delegate.
     auto* delegate = TfLiteMetaWareNNDelegateCreate(options);
     if (interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) return false;
-    
     // Resize input tensors, if desired.
     interpreter->AllocateTensors();
     
@@ -43,8 +42,9 @@ int main(){
 
     for (int i = 0; i < 224*224*3; i++)
     {
-      *passing_input = input[i];
-      passing_input++;
+      //*passing_input = input[i];
+      //passing_input++;
+      passing_input[i] = 125.8;
     }
     interpreter->Invoke();
     float* output = interpreter->typed_output_tensor<float>(0);

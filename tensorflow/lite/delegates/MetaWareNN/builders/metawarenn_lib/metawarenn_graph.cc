@@ -57,9 +57,11 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
   ::metawarenn::MWNNValueInfo mwnn_input(input_tensor.name, dims_ip_vec, input_tensor.type);
   mwnn_inputs.emplace_back(mwnn_input);
   ip_name = input_tensor.name;
-
   auto ip_node = mwnn_input.get_node();
   mwnn_graph_nodes[mwnn_input.get_name()] = std::move(ip_node);
+  //Fills Graph Input Tensor Details - Name, Dims
+  MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_dims());
+  mwnn_graph_ip_tensors.emplace_back(mwnn_ip_tensor);
 
   //Set Graph Output Node
   context->GetNodeAndRegistration(context, subgraph_nodes_[subgraph_nodes_.size()-1], &node, &reg);
@@ -69,6 +71,9 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
   ::metawarenn::MWNNValueInfo mwnn_output(output_tensor.name, dims_op_vec, output_tensor.type);
   mwnn_outputs.emplace_back(mwnn_output);
   op_name = output_tensor.name;
+  //Fills Graph Output Tensor Details - Name, Dims
+  MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_dims());
+  mwnn_graph_op_tensors.emplace_back(mwnn_op_tensor);
 
   for (size_t node_index = 0; node_index < subgraph_nodes_.size(); node_index++) {
     std::cout << "\n -------------------------------------------------------------------------------------------------------------";
@@ -90,6 +95,7 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
       const TfLiteConvParams* conv_params = reinterpret_cast<const TfLiteConvParams*>(node->builtin_data);
       const int weight_tensor_id = node->inputs->data[1];
       const auto& weight_tensor = context->tensors[weight_tensor_id];
+
       ::metawarenn::MWNNAttribute mwnn_attr_dilate("dilations", {conv_params->dilation_height_factor, conv_params->dilation_width_factor});
       node_attributes.emplace_back(mwnn_attr_dilate);
       ::metawarenn::MWNNAttribute mwnn_attr_stride("strides", {conv_params->stride_height, conv_params->stride_width});
