@@ -18,7 +18,9 @@ TfLiteStatus MetaWareNNDelegateKernel::Init(TfLiteContext* context,
   }
   model_builder_ = std::unique_ptr<delegates::metawarenn::ModelBuilder>
                    (new delegates::metawarenn::ModelBuilder(nodes_));
-  mwnn_graph_ = model_builder_->BuildGraph(context);
+  mwnn_subgraph_counter_++;
+  std::string subgraph_name = "MetaWareNN_" + std::to_string(mwnn_subgraph_counter_);
+  mwnn_graph_ = model_builder_->BuildGraph(context, subgraph_name);
   return kTfLiteOk;
 }
 

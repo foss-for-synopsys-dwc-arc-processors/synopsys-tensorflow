@@ -17,7 +17,7 @@ class MWNNGraph {
     MWNNGraph(GraphProto& onnx_graph_proto);
     #endif
     #if TFLITE
-    MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_);
+    MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_, std::string subgraph_name);
     #endif
     #if GLOW
     MWNNGraph(Function *F);

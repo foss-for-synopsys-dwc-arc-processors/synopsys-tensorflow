@@ -7,11 +7,11 @@ namespace metawarenn {
 ModelBuilder::ModelBuilder(std::vector<int> nodes)
     : subgraph_nodes_(nodes) {}
 
-std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext* context) {
+std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext* context, std::string subgraph_name) {
   std::cout<<"\nBuildGraph!!"<<std::endl;
 
   /*Create MetaWareNN High Level Graph Representation from TFLite SubGraph Nodes*/
-  std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph_ptr = std::make_shared<::metawarenn::MWNNGraph>(context, subgraph_nodes_);
+  std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph_ptr = std::make_shared<::metawarenn::MWNNGraph>(context, subgraph_nodes_, subgraph_name);
   return mwnn_graph_ptr;
 }
 
@@ -100,7 +100,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
     }
   }
   manager.run_passes();
-  /*#if INVOKE_NNAC
+  #if INVOKE_NNAC
     std::cout << "\n ---------------------------Graph----------------------------- \n";
     std::cout << "\n Graph Name : " << mwnn_graph->get_name();
     ::MWNN::MWNNGraphProto mwnn_graph_proto;
@@ -181,14 +181,22 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
       for (auto t_val : g_t.get_tensor())
         initializer->add_float_data(t_val);
     }
-    int fp = open("/path/to/store/mobilenetv2-7_graphproto.bin", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+    std::cout << "\n Graph Name : " << mwnn_graph->get_name();
+    std::string g_name = mwnn_graph->get_name();
+    auto mwnn_op_path = "/Path/to/EV_DUMPS/";
+    auto mwnn_proto_bin = std::string(mwnn_op_path) + std::string(g_name) + ".bin";
+
+    int fp = open(mwnn_proto_bin.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
     std::cout << fp;
     std::cout << mwnn_graph_proto.SerializeToFileDescriptor(fp);
     close(fp);
 
-    std::cout << "\n\n==============Initiating NNAC python script through shell script=========================\n";
-    system("bash /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh");
-    //exit(1);
+    std::cout << "\n\n=================Initiating NNAC python script via shell script======================\n";
+    std::string cmd = "bash /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh " + mwnn_proto_bin + " " + mwnn_op_path + " " + g_name;
+    const char *command = cmd.c_str();
+    system(command);
+
   #endif
 
   //oa << *mwnn_graph;*/

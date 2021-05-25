@@ -25,7 +25,7 @@ class ModelBuilder {
  public:
   ModelBuilder(std::vector<int> nodes);
   ~ModelBuilder() = default;
-  std::shared_ptr<::metawarenn::MWNNGraph> BuildGraph(TfLiteContext* context);
+  std::shared_ptr<::metawarenn::MWNNGraph> BuildGraph(TfLiteContext* context, std::string subgraph_name);
   TfLiteStatus MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph);
 
  private:

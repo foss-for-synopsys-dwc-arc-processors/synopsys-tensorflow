@@ -12,6 +12,8 @@
 
 namespace tflite {
 
+static int mwnn_subgraph_counter_ = 0;
+
 class MetaWareNNDelegateKernel {
  public:
 
@@ -21,9 +23,7 @@ class MetaWareNNDelegateKernel {
 
   TfLiteStatus Invoke(TfLiteContext* context, TfLiteNode* node);
 
-
  private:
-
   //Create model builder
   std::unique_ptr<delegates::metawarenn::ModelBuilder> model_builder_;
 

@@ -41,8 +41,8 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto) {
 
 #if TFLITE
 //TFConstructor
-MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_) {
-  name = "MetaWareNN_NodeSubSet_1";
+MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_, std::string subgraph_name) {
+  name = subgraph_name;
   std::cout << "\n----------------------------------------------------------------------------------------------------------------\n";
   std::cout << "\n MWNN Graph Name : " << get_name() << " with size as " << subgraph_nodes_.size() << " nodes";
 

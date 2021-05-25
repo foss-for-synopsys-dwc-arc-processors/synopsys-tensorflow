@@ -64,12 +64,14 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
 
 5. Modify below mentioned files:
     I. Update "/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/model_builder.cc" file
-        i. Set the Path to store serialized "mobilenetv2-7_graphproto.bin" in line no:179
-        ii. Update the path to synopsys-tensorflow in line no:185
+        i. Set the path to store the MWNN file dumps in line no: 187
+        ii. Update the path to synopsys-tensorflow in line no: 196
     II. Update "/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh" file
-        i. Set the $EV_CNNMODELS_HOME path in line no:3
+        i. Set the $EV_CNNMODELS_HOME path in line no: 3
         ii. Set the absolute path for ARC/setup.sh file in line no: 4
-        iii. Update the path to synopsys tensorflow, path to serialized mobilenetv2-7_graphproto.bin, path to store nnac output in line no:5
+        iii. Update the path to Synopsys Tensorflow with MWNN support in line no: 8
+        iv. Update the path to evgencnn executable in line no: 9
+        v. Update the Imagenet images path in --images argument in evgencnn command in line no: 16
 
 6. Build MetaWareNN and its dependent libraries
 ```
