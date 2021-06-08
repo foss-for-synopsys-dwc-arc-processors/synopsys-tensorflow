@@ -161,8 +161,6 @@ class MWNNGraph {
     std::vector<MWNNNode> mwnn_nodes;
     std::vector<MWNNValueInfo> mwnn_inputs;
     std::vector<MWNNValueInfo> mwnn_outputs;
-    friend class boost::serialization::access;
-    template <typename Ar> void serialize(Ar& ar, unsigned) { ar & name & ip_name & op_name & mwnn_nodes & mwnn_initializer_tensors & mwnn_inputs & mwnn_outputs; }
 };
 
 } //namespace metawarenn

@@ -39,6 +39,7 @@ void convert_CHWN_to_NHWC(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph, s
          Generate Low Level Graph to run on devices*/
 TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph) {
   std::cout << "\n In MetaWareNNCompile !!! ";
+  //TODO: Remove the boost serialization object creation
   namespace bip = boost::interprocess;
   bip::shared_memory_object::remove("SharedMemoryFile");
   bip::shared_memory_object shm(bip::create_only, "SharedMemoryFile", bip::read_write);

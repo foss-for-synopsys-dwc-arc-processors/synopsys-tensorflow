@@ -85,8 +85,6 @@ class MWNNNode {
     std::vector<std::string> inputs;
     std::vector<std::string> outputs;
     std::vector<MWNNAttribute> mwnn_attributes;
-    friend class boost::serialization::access;
-    template <typename Ar> void serialize(Ar& ar, unsigned) { ar & name & op_type & inputs & outputs & mwnn_attributes; }
 };
 
 } //namespace metawarenn

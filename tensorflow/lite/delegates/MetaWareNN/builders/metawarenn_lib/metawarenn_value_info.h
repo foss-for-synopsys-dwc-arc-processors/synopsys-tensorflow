@@ -33,8 +33,6 @@ class MWNNValueInfo {
     int in_type;
     ElementType::element_type t_type;
     std::vector<int> dims;
-    friend class boost::serialization::access;
-    template <typename Ar> void serialize(Ar& ar, unsigned) { ar & name & in_type & t_type & dims; }
 };
 
 } //namespace metawarenn

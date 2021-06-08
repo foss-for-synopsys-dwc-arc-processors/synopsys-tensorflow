@@ -22,8 +22,6 @@ class MWNNAttribute {
     int type;
     std::vector<int> data;
     std::vector<std::string> string_data;
-    friend class boost::serialization::access;
-    template <typename Ar> void serialize(Ar& ar, unsigned) { ar & name & type & data & string_data; }
 };
 
 } //namespace metawarenn

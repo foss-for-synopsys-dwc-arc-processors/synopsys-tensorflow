@@ -44,8 +44,6 @@ class MWNNTensor {
     ElementType::element_type t_type;
     std::vector<int> dims;
     std::vector<float> tensor;
-    friend class boost::serialization::access;
-    template <typename Ar> void serialize(Ar& ar, unsigned) { ar & name & in_type & t_type & dims & tensor; }
 };
 
 } //namespace metawarenn

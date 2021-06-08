@@ -61,17 +61,6 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     }
   }
 
-  /*namespace bip = boost::interprocess;
-  bip::shared_memory_object shm(bip::open_only, "SharedMemoryFile", bip::read_only);
-  bip::mapped_region region(shm, bip::read_only);
-  bip::bufferstream bs(std::ios::in);
-  bs.buffer(reinterpret_cast<char*>(region.get_address()), region.get_size());
-  boost::archive::text_iarchive ia(bs);
-  ::metawarenn::MWNNGraph mwnn_graph;
-  ia >> mwnn_graph;
-  convert_to_mwnn_format(mwnn_graph, is_HWC) ;
-  bip::shared_memory_object::remove("SharedMemoryFile");*/
-
   std::cout << "\n In MWNN Kernel Invoke : " << mwnn_graph_->get_graph_nodes().size() << "  Graph Name : " << mwnn_graph_->get_name();
   convert_to_mwnn_format(*mwnn_graph_, graph_inputs, graph_outputs, is_HWC);
 
