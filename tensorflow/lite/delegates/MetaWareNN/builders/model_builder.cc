@@ -199,6 +199,39 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
     std::string cmd = "bash /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh " + mwnn_proto_bin + " " + mwnn_op_path + " " + g_name + " " + std::to_string(subgraph_counter);;
     const char *command = cmd.c_str();
     system(command);
+    std::ifstream in;
+    in.open("/path/to/ARC/cnn_tools/utils/tools/evgencnn/scripts/cnn_bin_" + g_name + ".bin", std::ios::in | std::ios::binary);
+    if(in.is_open())
+    {
+        std::streampos start = in.tellg();
+        in.seekg(0, std::ios::end);
+        std::streampos end = in.tellg();
+        in.seekg(0, std::ios::beg);
+        std::vector<char> contents;
+        contents.resize(static_cast<size_t>(end - start));
+        in.read(&contents[0], contents.size());
+        auto data = contents.data();
+        int shmid;
+        struct shmseg *shmp;
+        //Create unique key
+        key_t key = ftok("/tmp/",subgraph_counter);
+        std::cout << "\nkey: " << key;
+        shmid = shmget(key, sizeof(struct shmseg), 0644|IPC_CREAT);
+        if (shmid == -1) {
+            perror("Shared memory");
+            exit(1);
+        }
+        shmp = (shmseg*)shmat(shmid, NULL, 0);
+        if (shmp == (void *) -1) {
+            perror("Shared memory attach");
+            exit(1);
+        }
+        memcpy(shmp->buf, data, contents.size());
+        shmp->cnt = contents.size();
+        printf("\nWriting Process: Shared Memory Write: Wrote %d bytes\n", shmp->cnt);
+        sleep(3);
+        printf("\nWriting Process: Complete\n");
+    }
 
   #endif
 
