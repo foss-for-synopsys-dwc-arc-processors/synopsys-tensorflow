@@ -39,6 +39,8 @@ void convert_CHWN_to_NHWC(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph, s
          Generate Low Level Graph to run on devices*/
 TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph) {
   std::cout << "\n In MetaWareNNCompile !!! ";
+  static int subgraph_counter = 0;
+  subgraph_counter++;
   //TODO: Remove the boost serialization object creation
   namespace bip = boost::interprocess;
   bip::shared_memory_object::remove("SharedMemoryFile");
@@ -194,7 +196,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
     close(fp);
 
     std::cout << "\n\n=================Initiating NNAC python script via shell script======================\n";
-    std::string cmd = "bash /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh " + mwnn_proto_bin + " " + mwnn_op_path + " " + g_name;
+    std::string cmd = "bash /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh " + mwnn_proto_bin + " " + mwnn_op_path + " " + g_name + " " + std::to_string(subgraph_counter);;
     const char *command = cmd.c_str();
     system(command);
 
