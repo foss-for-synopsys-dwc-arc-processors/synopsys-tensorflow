@@ -19,7 +19,7 @@ class PassManager {
     void register_pass(T &pass) {
       auto p = std::make_shared<T>(pass);
       pass_list.push_back(std::static_pointer_cast<MWNNOptimizer>(p));
-      //std::cout << "\n In Register Pass : " << pass.get_name();
+      std::cout << "\n In Register Pass : " << pass.get_name();
     }
     void run_passes();
   private:

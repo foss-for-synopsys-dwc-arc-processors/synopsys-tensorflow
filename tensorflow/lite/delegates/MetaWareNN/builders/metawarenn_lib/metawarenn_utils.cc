@@ -4,7 +4,6 @@ namespace metawarenn {
 
 void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, mli_tensor *mwnn_initalizer, int *k_height, int *k_width, int *ch, int is_HWC)
 {
-  std::cout << "\n\nInitializer name: " << input_name;
   mwnn_initalizer->el_type = MLI_EL_FX_16;
   auto weight = mwnn_graph.get_initializer_tensor(input_name);
   auto dims = weight.get_dims();
@@ -25,11 +24,9 @@ void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, m
     *k_width = is_HWC ? dims[2] : dims[3];
   }
 
-  //std::cout << "\nDimension size: ";
   for (i = 0; i < dims.size(); i++)
   {
     mwnn_initalizer->mem_stride[i] = 0;
-    //std::cout << dims[i] << ", ";
     wt_buf_size = wt_buf_size * dims[i];
   }
   int16_t *buffer = (int16_t*)malloc(wt_buf_size * sizeof(int16_t));
@@ -40,12 +37,6 @@ void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, m
   }
   mwnn_initalizer->data.capacity = sizeof(buffer);
   mwnn_initalizer->data.mem.void_p = (void *)buffer;
-
-  /*std::cout << "\nMax of tensor: " << max;
-  std::cout << "\nInt bits : " << (int)ceil(log2(max));
-  std::cout << "\nFractional bits : " << (int)mwnn_initalizer->el_params.fx.frac_bits;
-  std::cout << "\nInitializer element type : " << mwnn_initalizer->el_type;
-  std::cout << "\nInitializer rank : " << mwnn_initalizer->rank;*/
 }
 
 void fill_mwnn_tensor_input(MWNNTensor input, mli_tensor *mwnn_tensor)
@@ -71,7 +62,6 @@ void fill_mwnn_tensor_input(MWNNTensor input, mli_tensor *mwnn_tensor)
   }
   mwnn_tensor->data.capacity = total_size * sizeof(int16_t);
   mwnn_tensor->data.mem.void_p = (void *)input_buffer;
-  std::cout << "\nInput's data capacity: " << mwnn_tensor->data.capacity;
 }
 
 void create_mwnn_tensor_output(mli_tensor *mwnn_tensor, long int buf_size)
@@ -82,7 +72,6 @@ void create_mwnn_tensor_output(mli_tensor *mwnn_tensor, long int buf_size)
   mwnn_tensor->data.capacity = buf_size * sizeof(int16_t);
   mwnn_tensor->data.mem.void_p = (void *)out_buffer;
   mwnn_tensor->el_params.fx.frac_bits = 8;
-  std::cout << "\nOutput's data capacity: " << mwnn_tensor->data.capacity;
 }
 
 void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string, float*> &graph_inputs, std::unordered_map<std::string, float*> &graph_outputs, int is_HWC)
@@ -92,7 +81,6 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
   mwnn_graph.update_input_tensors(graph_inputs);
   std::cout << "\n======================================================================================================================= \n";
   std::cout << "\n --------------------------------- Conversion to MetaWareNN High Level Graph Format -----------------------------------\n";
-  std::cout << "\n --------------Graph Name : " << mwnn_graph.get_name();
   auto node_list = mwnn_graph.get_graph_nodes();
   for (int node_idx = 0; node_idx < mwnn_graph.get_graph_nodes().size() ; node_idx++) {
     std::cout << "\n======================================================================================================================= \n";
@@ -122,15 +110,6 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
         conv_cfg.relu.type = MLI_RELU_GEN;
       else if(activation == ActivationType::Activation_Relu6)
         conv_cfg.relu.type = MLI_RELU_6;
-      /*std::cout << "\n\nConfig params:";
-      std::cout << "\nstride_height : " << (int)conv_cfg.stride_height;
-      std::cout << "\nstride_width : " << (int)conv_cfg.stride_width;
-      std::cout << "\npadding_top : " << (int)conv_cfg.padding_top;
-      std::cout << "\npadding_left : " << (int)conv_cfg.padding_left;
-      std::cout << "\npadding_bottom : " << (int)conv_cfg.padding_bottom;
-      std::cout << "\npadding_right : " << (int)conv_cfg.padding_right;
-      std::cout << "\ndilation_height : " << (int)conv_cfg.dilation_height;
-      std::cout << "\ndilation_width : " << (int)conv_cfg.dilation_width;*/
       mli_tensor input_tensor;
       mli_tensor conv_wt;
       mli_tensor conv_bias;
@@ -157,7 +136,6 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
       const int out_height = CEIL_DIV(input_height + conv_cfg.padding_top + conv_cfg.padding_bottom - effective_kernel_height + 1,
                                       conv_cfg.stride_height);
       create_mwnn_tensor_output(&output_tensor, out_width * out_height * channels);
-      std::cout << "\nInput node: " << input;
       // General convolution invocation
       if(op_type == "Conv")
       {
@@ -192,15 +170,12 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
       }
 
       output_tensor.shape[3] = 1;
-      std::cout << "\nOutput key in tensor map: " << g_n.get_outputs()[0];
       tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], output_tensor)); // Store the output tensor to tensor map
     }
     else if (op_type =="Add")
     {
       mli_tensor output_tensor;
       auto input = g_n.get_inputs();
-      /*std::cout << "\nInput node 1: " << input[0];
-      std::cout << "\nInput node 2: " << input[1];*/
       auto shape = (tensor_map.find(input[0]))->second.shape;
       int buf_size = 1;
       int rank = (tensor_map.find(input[0]))->second.rank;
@@ -219,14 +194,12 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
 
       create_mwnn_tensor_output(&output_tensor, buf_size);
       mli::krn::ref::eltwise_prepare_and_run<int16_t, mli::ELTWISE_ADD>(&(tensor_map.find(input[0]))->second, &(tensor_map.find(input[1]))->second, &output_tensor);
-      std::cout << "\nOutput: " << g_n.get_outputs()[0];
       tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], output_tensor));
     }
     else if (op_type =="GlobalAveragePool")
     {
       mli_tensor output_tensor;
       auto input = g_n.get_inputs();
-      std::cout << "\nInput node : " << input[0];
       auto shape = (tensor_map.find(input[0]))->second.shape;
       int buf_size = 1;
       int rank = (tensor_map.find(input[0]))->second.rank;

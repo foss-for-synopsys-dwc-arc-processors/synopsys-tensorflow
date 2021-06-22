@@ -8,6 +8,7 @@
 //ONNXRuntime
 #if ONNX
 #include "onnx/onnx-ml.pb.h"
+#include <numeric>
 #endif
 
 //TFLite
@@ -31,6 +32,7 @@
 #if GLOW
 #include "Glow/Graph/Graph.h"
 #include "Glow/Graph/Utils.h"
+#include "glow/Backend/BackendUtils.h"
 #endif
 
 #if ONNX

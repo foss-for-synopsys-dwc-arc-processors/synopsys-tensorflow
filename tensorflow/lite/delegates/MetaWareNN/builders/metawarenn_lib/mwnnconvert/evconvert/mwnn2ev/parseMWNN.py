@@ -18,7 +18,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from collections import OrderedDict
-from onnx import shape_inference, numpy_helper
+from onnx import numpy_helper
 import numpy as np
 
 class ConverterRegistry(object):
@@ -275,7 +275,6 @@ def parse_Conv(graphproto, node, node_name, inputs, outputs):
             group = attr.ints[0]
         if attr.name == "dilations":
             dilations = [int(n) for n in attr.ints]
-
 
     caffe_layer['functions'] = "{output_name} = L.Convolution({input_names}".format(**caffe_layer)
     # for non-2D conv

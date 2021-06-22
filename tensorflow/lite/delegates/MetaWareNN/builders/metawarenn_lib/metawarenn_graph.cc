@@ -4,8 +4,8 @@ namespace metawarenn {
 
 //ONNXConstructor
 #if ONNX
-MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto) {
-  name = onnx_graph_proto.name();
+MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto, std::string graph_name) {
+  name = graph_name;
 
   for (auto tensor_proto : onnx_graph_proto.initializer()) {
     MWNNTensor mwnn_tensor(tensor_proto);
@@ -29,12 +29,18 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto) {
       ip_name = mwnn_input.get_name();
       auto ip_node = mwnn_input.get_node();
       mwnn_graph_nodes[ip_name] = std::move(ip_node);
+      //Fills Graph Input Tensor Details - Name, Dims
+      MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_dims());
+      mwnn_graph_ip_tensors.emplace_back(mwnn_ip_tensor);
     }
   }
   for (auto op_value_info_proto : onnx_graph_proto.output()) {
     MWNNValueInfo mwnn_output(op_value_info_proto);
     mwnn_outputs.emplace_back(mwnn_output);
     op_name = mwnn_output.get_name();
+    //Fills Graph Output Tensor Details - Name, Dims
+    MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_dims());
+    mwnn_graph_op_tensors.emplace_back(mwnn_op_tensor);
   }
 }
 #endif
@@ -281,11 +287,12 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_, s
 
 #if GLOW
 //GLOWConstructor
-MWNNGraph::MWNNGraph(Function *F) {
-  name = std::string(F->getName());
+MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
+  name = subgraph_name;
   LOG(INFO) << "Function name: " << name;
   GraphPostOrderVisitor visitor(*F);
   auto node_list = visitor.getPostOrder();
+  auto global_output_name = "";
   for (auto *node : node_list) {
       LOG(INFO) << "==============================================================================================================";
       std::string node_name;
@@ -370,6 +377,8 @@ MWNNGraph::MWNNGraph(Function *F) {
             node_attributes.emplace_back(mwnn_attr_group);
             metawarenn::MWNNAttribute mwnn_attribute("activation", {0});
             node_attributes.emplace_back(mwnn_attribute);
+            metawarenn::MWNNAttribute mwnn_attr_kernel_shape("kernel_shape", {(int)filterDims.h, (int)filterDims.w});
+            node_attributes.emplace_back(mwnn_attr_kernel_shape);
             auto output_name = conv_node->getResult().generateNodeOutputName(true);
             node_outputs.emplace_back(output_name);
             LOG(INFO) << "output_name: " << output_name;
@@ -458,6 +467,7 @@ MWNNGraph::MWNNGraph(Function *F) {
         mwnn_nodes.emplace_back(mwnn_node);
         auto op_node = mwnn_node.get_node();
         mwnn_graph_nodes[mwnn_node.get_name()] = std::move(op_node);
+        global_output_name = node_outputs[0].c_str();
       }
   }
   // Graph input and output handling
@@ -466,28 +476,35 @@ MWNNGraph::MWNNGraph(Function *F) {
   auto &last_node = nodes.back();
   auto input_name = std::string(first_node.getNthInput(0).getNode()->getName());
   auto output_name = std::string(last_node.getNthResult(0).getNode()->getName());
-  ip_name = input_name;
-  op_name = output_name;
-  for (auto *v : F->getParent()->getPlaceholders()) {
-    auto glow_dims = v->getType()->dims();
-    auto data_type = v->getType()->getElementType();
+  for (auto &V : F->getParent()->getPlaceholders()) {
+    if (!usedInFunction(V, F)) {
+      continue;
+    }
+
+    auto glow_dims = V->getType()->dims();
+    auto data_type = V->getType()->getElementType();
     int size = glow_dims.size();
     std::vector<int> dims(size);
-    for(int i = 0; i < size; i++)
-    {
-      dims[i] = int(glow_dims[i]);
-    }
-    if(v->getName().equals(input_name))
-    {
-      metawarenn::MWNNValueInfo mwnn_input(input_name, dims, data_type);
-      mwnn_inputs.emplace_back(mwnn_input);
-      mwnn_initializer_names.insert(input_name);
-    }
-    else
-    {
-      metawarenn::MWNNValueInfo mwnn_output(input_name, dims, data_type);
+    // Input dims from NCHW to NHWC
+    dims[1] = int(glow_dims[3]);
+    dims[3] = int(glow_dims[1]);
+    dims[2] = int(glow_dims[2]);
+    dims[0] = int(glow_dims[0]);
+    if (getOutputSave(F, V)) {
+      metawarenn::MWNNValueInfo mwnn_output(global_output_name, dims, data_type);
       mwnn_outputs.emplace_back(mwnn_output);
-      mwnn_initializer_names.insert(output_name);
+      op_name = global_output_name;
+      //Fills Graph Output Tensor Details - Name, Dims
+      MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_dims());
+      mwnn_graph_op_tensors.emplace_back(mwnn_op_tensor);
+    }
+    else if(V->getName().equals(input_name)) {
+      metawarenn::MWNNValueInfo mwnn_input(V->getName(), dims, data_type);
+      mwnn_inputs.emplace_back(mwnn_input);
+      ip_name = V->getName();
+      //Fills Graph Input Tensor Details - Name, Dims
+      MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_dims());
+      mwnn_graph_ip_tensors.emplace_back(mwnn_ip_tensor);
     }
   }
 }

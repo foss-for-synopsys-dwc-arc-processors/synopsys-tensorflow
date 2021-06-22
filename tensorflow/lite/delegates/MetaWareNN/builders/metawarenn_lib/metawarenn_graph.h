@@ -14,13 +14,13 @@ class MWNNGraph {
   public:
     MWNNGraph() = default;
     #if ONNX
-    MWNNGraph(GraphProto& onnx_graph_proto);
+    MWNNGraph(GraphProto& onnx_graph_proto, std::string graph_name);
     #endif
     #if TFLITE
     MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_, std::string subgraph_name);
     #endif
     #if GLOW
-    MWNNGraph(Function *F);
+    MWNNGraph(Function *F, std::string subgraph_name);
     #endif
     std::string get_name() { return name; }
     std::string get_graph_ip_name() { return ip_name; }
@@ -38,52 +38,40 @@ class MWNNGraph {
       return *it;
     }
     void remove_initializer_names(std::string name){
-      std::cout << "\n mwnn_initializer_names size before: " << mwnn_initializer_names.size();
       auto it = mwnn_initializer_names.find(name);
       if(it != mwnn_initializer_names.end())
         mwnn_initializer_names.erase(it);
-      std::cout << "\n mwnn_initializer_names size after: " << mwnn_initializer_names.size();
     }
     void remove_initializer_tensor(std::string name){
-      std::cout << "\n mwnn_initializer_tensors size before: " << mwnn_initializer_tensors.size();
       auto it = std::find_if(
       std::begin(mwnn_initializer_tensors), std::end(mwnn_initializer_tensors), [&](MWNNTensor& tensor) {
           return tensor.get_name() == name;
       });
       mwnn_initializer_tensors.erase(it);
-      std::cout << "\n mwnn_initializer_tensors size after: " << mwnn_initializer_tensors.size();
     }
     void remove_nodes(std::string name){
-      std::cout << "\n mwnn_nodes size before: " << mwnn_nodes.size();
       auto it = std::find_if(
       std::begin(mwnn_nodes), std::end(mwnn_nodes), [&](MWNNNode& node) {
           return node.get_name() == name;
       });
       mwnn_nodes.erase(it);
-      std::cout << "\n mwnn_nodes size after: " << mwnn_nodes.size();
     }
      void remove_inputs(std::string name){
-      std::cout << "\n mwnn_inputs size before: " << mwnn_inputs.size();
       auto it = std::find_if(
       std::begin(mwnn_inputs), std::end(mwnn_inputs), [&](MWNNValueInfo& valueinfo) {
           return valueinfo.get_name() == name;
       });
       mwnn_inputs.erase(it);
-      std::cout << "\n mwnn_inputs size after: " << mwnn_inputs.size();
     }
      void remove_outputs(std::string name){
-      std::cout << "\n mwnn_outputs size before: " << mwnn_outputs.size();
       auto it = std::find_if(
       std::begin(mwnn_outputs), std::end(mwnn_outputs), [&](MWNNValueInfo& valueinfo) {
           return valueinfo.get_name() == name;
       });
       mwnn_outputs.erase(it);
-      std::cout << "\n mwnn_outputs size after: " << mwnn_outputs.size();
     }
      void remove_graph_nodes(std::string name){
-      std::cout << "\n mwnn_graph_nodes size before: " << mwnn_graph_nodes.size();
       mwnn_graph_nodes.erase(name);
-      std::cout << "\n mwnn_graph_nodes size after: " << mwnn_graph_nodes.size();
     }
     void update_node_inputs(std::string node_name, std::string ip_name, int index) {
       auto it = std::find_if(
