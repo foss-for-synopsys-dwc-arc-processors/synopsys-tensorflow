@@ -92,6 +92,9 @@ class MWNNGraph {
       std::begin(mwnn_nodes), std::end(mwnn_nodes), [&](MWNNNode& node) {
           return node.get_name() == node_name;
       });
+      if (it == std::end(mwnn_nodes)) {
+          std::cout << "\n ERROR : End of Nodes!!! - Couldn't find node" << name << " to update attribute!!!";
+      }
       return it->update_attribute_value(attr_name, value);
     }
     void update_initializer_tensors(std::string tensor_name, std::vector<int> n_dims, std::vector<float> n_tensor) {

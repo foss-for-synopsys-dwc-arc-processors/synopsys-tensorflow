@@ -216,10 +216,6 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_, s
         node_attributes.emplace_back(mwnn_attr_pad);
       }
     }
-    else if (op_type == kTfLiteBuiltinAveragePool2d) {
-      node_op_type = "GlobalAveragePool";
-      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
-    }
     else if (op_type == kTfLiteBuiltinAdd) {
       node_op_type = "Add";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
@@ -227,6 +223,127 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_, s
     else if (op_type == kTfLiteBuiltinRelu) {
       node_op_type = "Relu";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+    }
+    else if (op_type == kTfLiteBuiltinMaxPool2d || op_type == kTfLiteBuiltinAveragePool2d) {
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+      const TfLitePoolParams* pool_params = reinterpret_cast<const TfLitePoolParams*>(node->builtin_data);
+      if(op_type == kTfLiteBuiltinAveragePool2d) {
+        const int input_tensor_id = node->inputs->data[0];
+        const auto& input_tensor = context->tensors[input_tensor_id];
+        int in_height = input_tensor.dims->data[1];
+        int in_width = input_tensor.dims->data[2];
+        if(in_height == pool_params->filter_height && in_width == pool_params->filter_width)
+          node_op_type = "GlobalAveragePool";
+        else
+          node_op_type = "AveragePool";
+      }
+      else
+        node_op_type = "MaxPool";
+
+      ::metawarenn::MWNNAttribute mwnn_attr_stride("strides", {pool_params->stride_height, pool_params->stride_width});
+      node_attributes.emplace_back(mwnn_attr_stride);
+      ::metawarenn::MWNNAttribute mwnn_attr_kernel_shape("kernel_shape", {pool_params->filter_height, pool_params->filter_width});
+      node_attributes.emplace_back(mwnn_attr_kernel_shape);
+      ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {pool_params->activation});
+      node_attributes.emplace_back(mwnn_attr_activation);
+      if(pool_params->padding == kTfLitePaddingSame) {
+        const int input_tensor_id = node->inputs->data[0];
+        const auto& input_tensor = context->tensors[input_tensor_id];
+
+        int in_height = input_tensor.dims->data[1];
+        int in_width = input_tensor.dims->data[2];
+        int filter_height = pool_params->filter_height;
+        int filter_width = pool_params->filter_width;
+        int total_height_pad, total_width_pad;
+        int pad_top, pad_bottom, pad_left, pad_right;
+
+        if((in_height%pool_params->stride_height) == 0)
+          total_height_pad = std::max((filter_height - pool_params->stride_height), 0);
+        else
+          total_height_pad = std::max((filter_height - (in_height%pool_params->stride_height)), 0);
+
+        if((in_width%pool_params->stride_width) == 0)
+          total_width_pad = std::max((filter_width - pool_params->stride_width), 0);
+        else
+          total_width_pad = std::max((filter_width - (in_width%pool_params->stride_width)), 0);
+
+        pad_top = floor(total_height_pad / 2);
+        pad_bottom = total_height_pad - pad_top;
+        pad_left = floor(total_width_pad / 2);
+        pad_right = total_width_pad - pad_left;
+
+        ::metawarenn::MWNNAttribute mwnn_attr_pad("pads", {pad_top, pad_left, pad_bottom, pad_right});
+        node_attributes.emplace_back(mwnn_attr_pad);
+      }
+      else {
+        ::metawarenn::MWNNAttribute mwnn_attr_pad("pads", {0, 0, 0, 0});
+        node_attributes.emplace_back(mwnn_attr_pad);
+      }
+    }
+    else if (op_type == kTfLiteBuiltinMul) {
+      node_op_type = "Mul";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+      const TfLiteMulParams* mul_params = reinterpret_cast<const TfLiteMulParams*>(node->builtin_data);
+      ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {mul_params->activation});
+      node_attributes.emplace_back(mwnn_attr_activation);
+    }
+    else if (op_type == kTfLiteBuiltinConcatenation) {
+      node_op_type = "Concat";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+      const TfLiteConcatenationParams* concat_params = reinterpret_cast<const TfLiteConcatenationParams*>(node->builtin_data);
+      ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {concat_params->activation});
+      node_attributes.emplace_back(mwnn_attr_activation);
+      ::metawarenn::MWNNAttribute mwnn_attr_axis("axis", {concat_params->axis});
+      node_attributes.emplace_back(mwnn_attr_axis);
+    }
+    else if (op_type == kTfLiteBuiltinMean) {
+      node_op_type = "Mean";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+    }
+    else if (op_type == kTfLiteBuiltinFullyConnected) {
+      node_op_type = "Gemm";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+      const TfLiteFullyConnectedParams* fc_params = reinterpret_cast<const TfLiteFullyConnectedParams*>(node->builtin_data);
+      ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {fc_params->activation});
+      node_attributes.emplace_back(mwnn_attr_activation);
+      ::metawarenn::MWNNAttribute mwnn_attr_weights_format("weights_format", {fc_params->weights_format});
+      node_attributes.emplace_back(mwnn_attr_weights_format);
+    }
+    else if (op_type == kTfLiteBuiltinSplit) {
+      node_op_type = "Split";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+      const TfLiteSplitParams* split_params = reinterpret_cast<const TfLiteSplitParams*>(node->builtin_data);
+      ::metawarenn::MWNNAttribute mwnn_attr_num_splits("num_splits  ", {split_params->num_splits});
+      node_attributes.emplace_back(mwnn_attr_num_splits);
+    }
+    else if (op_type == kTfLiteBuiltinPad) {
+      node_op_type = "Pad";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+    }
+    else if (op_type == kTfLiteBuiltinStridedSlice) {
+      node_op_type = "StridedSlice";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+      const TfLiteStridedSliceParams* strided_slice_params = reinterpret_cast<const TfLiteStridedSliceParams*>(node->builtin_data);
+      ::metawarenn::MWNNAttribute mwnn_attr_begin_mask("begin_mask", {strided_slice_params->begin_mask});
+      node_attributes.emplace_back(mwnn_attr_begin_mask);
+      ::metawarenn::MWNNAttribute mwnn_attr_ellipsis_mask("ellipsis_mask", {strided_slice_params->ellipsis_mask});
+      node_attributes.emplace_back(mwnn_attr_ellipsis_mask);
+      ::metawarenn::MWNNAttribute mwnn_attr_end_mask("end_mask", {strided_slice_params->end_mask});
+      node_attributes.emplace_back(mwnn_attr_end_mask);
+      ::metawarenn::MWNNAttribute mwnn_attr_new_axis_mask("new_axis_mask", {strided_slice_params->new_axis_mask});
+      node_attributes.emplace_back(mwnn_attr_new_axis_mask);
+      ::metawarenn::MWNNAttribute mwnn_attr_shrink_axis_mask("shrink_axis_mask", {strided_slice_params->shrink_axis_mask});
+      node_attributes.emplace_back(mwnn_attr_shrink_axis_mask);
+    }
+    else if (op_type == kTfLiteBuiltinSqueeze) {
+      node_op_type = "Squeeze";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+      const TfLiteSqueezeParams* squeeze_params = reinterpret_cast<const TfLiteSqueezeParams*>(node->builtin_data);
+      ::metawarenn::MWNNAttribute mwnn_attr_num_squeeze_dims("num_squeeze_dims", {squeeze_params->num_squeeze_dims});
+      node_attributes.emplace_back(mwnn_attr_num_squeeze_dims);
+      std::vector<int> squeeze_dims(squeeze_params->squeeze_dims, squeeze_params->squeeze_dims + squeeze_params->num_squeeze_dims);
+      ::metawarenn::MWNNAttribute mwnn_attr_squeeze_dims("squeeze_dims", squeeze_dims);
+      node_attributes.emplace_back(mwnn_attr_squeeze_dims);
     }
     else if (op_type == kTfLiteBuiltinReshape) {
       node_op_type = "Reshape";

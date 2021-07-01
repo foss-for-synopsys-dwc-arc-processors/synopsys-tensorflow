@@ -67,7 +67,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
       if(g_t.get_dims().size() == 4) {
         //std::cout << "\n Name : " << g_t.get_name();
         for(auto node: mwnn_graph->get_graph_nodes()) {
-          if(g_t.get_name() == node.get_inputs()[1] && node.get_op_type() == "Conv") {
+          if(node.get_op_type() == "Conv" && g_t.get_name() == node.get_inputs()[1]) {
             /*std::cout << "\t Dims : ";
             for (auto dim : g_t.get_dims())
               std::cout << dim << ",";*/

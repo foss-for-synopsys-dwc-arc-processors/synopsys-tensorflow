@@ -268,6 +268,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
       }
       tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], output_tensor));
     }
+    // MLI kernel invocation yet to be handled.
     else if (op_type =="Reshape")
     {
       auto input = g_n.get_inputs();
@@ -278,6 +279,40 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
       auto input = g_n.get_inputs();
       tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], (tensor_map.find(input[0]))->second));
     }
+    else if(op_type == "MaxPool")
+    {}
+    else if(op_type == "Gemm")
+    {}
+    else if(op_type == "Flatten")
+    {}
+    else if(op_type == "BatchNormalization")
+    {}
+    else if(op_type == "Concat")
+    {}
+    else if(op_type == "LRN")
+    {}
+    else if(op_type == "Mul")
+    {}
+    else if(op_type == "Transpose")
+    {}
+    else if(op_type == "AvgPool")
+    {}
+    else if(op_type == "Clip")
+    {}
+    else if(op_type == "Shape")
+    {}
+    else if(op_type == "Squeeze")
+    {}
+    else if(op_type == "Unsqueeze")
+    {}
+    else if(op_type == "Mean")
+    {}
+    else if(op_type == "Split")
+    {}
+    else if(op_type == "Pad")
+    {}
+    else if(op_type == "StridedSlice")
+    {}
   }
   //To fill the graph output layer value in the passed argument
   for (auto g_op : graph_outputs) {

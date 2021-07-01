@@ -79,12 +79,22 @@ bool IsNodeSupportedByMetaWareNN(const TfLiteRegistration* registration,
     case kTfLiteBuiltinAdd:
     case kTfLiteBuiltinConv2d:
     case kTfLiteBuiltinDepthwiseConv2d:
-    //case kTfLiteBuiltinAveragePool2d:
+    case kTfLiteBuiltinAveragePool2d:
+    case kTfLiteBuiltinMaxPool2d:
+    case kTfLiteBuiltinMul:
+    case kTfLiteBuiltinConcatenation:
+    case kTfLiteBuiltinFullyConnected:
+    case kTfLiteBuiltinMean:
+    case kTfLiteBuiltinSplit:
+    case kTfLiteBuiltinPad:
+    case kTfLiteBuiltinStridedSlice:
+    case kTfLiteBuiltinSqueeze:
     case kTfLiteBuiltinRelu:
     case kTfLiteBuiltinReshape:
     case kTfLiteBuiltinSoftmax:
       return true;
     default:
+      std::cout<< "\nMetaWareNN unsupported node enum: " << registration->builtin_code;
       return false;
   }
   return false;

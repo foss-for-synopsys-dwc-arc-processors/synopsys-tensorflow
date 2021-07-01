@@ -33,7 +33,7 @@ struct shmseg {
 };
 
 #define HWC_TO_CHW 1
-#define INVOKE_NNAC 1
+#define INVOKE_NNAC 0
 
 namespace tflite {
 namespace delegates {
