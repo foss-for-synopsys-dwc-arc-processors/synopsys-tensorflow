@@ -301,9 +301,13 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_, s
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
     }
     else if (op_type == kTfLiteBuiltinFullyConnected) {
-      node_op_type = "Gemm";
+      node_op_type = "FullyConnected";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
       const TfLiteFullyConnectedParams* fc_params = reinterpret_cast<const TfLiteFullyConnectedParams*>(node->builtin_data);
+      ::metawarenn::MWNNAttribute mwnn_attr_asymmetric_quantize_inputs("asymmetric_quantize_inputs", {fc_params->asymmetric_quantize_inputs});
+      node_attributes.emplace_back(mwnn_attr_asymmetric_quantize_inputs);
+      ::metawarenn::MWNNAttribute mwnn_attr_keep_num_dims("keep_num_dims", {fc_params->keep_num_dims});
+      node_attributes.emplace_back(mwnn_attr_keep_num_dims);
       ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", {fc_params->activation});
       node_attributes.emplace_back(mwnn_attr_activation);
       ::metawarenn::MWNNAttribute mwnn_attr_weights_format("weights_format", {fc_params->weights_format});
