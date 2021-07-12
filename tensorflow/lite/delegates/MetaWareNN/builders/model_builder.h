@@ -21,19 +21,8 @@
 #include <boost/interprocess/streams/bufferstream.hpp>
 #include <boost/serialization/vector.hpp>
 
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <fstream>
-
-#define BUF_SIZE 7340032
-
-struct shmseg {
-   int cnt;
-   char buf[BUF_SIZE];
-};
-
 #define HWC_TO_CHW 1
-#define INVOKE_NNAC 1
+#define INVOKE_NNAC 0
 
 namespace tflite {
 namespace delegates {

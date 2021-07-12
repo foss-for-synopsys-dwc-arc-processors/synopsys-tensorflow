@@ -41,16 +41,6 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
   std::cout << "\n In MetaWareNNCompile !!! ";
   static int subgraph_counter = 0;
   subgraph_counter++;
-  //TODO: Remove the boost serialization object creation
-  namespace bip = boost::interprocess;
-  bip::shared_memory_object::remove("SharedMemoryFile");
-  bip::shared_memory_object shm(bip::create_only, "SharedMemoryFile", bip::read_write);
-  shm.truncate(60u<<20); // 60MiB
-  bip::mapped_region region(shm, bip::read_write);
-  bip::bufferstream bs(std::ios::out);
-  bs.buffer(reinterpret_cast<char*>(region.get_address()), region.get_size());
-  boost::archive::text_oarchive oa(bs);
-  bip::shared_memory_object::remove("SharedMemoryFile");
   //Call Passes
   ::metawarenn::optimizer::PassManager manager;
   for (auto node : mwnn_graph->get_graph_nodes())
@@ -235,7 +225,6 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
 
   #endif
 
-  //oa << *mwnn_graph;*/
   return kTfLiteOk;
   }
 } // namespace metawarenn

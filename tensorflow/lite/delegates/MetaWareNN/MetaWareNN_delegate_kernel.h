@@ -9,6 +9,7 @@
 #include <vector>
 #include "tensorflow/lite/context_util.h"
 #include "tensorflow/lite/delegates/MetaWareNN/builders/model_builder.h"
+#include "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnn_inference_api/mwnn_inference_api.h"
 
 namespace tflite {
 

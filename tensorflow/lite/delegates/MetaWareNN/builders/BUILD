@@ -48,6 +48,8 @@ cc_library(
         "metawarenn_lib/optimizer/remove_transpose.cc",
         "metawarenn_lib/optimizer/pass_manager.cc",
         "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.cc",
+        "metawarenn_lib/mwnn_inference_api/mwnn_inference_api.cc",
+        "metawarenn_lib/mwnn_inference_api/mwnn_inference_shm.cc",
     ],
     hdrs = [
         "model_builder.h",
@@ -120,6 +122,8 @@ cc_library(
         "metawarenn_lib/tensorflow/lite/builtin_ops.h",
         "metawarenn_lib/metawarenn_common.h",
         "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h",
+        "metawarenn_lib/mwnn_inference_api/mwnn_inference_api.h",
+        "metawarenn_lib/mwnn_inference_api/mwnn_inference_shm.h"
     ],
     tags = [
         "manual",
