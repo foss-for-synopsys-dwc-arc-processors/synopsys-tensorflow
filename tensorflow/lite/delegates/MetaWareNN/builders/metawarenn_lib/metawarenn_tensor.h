@@ -29,8 +29,13 @@ class MWNNTensor {
     MWNNTensor(std::string m_name, std::vector<int> m_dims, ElemKind m_type, std::vector<float> m_tensor);
     MWNNTensor(std::string t_name, std::vector<int> t_shape);
     #endif
+    MWNNTensor(std::string t_name, int type, std::vector<int> t_shape);
     std::string get_name() { return name; }
-    int get_type() { return in_type; }
+    int get_type() { return int(t_type); }
+    void set_index(uint32_t value) { index = value; }
+    void set_offset(uint32_t value) { offset = value; }
+    uint32_t get_index() { return index; }
+    uint32_t get_offset() { return offset; }
     std::vector<int> get_dims() { return dims; }
     std::vector<float> get_tensor() { return tensor; }
     std::shared_ptr<op::Node> get_constant_node() {
@@ -42,6 +47,8 @@ class MWNNTensor {
     }
   private:
     std::string name;
+    uint32_t index = 1; //used to maintain the constant initializers order index
+    uint32_t offset = 0; //used to maintain the constant initializers binary size
     int in_type;
     ElementType::element_type t_type;
     std::vector<int> dims;

@@ -9,6 +9,7 @@
 #include "metawarenn_lib/optimizer/metawarenn_optimizer.h"
 #include "metawarenn_lib/optimizer/remove_reshape.h"
 #include "metawarenn_lib/optimizer/convert_layout.h"
+#include "metawarenn_lib/optimizer/calculate_offset.h"
 
 #include "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h"
 

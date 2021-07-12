@@ -27,6 +27,7 @@
 #include "op/strided_slice.h"
 #include "op/pad.h"
 #include "op/mean.h"
+#include "op/channel_shuffle.h"
 #include "op/fully_connected.h"
 
 namespace metawarenn {
@@ -71,13 +72,15 @@ class MWNNNode {
         return std::make_shared<op::Conv>(name, inputs, outputs,
                                           get_attribute_value("dilations"),
                                           get_attribute_value("strides"),
-                                          get_attribute_value("pads"));
+                                          get_attribute_value("pads"),
+                                          get_attribute_value("activation")[0]);
       }
       else if(op_type == "DepthwiseConv") {
         return std::make_shared<op::DepthwiseConv>(name, inputs, outputs,
                                                    get_attribute_value("dilations"),
                                                    get_attribute_value("strides"),
-                                                   get_attribute_value("pads"));
+                                                   get_attribute_value("pads"),
+                                                   get_attribute_value("activation")[0]);
       }
       else if(op_type == "Relu") {
         return std::make_shared<op::Relu>(name, inputs, outputs);
@@ -138,6 +141,9 @@ class MWNNNode {
       }
       else if(op_type == "StridedSlice") {
         return std::make_shared<op::StridedSlice>(name, inputs, outputs);
+      }
+      else if(op_type == "ChannelShuffle") {
+        return std::make_shared<op::ChannelShuffle>(name, inputs, outputs);
       }
       else if(op_type == "FullyConnected") {
         return std::make_shared<op::FullyConnected>(name, inputs, outputs);

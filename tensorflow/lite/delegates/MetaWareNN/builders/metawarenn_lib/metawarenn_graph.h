@@ -104,6 +104,20 @@ class MWNNGraph {
       });
       return it->update_tensor(n_dims, n_tensor);
     }
+    void update_initializer_index(std::string tensor_name, uint32_t value) {
+      auto it = std::find_if(
+      std::begin(mwnn_initializer_tensors), std::end(mwnn_initializer_tensors), [&](MWNNTensor& tensor) {
+          return tensor.get_name() == tensor_name;
+      });
+      return it->set_index(value);
+    }
+    void update_initializer_offset(std::string tensor_name, uint32_t offset) {
+      auto it = std::find_if(
+      std::begin(mwnn_initializer_tensors), std::end(mwnn_initializer_tensors), [&](MWNNTensor& tensor) {
+          return tensor.get_name() == tensor_name;
+      });
+      return it->set_offset(offset);
+    }
     void update_input_tensors(std::unordered_map<std::string, float*> graph_inputs) {
       for (auto it = mwnn_graph_ip_tensors.begin(); it != mwnn_graph_ip_tensors.end(); ++it) {
         auto name = it->get_name();

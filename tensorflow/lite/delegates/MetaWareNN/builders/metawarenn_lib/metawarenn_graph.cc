@@ -30,7 +30,7 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto, std::string graph_name) {
       auto ip_node = mwnn_input.get_node();
       mwnn_graph_nodes[ip_name] = std::move(ip_node);
       //Fills Graph Input Tensor Details - Name, Dims
-      MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_dims());
+      MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_type(), mwnn_input.get_dims());
       mwnn_graph_ip_tensors.emplace_back(mwnn_ip_tensor);
     }
   }
@@ -39,7 +39,7 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto, std::string graph_name) {
     mwnn_outputs.emplace_back(mwnn_output);
     op_name = mwnn_output.get_name();
     //Fills Graph Output Tensor Details - Name, Dims
-    MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_dims());
+    MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_type(), mwnn_output.get_dims());
     mwnn_graph_op_tensors.emplace_back(mwnn_op_tensor);
   }
 }
@@ -66,7 +66,7 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_, s
   auto ip_node = mwnn_input.get_node();
   mwnn_graph_nodes[mwnn_input.get_name()] = std::move(ip_node);
   //Fills Graph Input Tensor Details - Name, Dims
-  MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_dims());
+  MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_type(), mwnn_input.get_dims());
   mwnn_graph_ip_tensors.emplace_back(mwnn_ip_tensor);
 
   //Set Graph Output Node
@@ -78,7 +78,7 @@ MWNNGraph::MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_, s
   mwnn_outputs.emplace_back(mwnn_output);
   op_name = output_tensor.name;
   //Fills Graph Output Tensor Details - Name, Dims
-  MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_dims());
+  MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_type(), mwnn_output.get_dims());
   mwnn_graph_op_tensors.emplace_back(mwnn_op_tensor);
 
   for (size_t node_index = 0; node_index < subgraph_nodes_.size(); node_index++) {
@@ -490,7 +490,7 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
             auto group = conv_node->getGroup();
             metawarenn::MWNNAttribute mwnn_attr_dilate("dilations", {int(dilations[0]), int(dilations[1])});
             node_attributes.emplace_back(mwnn_attr_dilate);
-            metawarenn::MWNNAttribute mwnn_attr_stride("strides", {int(strides[0]), int(strides[0])});
+            metawarenn::MWNNAttribute mwnn_attr_stride("strides", {int(strides[0]), int(strides[1])});
             node_attributes.emplace_back(mwnn_attr_stride);
             metawarenn::MWNNAttribute mwnn_attr_pad("pads", {int(pads[0]), int(pads[1]), int(pads[2]), int(pads[3])});
             node_attributes.emplace_back(mwnn_attr_pad);
@@ -521,6 +521,15 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
         {
             node_op_type = "GlobalAveragePool";
             auto *avgpool_node = llvm::cast<AvgPoolNode>(node);
+            auto kernels = avgpool_node->getKernels();
+            auto strides = avgpool_node->getStrides();
+            auto pads = avgpool_node->getPads();
+            metawarenn::MWNNAttribute mwnn_attr_kernel_shape("kernel_shape", {int(kernels[0]), int(kernels[1])});
+            node_attributes.emplace_back(mwnn_attr_kernel_shape);
+            metawarenn::MWNNAttribute mwnn_attr_stride("strides", {int(strides[0]), int(strides[1])});
+            node_attributes.emplace_back(mwnn_attr_stride);
+            metawarenn::MWNNAttribute mwnn_attr_pads("pads", {int(pads[0]), int(pads[1]), int(pads[2]), int(pads[3])});
+            node_attributes.emplace_back(mwnn_attr_pads);
             auto input_name = avgpool_node->getInput().generateNodeOutputName(true);
             node_inputs.emplace_back(input_name);
             LOG(INFO) << "input_name: " << input_name;
@@ -581,6 +590,253 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
             LOG(INFO) << "output_name: " << output_name;
             break;
         }
+        case Kinded::Kind::LocalResponseNormalizationNodeKind:
+        {
+            node_op_type = "LRN";
+            auto *lrn_node = llvm::cast<LocalResponseNormalizationNode>(node);
+            metawarenn::MWNNAttribute mwnn_attr_alpha("alpha", {int(lrn_node->getAlpha())});
+            node_attributes.emplace_back(mwnn_attr_alpha);
+            metawarenn::MWNNAttribute mwnn_attr_beta("beta", {int(lrn_node->getBeta())});
+            node_attributes.emplace_back(mwnn_attr_beta);
+            metawarenn::MWNNAttribute mwnn_attr_half_window_size("half_window_size", {int(lrn_node->getHalfWindowSize())});
+            node_attributes.emplace_back(mwnn_attr_half_window_size);
+            auto input_name = lrn_node->getInput().generateNodeOutputName(true);
+            node_inputs.emplace_back(input_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto output_name = lrn_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::MaxPoolNodeKind:
+        {
+            node_op_type = "MaxPool";
+            auto *maxpool_node = llvm::cast<MaxPoolNode>(node);
+            auto kernels = maxpool_node->getKernels();
+            auto strides = maxpool_node->getStrides();
+            auto pads = maxpool_node->getPads();
+            metawarenn::MWNNAttribute mwnn_attr_kernel_shape("kernel_shape", {int(kernels[0]), int(kernels[1])});
+            node_attributes.emplace_back(mwnn_attr_kernel_shape);
+            metawarenn::MWNNAttribute mwnn_attr_stride("strides", {int(strides[0]), int(strides[1])});
+            node_attributes.emplace_back(mwnn_attr_stride);
+            metawarenn::MWNNAttribute mwnn_attr_pad("pads", {int(pads[0]), int(pads[1]), int(pads[2]), int(pads[3])});
+            node_attributes.emplace_back(mwnn_attr_pad);
+            auto input_name = maxpool_node->getInput().generateNodeOutputName(true);
+            node_inputs.emplace_back(input_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto output_name = maxpool_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::GemmNodeKind:
+        {
+            node_op_type = "Gemm";
+            auto *gemm_node = llvm::cast<GemmNode>(node);
+            std::cout << "\n gemm inputs: " << gemm_node->getNumInputs();
+            auto filter_node_value = gemm_node->getNthInput(1);
+            auto filter_name = filter_node_value.generateNodeOutputName(true);
+            auto *filter_constant = llvm::dyn_cast<glow::Constant>(filter_node_value.getNode());
+            glow::Tensor filter_tensor = filter_constant->getPayload().clone();
+            auto type = filter_tensor.getType();
+            glow::ElemKind data_type = type.getElementType();
+            ShapeNHWC filterDims(filter_node_value.dims());
+            size_t wt_size = filterDims.n * filterDims.h; //n - height, h - width
+            std::vector<float> weights(wt_size);
+            std::vector<int> weight_dims(filter_constant->dims().vec().size());
+            weight_dims[0] = filterDims.n;
+            weight_dims[1] = filterDims.h;
+            auto handle = filter_tensor.getHandle<float>();
+            int i = 0;
+            for (auto elem : handle)
+            {
+                weights[i++] = elem;
+            }
+            metawarenn::MWNNTensor mwnn_weight_tensor(filter_name, weight_dims, data_type, weights);
+            mwnn_initializer_tensors.emplace_back(mwnn_weight_tensor);
+            auto bias_node_value = gemm_node->getNthInput(2);
+            auto bias_name = bias_node_value.generateNodeOutputName(true);
+            LOG(INFO) << "bias_name: " << bias_name;
+            node_inputs.emplace_back(bias_name);
+            mwnn_initializer_names.insert(bias_name);
+            auto *bias_constant = llvm::dyn_cast<glow::Constant>(bias_node_value.getNode());
+            glow::Tensor bias_tensor = bias_constant->getPayload().clone();
+            auto handle1 = bias_tensor.getHandle<float>();
+            auto base1 = handle1.getElementPtr({static_cast<unsigned long>(0)});
+            std::vector<float> bias(filterDims.n);
+            std::vector<int> bias_dims(1);
+            bias_dims[0] = filterDims.n;
+            i = 0;
+            for (auto elem : handle1)
+            {
+                bias[i++] = elem;
+            }
+            type = bias_tensor.getType();
+            data_type = type.getElementType();
+            metawarenn::MWNNTensor mwnn_bias_tensor(bias_name, bias_dims, data_type, bias);
+            mwnn_initializer_tensors.emplace_back(mwnn_bias_tensor);
+            metawarenn::MWNNAttribute mwnn_attr_alpha("alpha", {int(gemm_node->getAlpha())});
+            node_attributes.emplace_back(mwnn_attr_alpha);
+            metawarenn::MWNNAttribute mwnn_attr_beta("beta", {int(gemm_node->getBeta())});
+            node_attributes.emplace_back(mwnn_attr_beta);
+            auto input_name = gemm_node->getInputName(0);
+            node_inputs.emplace_back(input_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto output_name = gemm_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::ConcatNodeKind:
+        {
+            node_op_type = "Concat";
+            auto *concat_node = llvm::cast<ConcatNode>(node);
+            for(int i = 0; i < concat_node->getInputs().size(); i++)
+            {
+              auto input_name = concat_node->getInputName(i);
+              node_inputs.emplace_back(input_name);
+              LOG(INFO) << "input_name: " << input_name;
+            }
+            auto output_name = concat_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::BatchNormalizationNodeKind:
+        {
+            node_op_type = "BatchNormalization";
+            auto *batchnorm_node = llvm::cast<BatchNormalizationNode>(node);
+            batchnorm_node->getEpsilon();
+            batchnorm_node->getMomentum();
+            auto bias_node_value = batchnorm_node->getBias();
+            auto bias_name = bias_node_value.generateNodeOutputName(true);
+            LOG(INFO) << "bias_name: " << bias_name;
+            node_inputs.emplace_back(bias_name);
+            mwnn_initializer_names.insert(bias_name);
+            auto *bias_constant = llvm::dyn_cast<glow::Constant>(bias_node_value.getNode());
+            glow::Tensor bias_tensor = bias_constant->getPayload().clone();
+            auto handle1 = bias_tensor.getHandle<float>();
+            auto base1 = handle1.getElementPtr({static_cast<unsigned long>(0)});
+            std::vector<float> bias(bias_tensor.size());
+            std::vector<int> bias_dims(1);
+            bias_dims[0] = bias_tensor.dims()[0];
+            int i = 0;
+            for (auto elem : handle1)
+            {
+                bias[i++] = elem;
+            }
+            auto type = bias_tensor.getType();
+            auto data_type = type.getElementType();
+            metawarenn::MWNNTensor mwnn_bias_tensor(bias_name, bias_dims, data_type, bias);
+            mwnn_initializer_tensors.emplace_back(mwnn_bias_tensor);
+            metawarenn::MWNNAttribute mwnn_attr_momentum("momentum", {int(batchnorm_node->getMomentum())});
+            node_attributes.emplace_back(mwnn_attr_momentum);
+            metawarenn::MWNNAttribute mwnn_attr_epsilon("epsilon", {int(batchnorm_node->getEpsilon())});
+            node_attributes.emplace_back(mwnn_attr_epsilon);
+            auto input_name = batchnorm_node->getInputName(0);
+            node_inputs.emplace_back(input_name);
+            auto output_name = batchnorm_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::ChannelShuffleNodeKind:
+        {
+            node_op_type = "ChannelShuffle";
+            auto *channel_shuffle_node = llvm::cast<ChannelShuffleNode>(node);
+            metawarenn::MWNNAttribute mwnn_attr_group("group", {int(channel_shuffle_node->getGroup())});
+            node_attributes.emplace_back(mwnn_attr_group);
+            metawarenn::MWNNAttribute mwnn_attr_kernel("kernel", {int(channel_shuffle_node->getKernel())});
+            node_attributes.emplace_back(mwnn_attr_kernel);
+            auto input_name = channel_shuffle_node->getInputName(0);
+            node_inputs.emplace_back(input_name);
+            auto output_name = channel_shuffle_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
+        case Kinded::Kind::ClipNodeKind:
+        {
+            node_op_type = "Clip";
+            auto *clip_node = llvm::cast<ClipNode>(node);
+            clip_node->getMax();
+            clip_node->getMin();
+            metawarenn::MWNNAttribute mwnn_attr_max("max", {int(clip_node->getMax())});
+            node_attributes.emplace_back(mwnn_attr_max);
+            metawarenn::MWNNAttribute mwnn_attr_min("min", {int(clip_node->getMax())});
+            node_attributes.emplace_back(mwnn_attr_min);
+            auto input_name = clip_node->getInputName(0);
+            node_inputs.emplace_back(input_name);
+            auto output_name = clip_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+          break;
+        }
+        case Kinded::Kind::FullyConnectedNodeKind:
+        {
+            node_op_type = "FullyConnected";
+            auto *fc_node = llvm::cast<FullyConnectedNode>(node);
+            auto filter_node_value = fc_node->getWeights();
+            auto filter_name = filter_node_value.generateNodeOutputName(true);
+            auto *filter_constant = llvm::dyn_cast<glow::Constant>(filter_node_value.getNode());
+            glow::Tensor filter_tensor = filter_constant->getPayload().clone();
+            auto type = filter_tensor.getType();
+            glow::ElemKind data_type = type.getElementType();
+            ShapeNHWC filterDims(filter_node_value.dims());
+            size_t wt_size = filterDims.n * filterDims.h; //n - height, h - width
+            std::vector<float> weights(wt_size);
+            std::vector<int> weight_dims(filter_constant->dims().vec().size());
+            weight_dims[0] = filterDims.n;
+            weight_dims[1] = filterDims.h;
+            auto handle = filter_tensor.getHandle<float>();
+            int i = 0;
+            for (auto elem : handle)
+            {
+                weights[i++] = elem;
+            }
+            metawarenn::MWNNTensor mwnn_weight_tensor(filter_name, weight_dims, data_type, weights);
+            mwnn_initializer_tensors.emplace_back(mwnn_weight_tensor);
+            auto bias_node_value = fc_node->getBias();;
+            auto bias_name = bias_node_value.generateNodeOutputName(true);
+            LOG(INFO) << "bias_name: " << bias_name;
+            node_inputs.emplace_back(bias_name);
+            mwnn_initializer_names.insert(bias_name);
+            auto *bias_constant = llvm::dyn_cast<glow::Constant>(bias_node_value.getNode());
+            glow::Tensor bias_tensor = bias_constant->getPayload().clone();
+            auto handle1 = bias_tensor.getHandle<float>();
+            auto base1 = handle1.getElementPtr({static_cast<unsigned long>(0)});
+            std::vector<float> bias(filterDims.n);
+            std::vector<int> bias_dims(1);
+            bias_dims[0] = filterDims.n;
+            i = 0;
+            for (auto elem : handle1)
+            {
+                bias[i++] = elem;
+            }
+            type = bias_tensor.getType();
+            data_type = type.getElementType();
+            metawarenn::MWNNTensor mwnn_bias_tensor(bias_name, bias_dims, data_type, bias);
+            mwnn_initializer_tensors.emplace_back(mwnn_bias_tensor);
+            auto input_name = fc_node->getInputName(0);
+            node_inputs.emplace_back(input_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto output_name = fc_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+          break;
+        }
+        case Kinded::Kind::SoftMaxNodeKind:
+        {
+            node_op_type = "Softmax";
+            auto *softmax_node = llvm::cast<SoftMaxNode>(node);
+            auto input_name = softmax_node->getInputName(0);
+            node_inputs.emplace_back(input_name);
+            LOG(INFO) << "input_name: " << input_name;
+            auto output_name = softmax_node->getResult().generateNodeOutputName(true);
+            node_outputs.emplace_back(output_name);
+            LOG(INFO) << "output_name: " << output_name;
+            break;
+        }
         default:
             break;
         }
@@ -616,7 +872,7 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
       mwnn_outputs.emplace_back(mwnn_output);
       op_name = global_output_name;
       //Fills Graph Output Tensor Details - Name, Dims
-      MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_dims());
+      MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_type(), mwnn_output.get_dims());
       mwnn_graph_op_tensors.emplace_back(mwnn_op_tensor);
     }
     else if(V->getName().equals(input_name)) {
@@ -624,7 +880,7 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
       mwnn_inputs.emplace_back(mwnn_input);
       ip_name = V->getName();
       //Fills Graph Input Tensor Details - Name, Dims
-      MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_dims());
+      MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_type(), mwnn_input.get_dims());
       mwnn_graph_ip_tensors.emplace_back(mwnn_ip_tensor);
     }
   }

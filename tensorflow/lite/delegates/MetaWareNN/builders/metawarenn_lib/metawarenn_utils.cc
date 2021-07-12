@@ -313,6 +313,8 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
     {}
     else if(op_type == "StridedSlice")
     {}
+    else if(op_type == "Mean")
+    {}
     else if(op_type == "FullyConnected")
     {}
   }

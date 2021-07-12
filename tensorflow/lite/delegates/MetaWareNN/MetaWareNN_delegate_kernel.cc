@@ -31,6 +31,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
     graph_prepared_ = true;
   }
   std::cout << "\n In MWNN Kernel Prepare : " << mwnn_graph_->get_graph_nodes().size() << "  Graph Name : " << mwnn_graph_->get_name();
+  mwnn_exe_graph_ = std::make_shared<metawarenn::MWNNExecutableGraph>(*mwnn_graph_);
   return kTfLiteOk;
 }
 
@@ -85,6 +86,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     // ******************************************* Call to invoke the local run function *****************************************
 
     //convert_to_mwnn_format(*mwnn_graph_, graph_inputs, graph_outputs, is_HWC);
+    //mwnn_exe_graph_->runGraph();
 
   return kTfLiteOk;
 }

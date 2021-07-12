@@ -92,7 +92,10 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
       manager.register_pass(fr);
     }
   }
+  ::metawarenn::optimizer::CalculateOffset co(mwnn_graph);
+  manager.register_pass(co);
   manager.run_passes();
+
   #if INVOKE_NNAC
     std::cout << "\n ---------------------------Graph----------------------------- \n";
     std::cout << "\n Graph Name : " << mwnn_graph->get_name();

@@ -5,6 +5,7 @@
 #include "fuse_relu.h"
 #include "convert_layout.h"
 #include "remove_transpose.h"
+#include "calculate_offset.h"
 #include <vector>
 #include <memory>
 

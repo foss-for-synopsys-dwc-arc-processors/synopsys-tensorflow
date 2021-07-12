@@ -20,6 +20,9 @@ void PassManager::run_passes() {
     else if (auto remove_transpose_pass = std::dynamic_pointer_cast<RemoveTranspose>(pass)) {
       remove_transpose_pass->RunPass();
     }
+    else if (auto calculate_offset_pass = std::dynamic_pointer_cast<CalculateOffset>(pass)) {
+      calculate_offset_pass->RunPass();
+    }
   }
 }
 

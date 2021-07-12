@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include "../executable_network/metawarenn_serialization.h"
 
 namespace metawarenn {
 
@@ -11,7 +12,8 @@ class Node {
   public:
     Node();
     Node(std::string n_name, std::string n_type);
-    virtual ~Node() {}
+    virtual ~Node();
+    virtual void fill_attributes(DataSerialization &layer_serializer) = 0;
     std::string name;
     std::string type;
 };

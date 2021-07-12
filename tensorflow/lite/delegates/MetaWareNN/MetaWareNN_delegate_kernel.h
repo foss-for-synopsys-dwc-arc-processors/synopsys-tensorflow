@@ -29,6 +29,7 @@ class MetaWareNNDelegateKernel {
   std::unique_ptr<delegates::metawarenn::ModelBuilder> model_builder_;
 
   std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph_;
+  std::shared_ptr<metawarenn::MWNNExecutableGraph> mwnn_exe_graph_;
 
   // Indices of nodes in the delegated TfLite subgraph.
   std::vector<int> nodes_;
