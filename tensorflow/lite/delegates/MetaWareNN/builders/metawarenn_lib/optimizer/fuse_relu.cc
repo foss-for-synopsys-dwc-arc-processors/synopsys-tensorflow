@@ -26,7 +26,7 @@ void FuseRelu::RunPass() {
         graph->update_node_outputs(g_n.get_name(), node.get_name(), i);
         producers.insert(g_n.get_name());
         if(g_n.get_op_type() == "Conv" or g_n.get_op_type() == "DepthwiseConv") {
-          g_n.update_attribute_value("activation", {1});
+          graph->update_node_attribute(g_n.get_name(), "activation", 1);
         }
       }
     }

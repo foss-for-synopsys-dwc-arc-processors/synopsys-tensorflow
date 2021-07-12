@@ -90,3 +90,19 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
 
 7. Run the object file
 `./inference`
+
+## To run multiple TFLite models from model zoo
+   1. Create a directory to download tflite models and move to the directory
+      `cd /path/to/store/tflite_model_dir`
+   2. Download the models from TFLite model zoo by running the below shell script
+      `sh /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/download_models.sh`
+   3. Set the path to downloaded tflite model directory in synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_regression.cpp file at line no: 19
+   4. `cd /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
+   5. Set CPLUS_INCLUDE_PATH and LD_LIBRARY_PATH environment variables as mentioned above in step 1 & 2
+   6. Compile the inference script
+      `g++ -o inference inference_regression.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lboost_serialization -L/usr/lib/x86_64-linux-gnu -lrt`
+   7. Run the executable
+      `./inference`
+
+   Note:
+      i. Invoke call from the inference script has been commented since the MLI kernel support need to be handled for added ops.

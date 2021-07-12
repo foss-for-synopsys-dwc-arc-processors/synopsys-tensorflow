@@ -20,7 +20,7 @@ class MWNNValueInfo {
     MWNNValueInfo(std::string m_name, std::vector<int> m_dims, ElemKind m_type);
     #endif
     std::string get_name() { return name; }
-    int get_type() { return in_type; }
+    int get_type() { return int(t_type); }
     std::vector<int> get_dims() { return dims; }
     std::shared_ptr<op::Node> get_node() {
       return std::make_shared<op::InputData>(name, dims, t_type);

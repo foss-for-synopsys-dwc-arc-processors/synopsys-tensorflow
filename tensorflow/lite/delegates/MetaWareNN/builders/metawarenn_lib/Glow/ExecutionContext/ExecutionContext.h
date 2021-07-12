@@ -19,7 +19,7 @@
 #include "TraceEvents.h"
 #include "../Graph/PlaceholderBindings.h"
 
-#include "llvm/ADT/STLExtras.h"
+#include "../LLVM/ADT/STLExtras.h"
 
 namespace glow {
 namespace runtime {

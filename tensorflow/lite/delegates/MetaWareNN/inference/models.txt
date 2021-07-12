@@ -1,0 +1,10 @@
+densenet/densenet.tflite
+squeezenet_2018_04_27/squeezenet.tflite
+nasnet_mobile_2018_04_27/nasnet_mobile.tflite
+nasnet_large_2018_04_27/nasnet_large.tflite
+resnet_v2_101/resnet_v2_101_299.tflite
+inception_resnet_v2_2018_04_27/inception_resnet_v2.tflite
+inception_v3_2018_04_27/inception_v3.tflite
+inception_v4_2018_04_27/inception_v4.tflite
+mobilenet_v1_1.0_224/mobilenet_v1_1.0_224.tflite
+mobilenet_v2_1.0_224/mobilenet_v2_1.0_224.tflite

@@ -6,6 +6,16 @@ namespace metawarenn {
 #if ONNX
 MWNNNode::MWNNNode(NodeProto& onnx_node_proto) {
   name = onnx_node_proto.name();
+  // Creates node name if node name from loaded graph is NULL.
+  if(name == "")
+  {
+    static int node_counter = 0;
+    char* node_name = (char*)malloc(100*sizeof(char));
+    std::strcpy(node_name, onnx_node_proto.op_type().c_str());
+    std::strcat(node_name, std::to_string(node_counter).c_str());
+    name = node_name;
+    node_counter++;
+  }
   op_type = onnx_node_proto.op_type();
   for (auto input : onnx_node_proto.input()) {
     inputs.emplace_back(input);
