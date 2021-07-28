@@ -13,7 +13,7 @@ class ElementType {
   public:
     enum class element_type
       {
-          //Common ONNX & TF Types
+          //Common Types
           boolean_,
           double_,
           float16_,
@@ -23,7 +23,7 @@ class ElementType {
           int32_,
           int64_,
           uint8_,
-          //ONNX Specific
+          //ONNX & TVM Specific
           uint16_,
           uint32_,
           uint64_,
@@ -121,6 +121,21 @@ class ElementType {
                 return element_type::int64_;
             case ElemKind::UInt8QTy:
                 return element_type::uint8_;
+            default:
+                return element_type::dynamic_;
+        }
+    }
+    #endif
+
+    #if TVM
+    static element_type get_mwnn_type_tvm(int tvm_type) {
+        switch (tvm_type) {
+            case kDLFloat:
+                return element_type::float_;
+            case kDLInt:
+                return element_type::int32_;
+            case kDLUInt:
+                return element_type::uint32_;
             default:
                 return element_type::dynamic_;
         }

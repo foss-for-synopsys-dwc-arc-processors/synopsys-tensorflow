@@ -19,6 +19,9 @@ class MWNNValueInfo {
     #if GLOW
     MWNNValueInfo(std::string m_name, std::vector<int> m_dims, ElemKind m_type);
     #endif
+    #if TVM
+    MWNNValueInfo(std::string m_name, std::vector<int> m_dims, int m_type);
+    #endif
     std::string get_name() { return name; }
     int get_type() { return int(t_type); }
     std::vector<int> get_dims() { return dims; }

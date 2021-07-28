@@ -4,6 +4,7 @@
 #define ONNX 0
 #define TFLITE 1
 #define GLOW 0
+#define TVM 0
 
 //ONNXRuntime
 #if ONNX
@@ -35,11 +36,21 @@
 #include "glow/Backend/BackendUtils.h"
 #endif
 
+//TVM
+#if TVM
+#include <numeric>
+#include <regex>
+#include "tvm/json/json_node.h"
+#include "tvm/json/json_runtime.h"
+#endif
+
 #if ONNX
 using namespace onnx;
 #endif
 #if GLOW
 using namespace glow;
 #endif
-
+#if TVM
+using namespace tvm::runtime::json;
+#endif
 #endif //METAWARENN_COMMON_H_

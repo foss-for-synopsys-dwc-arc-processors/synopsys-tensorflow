@@ -18,16 +18,16 @@ class MWNNTensor {
     MWNNTensor() = default;
     #if ONNX
     MWNNTensor(TensorProto& onnx_tensor_proto);
-    MWNNTensor(std::string t_name, std::vector<int> t_shape);
     void set_tensor(TensorProto& onnx_tensor_proto);
     #endif
     #if TFLITE
     MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, std::vector<float> m_tensor);
-    MWNNTensor(std::string t_name, std::vector<int> t_shape);
     #endif
     #if GLOW
     MWNNTensor(std::string m_name, std::vector<int> m_dims, ElemKind m_type, std::vector<float> m_tensor);
-    MWNNTensor(std::string t_name, std::vector<int> t_shape);
+    #endif
+    #if TVM
+    MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, std::vector<float> m_tensor);
     #endif
     MWNNTensor(std::string t_name, int type, std::vector<int> t_shape);
     std::string get_name() { return name; }

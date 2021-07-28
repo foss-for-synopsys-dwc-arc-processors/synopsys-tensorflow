@@ -32,7 +32,8 @@ MWNNNode::MWNNNode(NodeProto& onnx_node_proto) {
     }
   }
   if(op_type == "Conv" or op_type == "DepthwiseConv") {
-    MWNNAttribute mwnn_attribute("activation", {0});
+    std::vector<int> activation= {0};
+    MWNNAttribute mwnn_attribute("activation", activation);
     mwnn_attributes.emplace_back(mwnn_attribute);
   }
 }

@@ -57,6 +57,16 @@ class MWNNNode {
       }
       return it->get_data();
     }
+    std::vector<float> get_attribute_value_float(std::string name) {
+      auto it = std::find_if(
+      std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
+          return attribute.get_name() == name;
+      });
+      if (it == std::end(mwnn_attributes)) {
+          std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name;
+      }
+      return it->get_float_data();
+    }
     void update_attribute_value(std::string name, int value) {
       auto it = std::find_if(
       std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
@@ -127,8 +137,9 @@ class MWNNNode {
       else if(op_type == "Shape") {
         return std::make_shared<op::Shape>(name, inputs, outputs);
       }
-      else if(op_type == "BatchNormalization") {
-        return std::make_shared<op::BatchNormalization>(name, inputs, outputs);
+      else if(op_type == "BatchNorm") {
+          return std::make_shared<op::BatchNormalization>(name, inputs, outputs,
+                                                        get_attribute_value_float("epsilon")[0]);
       }
       else if(op_type == "Split") {
         return std::make_shared<op::Split>(name, inputs, outputs);

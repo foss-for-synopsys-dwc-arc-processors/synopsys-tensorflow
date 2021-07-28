@@ -12,15 +12,16 @@ class MWNNAttribute {
     void set_data(AttributeProto& onnx_attribute_proto);
     #endif
     MWNNAttribute(std::string m_name, std::vector<int> m_data);
+    MWNNAttribute(std::string m_name, std::vector<float> m_data);
+    std::vector<float> get_float_data() { return float_data; }
     void set_data(int m_data);
     std::string get_name() { return name; }
-    int get_type() { return type; }
     std::vector<int> get_data() { return data; }
     std::vector<std::string> get_string_data() { return string_data; }
   private:
     std::string name;
-    int type;
     std::vector<int> data;
+    std::vector<float> float_data;
     std::vector<std::string> string_data;
 };
 

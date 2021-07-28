@@ -14,11 +14,6 @@ MWNNTensor::MWNNTensor(TensorProto& onnx_tensor_proto) {
   set_tensor(onnx_tensor_proto);
 }
 
-MWNNTensor::MWNNTensor(std::string t_name, std::vector<int> t_shape) {
-  name = t_name;
-  dims = t_shape;
-}
-
 void MWNNTensor::set_tensor(TensorProto& onnx_tensor_proto) {
   switch (in_type) {
     case onnx::TensorProto_DataType_FLOAT:
@@ -53,6 +48,17 @@ MWNNTensor::MWNNTensor(std::string m_name, std::vector<int> m_dims, ElemKind m_t
     t_type = ElementType::get_mwnn_type_glow(m_type);
     tensor = m_tensor;
     for (auto& it : dims) { std::cout << it << ' '; }
+}
+#endif
+
+#if TVM
+//TVMConstructor
+MWNNTensor::MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, std::vector<float> m_tensor) {
+    name = m_name;
+    dims = m_dims;
+    in_type = m_type;
+    t_type = ElementType::get_mwnn_type_tvm(in_type);
+    tensor = m_tensor;
 }
 #endif
 

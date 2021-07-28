@@ -305,8 +305,6 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
     {}
     else if(op_type == "Unsqueeze")
     {}
-    else if(op_type == "Mean")
-    {}
     else if(op_type == "Split")
     {}
     else if(op_type == "Pad")

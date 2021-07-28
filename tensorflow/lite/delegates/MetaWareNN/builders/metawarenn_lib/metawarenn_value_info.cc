@@ -40,4 +40,14 @@ MWNNValueInfo::MWNNValueInfo(std::string m_name, std::vector<int> m_dims, ElemKi
   t_type = ElementType::get_mwnn_type_glow(m_type);
 }
 #endif
+
+#if TVM
+//TVMConstructor
+MWNNValueInfo::MWNNValueInfo(std::string m_name, std::vector<int> m_dims, int m_type) {
+  name = m_name;
+  dims = m_dims;
+  in_type = m_type;
+  t_type = ElementType::get_mwnn_type_tvm(in_type);
+}
+#endif
 } //namespace metawarenn

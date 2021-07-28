@@ -22,6 +22,12 @@ class MWNNGraph {
     #if GLOW
     MWNNGraph(Function *F, std::string subgraph_name);
     #endif
+    #if TVM
+    MWNNGraph(std::vector<JSONGraphNode> graph_nodes_, std::string graph_name);
+    void set_graph_initializers(std::string const_name, const DLTensor* data);
+    void set_graph_inputs(std::string name, const JSONGraphNode& node);
+    void set_graph_outputs(std::string name, std::vector<int> dims, int type);
+    #endif
     std::string get_name() { return name; }
     std::string get_graph_ip_name() { return ip_name; }
     std::string get_graph_op_name() { return op_name; }
