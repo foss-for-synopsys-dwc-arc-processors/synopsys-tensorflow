@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <cmath>
 #include "../metawarenn_graph.h"
 
 namespace metawarenn {

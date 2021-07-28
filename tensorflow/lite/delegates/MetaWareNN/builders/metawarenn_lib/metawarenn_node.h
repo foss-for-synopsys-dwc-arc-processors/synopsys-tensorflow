@@ -43,6 +43,7 @@ class MWNNNode {
     std::string get_op_type() { return op_type; }
     std::vector<std::string> get_inputs() { return inputs; }
     std::vector<std::string> get_outputs() { return outputs; }
+    void add_inputs(std::string name) { inputs.emplace_back(name); }
     void set_inputs(std::string name, int index) { inputs[index] = name; }
     void set_outputs(std::string name, int index) { outputs[index] = name; }
     std::vector<MWNNAttribute> get_attributes() { return mwnn_attributes; }

@@ -10,6 +10,9 @@ void PassManager::run_passes() {
     if (auto remove_reshape_pass = std::dynamic_pointer_cast<RemoveReshape>(pass)) {
       remove_reshape_pass->RunPass();
     }
+    else if (auto fuse_batchnorm_pass = std::dynamic_pointer_cast<FuseBatchNorm>(pass)) {
+      fuse_batchnorm_pass->RunPass();
+    }
     else if (auto fuse_relu_pass = std::dynamic_pointer_cast<FuseRelu>(pass)) {
       fuse_relu_pass->RunPass();
     }

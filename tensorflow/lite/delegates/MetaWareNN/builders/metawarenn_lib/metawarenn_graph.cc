@@ -910,7 +910,8 @@ MWNNGraph::MWNNGraph(std::vector<JSONGraphNode> graph_nodes_, std::string graph_
       //Node Inputs Parsing
       for (size_t i = 0; i < node.GetInputs().size(); ++i) {
         auto in_node = node.GetInputs()[i];
-        out_index = in_node.id_;
+        if(in_node.id_ > out_index)
+          out_index = in_node.id_;
         std::string ip_name = "node_" + std::to_string(in_node.id_);
         node_inputs.emplace_back(ip_name);
       }
@@ -934,7 +935,7 @@ MWNNGraph::MWNNGraph(std::vector<JSONGraphNode> graph_nodes_, std::string graph_
 
         MWNNAttribute mwnn_attr_dilate("dilations", std::vector<int>({std::stoi(dilations[0]), std::stoi(dilations[1])}));
         node_attributes.emplace_back(mwnn_attr_dilate);
-        MWNNAttribute mwnn_attr_stride("strides", std::vector<int>({std::stoi(strides[0]), std::stoi(strides[0])}));
+        MWNNAttribute mwnn_attr_stride("strides", std::vector<int>({std::stoi(strides[0]), std::stoi(strides[1])}));
         node_attributes.emplace_back(mwnn_attr_stride);
         MWNNAttribute mwnn_attr_pad("pads", std::vector<int>({std::stoi(pads[0]), std::stoi(pads[1]), std::stoi(pads[2]), std::stoi(pads[3])}));
         node_attributes.emplace_back(mwnn_attr_pad);
@@ -968,7 +969,6 @@ MWNNGraph::MWNNGraph(std::vector<JSONGraphNode> graph_nodes_, std::string graph_
       else if (node.GetOpName() == "reshape") {
         node_op_type = "Reshape";
         node_name = node_op_type + std::to_string(layer_count++);
-
         std::vector<std::string> shape = node.GetAttr<std::vector<std::string>>("newshape");
         MWNNAttribute mwnn_attr_shape("shape", std::vector<int>({std::stoi(shape[0]), std::stoi(shape[1])}));
         node_attributes.emplace_back(mwnn_attr_shape);

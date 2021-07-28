@@ -79,12 +79,15 @@ class MWNNGraph {
      void remove_graph_nodes(std::string name){
       mwnn_graph_nodes.erase(name);
     }
-    void update_node_inputs(std::string node_name, std::string ip_name, int index) {
+    void update_node_inputs(std::string node_name, std::string ip_name, int index, bool new_ip=false) {
       auto it = std::find_if(
       std::begin(mwnn_nodes), std::end(mwnn_nodes), [&](MWNNNode& node) {
           return node.get_name() == node_name;
       });
-      return it->set_inputs(ip_name, index);
+      if(new_ip)
+        return it->add_inputs(ip_name);
+      else
+        return it->set_inputs(ip_name, index);
     }
     void update_node_outputs(std::string node_name, std::string op_name, int index) {
       auto it = std::find_if(
@@ -109,6 +112,15 @@ class MWNNGraph {
           return tensor.get_name() == tensor_name;
       });
       return it->update_tensor(n_dims, n_tensor);
+    }
+    void add_initializer_tensor(std::string tensor_name, std::vector<int> n_dims, std::vector<float> n_tensor) {
+      #if TVM
+      MWNNTensor mwnn_tensor(tensor_name, n_dims, 2, n_tensor);
+      mwnn_initializer_tensors.emplace_back(mwnn_tensor);
+      mwnn_initializer_names.insert(mwnn_tensor.get_name());
+      auto const_node = mwnn_tensor.get_constant_node();
+      mwnn_graph_nodes[mwnn_tensor.get_name()] = std::move(const_node);
+      #endif
     }
     void update_initializer_index(std::string tensor_name, uint32_t value) {
       auto it = std::find_if(
