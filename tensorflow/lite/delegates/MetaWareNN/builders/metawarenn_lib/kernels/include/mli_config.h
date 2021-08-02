@@ -99,25 +99,26 @@
 * 4 - ARCV2DSP ISA with vector DSP
 */
 
+/*
 #if defined(V2DSP_VECTOR) || ((defined(__Xvdsp)))
 #undef V2DSP_VECTOR
 #define PLATFORM (4)
 #define PLATFORM_STR  "ARCv2DSP VDSP"
 #include "arc_vector.h"
 #elif defined(V2DSP_XY) || ((defined __Xxy) && !(defined(V2DSP) || defined(V2DSP_WIDE)))
-/* Platform with XY memory (EM9D or EM11D) */
+// Platform with XY memory (EM9D or EM11D)
 #undef V2DSP_XY
 #define PLATFORM (2)
 #define PLATFORM_STR  "ARCv2DSP XY"
 
 #elif defined(V2DSP_WIDE) || ((defined __Xdsp_wide) && !(defined(V2DSP) || defined(V2DSP_XY)))
-/* Platform with wide DSP ISA (HS45D or HS47D) */
+// Platform with wide DSP ISA (HS45D or HS47D)
 #undef V2DSP_WIDE
 #define PLATFORM (3)
 #define PLATFORM_STR  "ARCv2DSP Wide"
 
 #elif defined(V2DSP) || ((defined(__Xdsp2) || defined(__Xdsp_complex)) && !(defined(V2DSP_XY) || defined(V2DSP_WIDE)))
-/* Platform with DSP ISA (EM5D or EM7D) */
+// Platform with DSP ISA (EM5D or EM7D)
 #undef V2DSP
 #define PLATFORM (1)
 #define PLATFORM_STR  "ARCv2DSP"
@@ -130,7 +131,7 @@
 #else
 #error "Target platform is undefined or defined incorrectly"
 
-#endif
+#endif */
 
 #define     V2DSP        (1)
 #define     V2DSP_XY     (2)
