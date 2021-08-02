@@ -35,7 +35,7 @@ from mwnn_protobuf.python_wrapper import MWNN_pb2
 def input_in_skip_list(graphproto, node_name, skip_list, anonym):
     node = [n for n in graphproto.node
             if n.output[0] == node_name or n.name == node_name][0]
-    for input_name in node.input:
+    for input_name in node.ip_name:
         if input_name in skip_list:
             return True, input_name
         elif input_name in anonym.keys():
@@ -89,7 +89,7 @@ def convert(mwnn_file_path, output_folder, last_nodes=[], input_shape=[], first_
     if last_nodes != [] or first_nodes != []:
         all_node_name = []
         for node in graphproto.node:
-            node_name = node.name if node.name else node.output[0]
+            node_name = node.name if node.name else node.op_name[0]
             all_node_name.append(node_name)
 
         for l in last_nodes:
@@ -105,15 +105,15 @@ def convert(mwnn_file_path, output_folder, last_nodes=[], input_shape=[], first_
         ### DiGraph object (G) used ony to check the validity of first nodes and last nodes. Those are empty as it's not passed
         G = nx.DiGraph()
         for node in graphproto.node:
-            node_name = node.name if node.name else node.output[0]
+            node_name = node.name if node.name else node.op_name[0]
             G.add_node(node_name, name=node_name)
-            for i in range(len(node.input)):
-                G.add_edge(node.input[i], node_name)
-                if node_name != node.output[0]:
-                    G.add_edge(node_name, node.output[0])
-                    if len(node.output) > 1:
-                        for i in range(len(node.output)):
-                            G.add_edge(node_name, node.output[i])
+            for i in range(len(node.ip_name)):
+                G.add_edge(node.ip_name[i], node_name)
+                if node_name != node.op_name[0]:
+                    G.add_edge(node_name, node.op_name[0])
+                    if len(node.op_name) > 1:
+                        for i in range(len(node.op_name)):
+                            G.add_edge(node_name, node.op_name[i])
 
         if last_nodes != []:
             for n in G.nodes:
@@ -153,34 +153,37 @@ def convert(mwnn_file_path, output_folder, last_nodes=[], input_shape=[], first_
         singularity = 0
         mwnn_last_nodes = [n.name for n in graphproto.output]
         mwnn_first_nodes = [n.name for n in graphproto.input]
+        print(" mwnn_first_nodes : ", mwnn_first_nodes)
+        print(" mwnn_last_nodes : ", mwnn_last_nodes)
         for node in graphproto.node:
-            node_name = node.name if node.name else node.output[0]
-            if node.output[0] in mwnn_last_nodes:
+            node_name = node.name if node.name else node.op_name[0]
+            print("name : ", node.name, " op : ", node.op_name[0])
+            if node.op_name[0] in mwnn_last_nodes:
                 if node.op_type not in Skip_last_node_types:
                     implicit_last_nodes.append(node_name)
                 else:
-                    if len(node.input) == 0:
+                    if len(node.ip_name) == 0:
                         print("The node {} is isolated. Ignore it in last node list.\n".format(node_name))
                         singularity += 1
                         continue
-                    pre_node_name = node.input[0]
+                    pre_node_name = node.ip_name[0]
                     if pre_node_name in mwnn_first_nodes:
                         print("The node {} is isolated. Ignore it in last node list.\n".format(node_name))
                         singularity += 1
                         continue
                     for pre_node in graphproto.node:
-                        if pre_node.name == pre_node_name or pre_node.output[0] == pre_node_name:
-                            pre_node_name = pre_node.name if pre_node.name else pre_node.output[0]
+                        if pre_node.name == pre_node_name or pre_node.op_name[0] == pre_node_name:
+                            pre_node_name = pre_node.name if pre_node.name else pre_node.op_name[0]
                             if pre_node.op_type not in Skip_last_node_types:
                                 implicit_last_nodes.append(pre_node_name)
                             else:
                                 # maximum search back 2 nodes deep
-                                if len(pre_node.input) == 0:
+                                if len(pre_node.ip_name) == 0:
                                     print("The node {} is isolated. Ignore it in last node list.\n".format(
                                         pre_node_name))
                                     singularity += 1
                                     continue
-                                pre_pre_node_name = pre_node.input[0]
+                                pre_pre_node_name = pre_node.ip_name[0]
                                 if pre_pre_node_name in mwnn_first_nodes:
                                     print("The node {} is isolated. Ignore it in last node list.\n".format(
                                         pre_node_name))
@@ -188,9 +191,9 @@ def convert(mwnn_file_path, output_folder, last_nodes=[], input_shape=[], first_
                                     continue
                                 for pre_pre_node in graphproto.node:
                                     if pre_pre_node.name == pre_pre_node_name or \
-                                            pre_pre_node.output[0] == pre_pre_node_name:
+                                            pre_pre_node.op_name[0] == pre_pre_node_name:
                                         pre_pre_node_name = pre_pre_node.name if pre_pre_node.name else \
-                                            pre_pre_node.output[0]
+                                            pre_pre_node.op_name[0]
                                         if pre_pre_node.op_type not in Skip_last_node_types:
                                             implicit_last_nodes.append(pre_pre_node_name)
                                         else:
@@ -205,18 +208,18 @@ def convert(mwnn_file_path, output_folder, last_nodes=[], input_shape=[], first_
     # start conversion
     layer_count = 0
     for node in graphproto.node:
-        node_name = node.name if node.name else node.output[0]
+        node_name = node.name if node.name else node.op_name[0]
         if node_name in skip_nodes or node_name in ignore_branches:
             continue
         # G.add_node(node_name)
         inputs = []
-        for inp in node.input:
+        for inp in node.ip_name:
             if inp not in initializers:
                 # G.add_node(inp)
-                # G.add_edge(inp, node.output[0])
+                # G.add_edge(inp, node.op_name[0])
                 inputs.append(inp)
 
-        outputs = node.output
+        outputs = node.op_name
         print("inputs: ", inputs)
         print("outputs: ", outputs)
 

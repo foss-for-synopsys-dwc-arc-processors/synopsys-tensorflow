@@ -29,6 +29,16 @@
 #include "op/mean.h"
 #include "op/channel_shuffle.h"
 #include "op/fully_connected.h"
+#include "op/dense.h"
+#include "op/batch_flatten.h"
+#include "op/bias_add.h"
+#include "op/max.h"
+#include "op/subtract.h"
+#include "op/exp.h"
+#include "op/sum.h"
+#include "op/divide.h"
+#include "op/minimum.h"
+#include "op/maximum.h"
 
 namespace metawarenn {
 
@@ -48,7 +58,7 @@ class MWNNNode {
     void set_outputs(std::string name, int index) { outputs[index] = name; }
     std::vector<MWNNAttribute> get_attributes() { return mwnn_attributes; }
 
-    std::vector<int> get_attribute_value(std::string name) {
+    std::vector<int> get_attribute_value_int(std::string name) {
       auto it = std::find_if(
       std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
           return attribute.get_name() == name;
@@ -56,7 +66,7 @@ class MWNNNode {
       if (it == std::end(mwnn_attributes)) {
           std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name;
       }
-      return it->get_data();
+      return it->get_int_data();
     }
     std::vector<float> get_attribute_value_float(std::string name) {
       auto it = std::find_if(
@@ -81,17 +91,17 @@ class MWNNNode {
     std::shared_ptr<op::Node> get_node() {
       if(op_type == "Conv") {
         return std::make_shared<op::Conv>(name, inputs, outputs,
-                                          get_attribute_value("dilations"),
-                                          get_attribute_value("strides"),
-                                          get_attribute_value("pads"),
-                                          get_attribute_value("activation")[0]);
+                                          get_attribute_value_int("dilations"),
+                                          get_attribute_value_int("strides"),
+                                          get_attribute_value_int("pads"),
+                                          get_attribute_value_int("activation")[0]);
       }
       else if(op_type == "DepthwiseConv") {
         return std::make_shared<op::DepthwiseConv>(name, inputs, outputs,
-                                                   get_attribute_value("dilations"),
-                                                   get_attribute_value("strides"),
-                                                   get_attribute_value("pads"),
-                                                   get_attribute_value("activation")[0]);
+                                                   get_attribute_value_int("dilations"),
+                                                   get_attribute_value_int("strides"),
+                                                   get_attribute_value_int("pads"),
+                                                   get_attribute_value_int("activation")[0]);
       }
       else if(op_type == "Relu") {
         return std::make_shared<op::Relu>(name, inputs, outputs);
@@ -117,6 +127,13 @@ class MWNNNode {
       else if(op_type == "AveragePool") {
         return std::make_shared<op::AvgPool>(name, inputs, outputs);
       }
+      else if(op_type == "Dense") {
+        return std::make_shared<op::Dense>(name, inputs, outputs);
+      }
+      else if(op_type == "BatchFlatten") {
+        return std::make_shared<op::BatchFlatten>(name, inputs, outputs);
+      }
+
       else if(op_type == "Concat") {
         return std::make_shared<op::Concat>(name, inputs, outputs);
       }
@@ -142,8 +159,29 @@ class MWNNNode {
           return std::make_shared<op::BatchNormalization>(name, inputs, outputs,
                                                         get_attribute_value_float("epsilon")[0]);
       }
+      else if(op_type == "BiasAdd") {
+          return std::make_shared<op::BiasAdd>(name, inputs, outputs);
+      }
+      else if(op_type == "Max") {
+          return std::make_shared<op::Max>(name, inputs, outputs);
+      }
+      else if(op_type == "Subtract") {
+          return std::make_shared<op::Subtract>(name, inputs, outputs);
+      }
+      else if(op_type == "Exp") {
+          return std::make_shared<op::Exp>(name, inputs, outputs);
+      }
+      else if(op_type == "Divide") {
+          return std::make_shared<op::Divide>(name, inputs, outputs);
+      }
       else if(op_type == "Split") {
         return std::make_shared<op::Split>(name, inputs, outputs);
+      }
+      else if(op_type == "Maximum") {
+        return std::make_shared<op::Maximum>(name, inputs, outputs);
+      }
+      else if(op_type == "Minimum") {
+        return std::make_shared<op::Minimum>(name, inputs, outputs);
       }
       else if(op_type == "Mean") {
         return std::make_shared<op::Mean>(name, inputs, outputs);

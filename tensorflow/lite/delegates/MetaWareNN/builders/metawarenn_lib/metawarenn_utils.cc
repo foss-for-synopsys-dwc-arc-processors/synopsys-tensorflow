@@ -92,9 +92,9 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
     {
       mli_conv2d_cfg conv_cfg;
       int kernel_height, kernel_width, channels;
-      auto strides = g_n.get_attribute_value("strides");
-      auto pads = g_n.get_attribute_value("pads");
-      auto dilations = g_n.get_attribute_value("dilations");
+      auto strides = g_n.get_attribute_value_int("strides");
+      auto pads = g_n.get_attribute_value_int("pads");
+      auto dilations = g_n.get_attribute_value_int("dilations");
       conv_cfg.stride_height = strides[0];
       conv_cfg.stride_width = strides[1];
       conv_cfg.padding_top = pads[0];
@@ -103,7 +103,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
       conv_cfg.padding_right = pads[3];
       conv_cfg.dilation_height = dilations[0];
       conv_cfg.dilation_width = dilations[1];
-      auto activation = g_n.get_attribute_value("activation")[0];
+      auto activation = g_n.get_attribute_value_int("activation")[0];
       if(activation == ActivationType::Activation_None)
         conv_cfg.relu.type = MLI_RELU_NONE;
       else if(activation == ActivationType::Activation_Relu)
@@ -120,10 +120,11 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, std::unordered_map<std::string
       fill_mwnn_tensor_initalizer(inputs[1], mwnn_graph, &conv_wt, &kernel_height, &kernel_width, &channels, is_HWC);
       auto input = g_n.get_inputs()[0];
       // Handles the initial graph input to the first conv node and updates tensor map
-      if(input == mwnn_graph.get_graph_ip_name())
-      {
-        fill_mwnn_tensor_input(mwnn_graph.get_graph_ip_tensor()[0], &input_tensor);
-        tensor_map.insert(std::pair<std::string, mli_tensor>(input, input_tensor));
+      for (auto ip_name : mwnn_graph.get_graph_ip_names()) {
+        if(input == ip_name) {
+          fill_mwnn_tensor_input(mwnn_graph.get_graph_ip_tensor()[0], &input_tensor);
+          tensor_map.insert(std::pair<std::string, mli_tensor>(input, input_tensor));
+        }
       }
       input_tensor = (tensor_map.find(input))->second;
       // Output buffer size calculation

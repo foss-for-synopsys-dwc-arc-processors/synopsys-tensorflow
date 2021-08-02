@@ -102,7 +102,7 @@ class ConverterRegistry(object):
                 activation_valid = False
                 for attr in node.attribute:
                     # Checks for valid activation
-                    if(attr.name == "activation" and attr.ints[0] != 0):
+                    if(attr.name == "activation" and attr.int_data[0] != 0):
                         activation_valid = True
                         conv_output = []
                         conv_output.append(node_name+"_out")
@@ -115,11 +115,11 @@ class ConverterRegistry(object):
                         relu_outputs.append(outputs[0])
                         caffe_layer = init_node(model, relu_node_name, relu_inputs, relu_outputs)
                         # Adds separate caffe layer for Relu
-                        if(attr.ints[0] == 1):
+                        if(attr.int_data[0] == 1):
                             caffe_layer['functions'] = '{output_name} = L.ReLU({input_names})\n'.format(
                             **caffe_layer)
                         # Adds separate caffe layer for Relu6
-                        elif(attr.ints[0] == 2):
+                        elif(attr.int_data[0] == 2):
                             caffe_layer['functions'] = '{output_name} = L.ReLU({input_names}relu6=True)\n'.format(
                                 **caffe_layer)
                         cls.caffe_network[outputs[0]] = caffe_layer
@@ -176,7 +176,7 @@ def init_node(graphproto, node_name, inputs, outputs):
 def parse_Conv(graphproto, node, node_name, inputs, outputs):
     caffe_layer = init_node(graphproto, node_name, inputs, outputs)
 
-    weight = node.input[1]
+    weight = node.ip_name[1]
 
     if len(inputs) == 1:
         # 2nd input (initializer) specifies the weights
@@ -192,7 +192,7 @@ def parse_Conv(graphproto, node, node_name, inputs, outputs):
             if caffe_layer['weight'].op_type == 'Transpose':
                 for attr in caffe_layer['weight'].attribute:
                     if attr.name == 'perm':
-                        perm = [int(n) for n in attr.ints]
+                        perm = [int(n) for n in attr.int_data]
                 weight = caffe_layer['weight'].input[0]
                 weight_tensor = [n for n in graphproto.initializer
                                 if n.name == weight]
@@ -227,11 +227,11 @@ def parse_Conv(graphproto, node, node_name, inputs, outputs):
             num_output = caffe_layer['weight'].attribute[0].t.dims[0]
             caffe_layer['weight'] = caffe_layer['weight'].attribute[0].t
 
-    if len(node.input) > 2:
+    if len(node.ip_name) > 2:
         if len(inputs) == 1:
             # 3rd input (initializer) specifies the bias
             caffe_layer['bias'] = [b for b in graphproto.initializer
-                                   if b.name == node.input[2]][0]
+                                   if b.name == node.ip_name[2]][0]
         else:
             # 3rd input (constant) specifies the bias
             caffe_layer['bias'] = [b for b in graphproto.node
@@ -248,33 +248,33 @@ def parse_Conv(graphproto, node, node_name, inputs, outputs):
     dilations = [1, 1]
     for attr in node.attribute:
         if attr.name == 'kernel_shape':
-            if len(attr.ints) == 1:
-                kernel_shape = attr.ints[0]
-            elif len(attr.ints) > 2:
-                kernel_shape = [int(n) for n in attr.ints]
+            if len(attr.int_data) == 1:
+                kernel_shape = attr.int_data[0]
+            elif len(attr.int_data) > 2:
+                kernel_shape = [int(n) for n in attr.int_data]
             else:
-                [kernel_h, kernel_w] = attr.ints[:2]
+                [kernel_h, kernel_w] = attr.int_data[:2]
         if attr.name == 'strides':
-            if len(attr.ints) == 1:
-                stride = attr.ints[0]
-            elif len(attr.ints) > 2:
-                stride = [int(n) for n in attr.ints]
+            if len(attr.int_data) == 1:
+                stride = attr.int_data[0]
+            elif len(attr.int_data) > 2:
+                stride = [int(n) for n in attr.int_data]
             else:
-                [stride_h, stride_w] = attr.ints[:2]
+                [stride_h, stride_w] = attr.int_data[:2]
         if attr.name == 'pads':
-            if len(attr.ints) == 2:
+            if len(attr.int_data) == 2:
                 # TODO: no support for 1D asymmetric paddding in Caffe yet
-                pad = attr.ints[0]
-            elif len(attr.ints) > 4:
+                pad = attr.int_data[0]
+            elif len(attr.int_data) > 4:
                 # TODO: no support for non-2D asymmetric paddding in Caffe yet
                 # FIXME: add support for "once per spatial dimension" case
-                pad = attr.ints[0]
+                pad = attr.int_data[0]
             else:
-                [pad_t, pad_l, pad_b, pad_r] = attr.ints
+                [pad_t, pad_l, pad_b, pad_r] = attr.int_data
         if attr.name == 'group':
-            group = attr.ints[0]
+            group = attr.int_data[0]
         if attr.name == "dilations":
-            dilations = [int(n) for n in attr.ints]
+            dilations = [int(n) for n in attr.int_data]
 
     caffe_layer['functions'] = "{output_name} = L.Convolution({input_names}".format(**caffe_layer)
     # for non-2D conv
@@ -329,7 +329,7 @@ def parse_Add(graphproto, node, node_name, inputs, outputs):
     caffe_layer = init_node(graphproto, node_name, inputs, outputs)
 
     bias_node = [n for n in graphproto.initializer
-                    if n.name == node.input[1]]
+                    if n.name == node.ip_name[1]]
     if bias_node != []:
         caffe_layer['bias'] = bias_node
         if len(caffe_layer['bias'][0].float_data) == 1:
@@ -349,7 +349,7 @@ def parse_Add(graphproto, node, node_name, inputs, outputs):
 
     # if 1st input is the Constant (yolact.onnx)
     add_tensor = [n for n in graphproto.node
-                    if n.output[0] == inputs[0]][0]
+                    if n.op_name[0] == inputs[0]][0]
     if add_tensor.op_type == "Constant":
         addend = numpy_helper.to_array(add_tensor.attribute[0].t)
         caffe_layer['input_names'] = caffe_layer['input_names'].lstrip(', ')
@@ -373,18 +373,18 @@ def parse_Add(graphproto, node, node_name, inputs, outputs):
             return caffe_layer
 
     # normal case
-    bias = node.input[1]
+    bias = node.ip_name[1]
     caffe_layer['bias'] = [w for w in graphproto.initializer
                            if w.name == bias]
     # second input (initializer) specifies the add data
     if caffe_layer['bias']:
         caffe_layer['bias'] = caffe_layer['bias'][0]
     else:
-        bias_node = [n for n in graphproto.node if n.output[0] == bias]
+        bias_node = [n for n in graphproto.node if n.op_name[0] == bias]
         if bias_node:
             bias_node = bias_node[0]
             if bias_node.op_type == 'Unsqueeze':
-                bias = bias_node.input[0]
+                bias = bias_node.ip_name[0]
                 caffe_layer['bias'] = [w for w in graphproto.initializer
                                        if w.name == bias][0]
                 caffe_layer['input_names'] = caffe_layer['input_names'][:caffe_layer['input_names'].find(",") + 2]
@@ -437,7 +437,7 @@ def parse_Reshape(graphproto, node, node_name, inputs, outputs):
 
     for attr in node.attribute:
         if attr.name == 'shape':
-            shape = [int(n) for n in attr.ints]
+            shape = [int(n) for n in attr.int_data]
 
     # special case hack for m3d: 1st input is Constant,
     # or for tine-yolov3: 1st input is initializer,
@@ -445,7 +445,7 @@ def parse_Reshape(graphproto, node, node_name, inputs, outputs):
     input_constant = False
     value = []
     if len(inputs) == 1:
-        data_tensor = [n for n in graphproto.initializer if n.name == node.input[0]]
+        data_tensor = [n for n in graphproto.initializer if n.name == node.ip_name[0]]
         if data_tensor != []:
             data_tensor = data_tensor[0]
             value = data_tensor.float_data
@@ -454,7 +454,7 @@ def parse_Reshape(graphproto, node, node_name, inputs, outputs):
             caffe_layer['value'] = numpy_helper.from_array(value)
     else:
         data_node = [n for n in graphproto.node
-                     if n.output[0] == inputs[0]]
+                     if n.op_name[0] == inputs[0]]
         if data_node != []:
             data_node = data_node[0]
             if data_node.op_type == "Constant":
@@ -475,10 +475,10 @@ def parse_Reshape(graphproto, node, node_name, inputs, outputs):
     if shape == [] and len(inputs) == 1:
         # second input (initializer) specifies the output shape
         shape_tensor = [n for n in graphproto.initializer
-                        if n.name == node.input[1]]
+                        if n.name == node.ip_name[1]]
         if shape_tensor != []:
             shape_tensor = shape_tensor[0]
-            shape_info = shape_tensor.int64_data
+            shape_info = [int(n) for n in shape_tensor.float_data]
             if shape_info == []:  # raw_data format
                 shape_info = shape_tensor.float_data
             shape = [int(n) for n in shape_info]
@@ -486,11 +486,11 @@ def parse_Reshape(graphproto, node, node_name, inputs, outputs):
         if len(inputs) > 1:
             # second input (constant) specifies the output shape
             shape_tensor = [n for n in graphproto.node
-                            if n.output[0] == inputs[1]]
+                            if n.op_name[0] == inputs[1]]
         else:
             # for tine-yolov3: 1st input is initializer, so the index for shape is changed
             shape_tensor = [n for n in graphproto.node
-                            if n.output[0] == inputs[0]]
+                            if n.op_name[0] == inputs[0]]
         if shape_tensor != []:
             shape_tensor = shape_tensor[0]
             if shape_tensor.op_type == "Constant":
@@ -543,7 +543,7 @@ def parse_Softmax(model, node, node_name, inputs, outputs):
     axis = 1
     for attr in node.attribute:
         if attr.name == 'beta':
-            axis = attr.ints[0]
+            axis = attr.int_data[0]
     caffe_layer['functions'] = '{} = L.Softmax({}axis={})\n'.format(
         caffe_layer['output_name'], caffe_layer['input_names'], axis)
 

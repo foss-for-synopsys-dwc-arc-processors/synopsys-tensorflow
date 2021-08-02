@@ -31,7 +31,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -48,7 +47,7 @@ struct TableStruct_MWNN_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -68,402 +67,16 @@ extern MWNNNodeProtoDefaultTypeInternal _MWNNNodeProto_default_instance_;
 class MWNNTensorProto;
 class MWNNTensorProtoDefaultTypeInternal;
 extern MWNNTensorProtoDefaultTypeInternal _MWNNTensorProto_default_instance_;
-class MWNNTensorProto_Segment;
-class MWNNTensorProto_SegmentDefaultTypeInternal;
-extern MWNNTensorProto_SegmentDefaultTypeInternal _MWNNTensorProto_Segment_default_instance_;
-class MWNNValueInfoProto;
-class MWNNValueInfoProtoDefaultTypeInternal;
-extern MWNNValueInfoProtoDefaultTypeInternal _MWNNValueInfoProto_default_instance_;
 }  // namespace MWNN
 PROTOBUF_NAMESPACE_OPEN
 template<> ::MWNN::MWNNAttributeProto* Arena::CreateMaybeMessage<::MWNN::MWNNAttributeProto>(Arena*);
 template<> ::MWNN::MWNNGraphProto* Arena::CreateMaybeMessage<::MWNN::MWNNGraphProto>(Arena*);
 template<> ::MWNN::MWNNNodeProto* Arena::CreateMaybeMessage<::MWNN::MWNNNodeProto>(Arena*);
 template<> ::MWNN::MWNNTensorProto* Arena::CreateMaybeMessage<::MWNN::MWNNTensorProto>(Arena*);
-template<> ::MWNN::MWNNTensorProto_Segment* Arena::CreateMaybeMessage<::MWNN::MWNNTensorProto_Segment>(Arena*);
-template<> ::MWNN::MWNNValueInfoProto* Arena::CreateMaybeMessage<::MWNN::MWNNValueInfoProto>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace MWNN {
 
-enum MWNNTensorProto_DataType : int {
-  MWNNTensorProto_DataType_UNDEFINED = 0,
-  MWNNTensorProto_DataType_FLOAT = 1,
-  MWNNTensorProto_DataType_UINT8 = 2,
-  MWNNTensorProto_DataType_INT8 = 3,
-  MWNNTensorProto_DataType_UINT16 = 4,
-  MWNNTensorProto_DataType_INT16 = 5,
-  MWNNTensorProto_DataType_INT32 = 6,
-  MWNNTensorProto_DataType_INT64 = 7,
-  MWNNTensorProto_DataType_STRING = 8,
-  MWNNTensorProto_DataType_BOOL = 9,
-  MWNNTensorProto_DataType_FLOAT16 = 10,
-  MWNNTensorProto_DataType_DOUBLE = 11,
-  MWNNTensorProto_DataType_UINT32 = 12,
-  MWNNTensorProto_DataType_UINT64 = 13,
-  MWNNTensorProto_DataType_COMPLEX64 = 14,
-  MWNNTensorProto_DataType_COMPLEX128 = 15
-};
-bool MWNNTensorProto_DataType_IsValid(int value);
-constexpr MWNNTensorProto_DataType MWNNTensorProto_DataType_DataType_MIN = MWNNTensorProto_DataType_UNDEFINED;
-constexpr MWNNTensorProto_DataType MWNNTensorProto_DataType_DataType_MAX = MWNNTensorProto_DataType_COMPLEX128;
-constexpr int MWNNTensorProto_DataType_DataType_ARRAYSIZE = MWNNTensorProto_DataType_DataType_MAX + 1;
-
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MWNNTensorProto_DataType_descriptor();
-template<typename T>
-inline const std::string& MWNNTensorProto_DataType_Name(T enum_t_value) {
-  static_assert(::std::is_same<T, MWNNTensorProto_DataType>::value ||
-    ::std::is_integral<T>::value,
-    "Incorrect type passed to function MWNNTensorProto_DataType_Name.");
-  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
-    MWNNTensorProto_DataType_descriptor(), enum_t_value);
-}
-inline bool MWNNTensorProto_DataType_Parse(
-    const std::string& name, MWNNTensorProto_DataType* value) {
-  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<MWNNTensorProto_DataType>(
-    MWNNTensorProto_DataType_descriptor(), name, value);
-}
 // ===================================================================
-
-class MWNNValueInfoProto :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:MWNN.MWNNValueInfoProto) */ {
- public:
-  MWNNValueInfoProto();
-  virtual ~MWNNValueInfoProto();
-
-  MWNNValueInfoProto(const MWNNValueInfoProto& from);
-  MWNNValueInfoProto(MWNNValueInfoProto&& from) noexcept
-    : MWNNValueInfoProto() {
-    *this = ::std::move(from);
-  }
-
-  inline MWNNValueInfoProto& operator=(const MWNNValueInfoProto& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline MWNNValueInfoProto& operator=(MWNNValueInfoProto&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
-  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return GetMetadataStatic().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return GetMetadataStatic().reflection;
-  }
-  static const MWNNValueInfoProto& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MWNNValueInfoProto* internal_default_instance() {
-    return reinterpret_cast<const MWNNValueInfoProto*>(
-               &_MWNNValueInfoProto_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    0;
-
-  friend void swap(MWNNValueInfoProto& a, MWNNValueInfoProto& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(MWNNValueInfoProto* other) {
-    if (other == this) return;
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline MWNNValueInfoProto* New() const final {
-    return CreateMaybeMessage<MWNNValueInfoProto>(nullptr);
-  }
-
-  MWNNValueInfoProto* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MWNNValueInfoProto>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MWNNValueInfoProto& from);
-  void MergeFrom(const MWNNValueInfoProto& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  inline void SharedCtor();
-  inline void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(MWNNValueInfoProto* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "MWNN.MWNNValueInfoProto";
-  }
-  private:
-  inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_MWNN_2eproto);
-    return ::descriptor_table_MWNN_2eproto.file_level_metadata[kIndexInFileMessages];
-  }
-
-  public:
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kDimsFieldNumber = 3,
-    kNameFieldNumber = 1,
-    kTypeFieldNumber = 2,
-  };
-  // repeated int32 dims = 3;
-  int dims_size() const;
-  private:
-  int _internal_dims_size() const;
-  public:
-  void clear_dims();
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_dims(int index) const;
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-      _internal_dims() const;
-  void _internal_add_dims(::PROTOBUF_NAMESPACE_ID::int32 value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-      _internal_mutable_dims();
-  public:
-  ::PROTOBUF_NAMESPACE_ID::int32 dims(int index) const;
-  void set_dims(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
-  void add_dims(::PROTOBUF_NAMESPACE_ID::int32 value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-      dims() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-      mutable_dims();
-
-  // optional string name = 1;
-  bool has_name() const;
-  private:
-  bool _internal_has_name() const;
-  public:
-  void clear_name();
-  const std::string& name() const;
-  void set_name(const std::string& value);
-  void set_name(std::string&& value);
-  void set_name(const char* value);
-  void set_name(const char* value, size_t size);
-  std::string* mutable_name();
-  std::string* release_name();
-  void set_allocated_name(std::string* name);
-  private:
-  const std::string& _internal_name() const;
-  void _internal_set_name(const std::string& value);
-  std::string* _internal_mutable_name();
-  public:
-
-  // optional int32 type = 2;
-  bool has_type() const;
-  private:
-  bool _internal_has_type() const;
-  public:
-  void clear_type();
-  ::PROTOBUF_NAMESPACE_ID::int32 type() const;
-  void set_type(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_type() const;
-  void _internal_set_type(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
-  // @@protoc_insertion_point(class_scope:MWNN.MWNNValueInfoProto)
- private:
-  class _Internal;
-
-  ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
-  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > dims_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
-  ::PROTOBUF_NAMESPACE_ID::int32 type_;
-  friend struct ::TableStruct_MWNN_2eproto;
-};
-// -------------------------------------------------------------------
-
-class MWNNTensorProto_Segment :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:MWNN.MWNNTensorProto.Segment) */ {
- public:
-  MWNNTensorProto_Segment();
-  virtual ~MWNNTensorProto_Segment();
-
-  MWNNTensorProto_Segment(const MWNNTensorProto_Segment& from);
-  MWNNTensorProto_Segment(MWNNTensorProto_Segment&& from) noexcept
-    : MWNNTensorProto_Segment() {
-    *this = ::std::move(from);
-  }
-
-  inline MWNNTensorProto_Segment& operator=(const MWNNTensorProto_Segment& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline MWNNTensorProto_Segment& operator=(MWNNTensorProto_Segment&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
-  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return GetMetadataStatic().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return GetMetadataStatic().reflection;
-  }
-  static const MWNNTensorProto_Segment& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const MWNNTensorProto_Segment* internal_default_instance() {
-    return reinterpret_cast<const MWNNTensorProto_Segment*>(
-               &_MWNNTensorProto_Segment_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    1;
-
-  friend void swap(MWNNTensorProto_Segment& a, MWNNTensorProto_Segment& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(MWNNTensorProto_Segment* other) {
-    if (other == this) return;
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline MWNNTensorProto_Segment* New() const final {
-    return CreateMaybeMessage<MWNNTensorProto_Segment>(nullptr);
-  }
-
-  MWNNTensorProto_Segment* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MWNNTensorProto_Segment>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const MWNNTensorProto_Segment& from);
-  void MergeFrom(const MWNNTensorProto_Segment& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  inline void SharedCtor();
-  inline void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(MWNNTensorProto_Segment* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "MWNN.MWNNTensorProto.Segment";
-  }
-  private:
-  inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-  private:
-  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
-    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_MWNN_2eproto);
-    return ::descriptor_table_MWNN_2eproto.file_level_metadata[kIndexInFileMessages];
-  }
-
-  public:
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kBeginFieldNumber = 1,
-    kEndFieldNumber = 2,
-  };
-  // optional int64 begin = 1;
-  bool has_begin() const;
-  private:
-  bool _internal_has_begin() const;
-  public:
-  void clear_begin();
-  ::PROTOBUF_NAMESPACE_ID::int64 begin() const;
-  void set_begin(::PROTOBUF_NAMESPACE_ID::int64 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int64 _internal_begin() const;
-  void _internal_set_begin(::PROTOBUF_NAMESPACE_ID::int64 value);
-  public:
-
-  // optional int64 end = 2;
-  bool has_end() const;
-  private:
-  bool _internal_has_end() const;
-  public:
-  void clear_end();
-  ::PROTOBUF_NAMESPACE_ID::int64 end() const;
-  void set_end(::PROTOBUF_NAMESPACE_ID::int64 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int64 _internal_end() const;
-  void _internal_set_end(::PROTOBUF_NAMESPACE_ID::int64 value);
-  public:
-
-  // @@protoc_insertion_point(class_scope:MWNN.MWNNTensorProto.Segment)
- private:
-  class _Internal;
-
-  ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
-  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  ::PROTOBUF_NAMESPACE_ID::int64 begin_;
-  ::PROTOBUF_NAMESPACE_ID::int64 end_;
-  friend struct ::TableStruct_MWNN_2eproto;
-};
-// -------------------------------------------------------------------
 
 class MWNNTensorProto :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:MWNN.MWNNTensorProto) */ {
@@ -514,7 +127,7 @@ class MWNNTensorProto :
                &_MWNNTensorProto_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    0;
 
   friend void swap(MWNNTensorProto& a, MWNNTensorProto& b) {
     a.Swap(&b);
@@ -575,80 +188,15 @@ class MWNNTensorProto :
 
   // nested types ----------------------------------------------------
 
-  typedef MWNNTensorProto_Segment Segment;
-
-  typedef MWNNTensorProto_DataType DataType;
-  static constexpr DataType UNDEFINED =
-    MWNNTensorProto_DataType_UNDEFINED;
-  static constexpr DataType FLOAT =
-    MWNNTensorProto_DataType_FLOAT;
-  static constexpr DataType UINT8 =
-    MWNNTensorProto_DataType_UINT8;
-  static constexpr DataType INT8 =
-    MWNNTensorProto_DataType_INT8;
-  static constexpr DataType UINT16 =
-    MWNNTensorProto_DataType_UINT16;
-  static constexpr DataType INT16 =
-    MWNNTensorProto_DataType_INT16;
-  static constexpr DataType INT32 =
-    MWNNTensorProto_DataType_INT32;
-  static constexpr DataType INT64 =
-    MWNNTensorProto_DataType_INT64;
-  static constexpr DataType STRING =
-    MWNNTensorProto_DataType_STRING;
-  static constexpr DataType BOOL =
-    MWNNTensorProto_DataType_BOOL;
-  static constexpr DataType FLOAT16 =
-    MWNNTensorProto_DataType_FLOAT16;
-  static constexpr DataType DOUBLE =
-    MWNNTensorProto_DataType_DOUBLE;
-  static constexpr DataType UINT32 =
-    MWNNTensorProto_DataType_UINT32;
-  static constexpr DataType UINT64 =
-    MWNNTensorProto_DataType_UINT64;
-  static constexpr DataType COMPLEX64 =
-    MWNNTensorProto_DataType_COMPLEX64;
-  static constexpr DataType COMPLEX128 =
-    MWNNTensorProto_DataType_COMPLEX128;
-  static inline bool DataType_IsValid(int value) {
-    return MWNNTensorProto_DataType_IsValid(value);
-  }
-  static constexpr DataType DataType_MIN =
-    MWNNTensorProto_DataType_DataType_MIN;
-  static constexpr DataType DataType_MAX =
-    MWNNTensorProto_DataType_DataType_MAX;
-  static constexpr int DataType_ARRAYSIZE =
-    MWNNTensorProto_DataType_DataType_ARRAYSIZE;
-  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
-  DataType_descriptor() {
-    return MWNNTensorProto_DataType_descriptor();
-  }
-  template<typename T>
-  static inline const std::string& DataType_Name(T enum_t_value) {
-    static_assert(::std::is_same<T, DataType>::value ||
-      ::std::is_integral<T>::value,
-      "Incorrect type passed to function DataType_Name.");
-    return MWNNTensorProto_DataType_Name(enum_t_value);
-  }
-  static inline bool DataType_Parse(const std::string& name,
-      DataType* value) {
-    return MWNNTensorProto_DataType_Parse(name, value);
-  }
-
   // accessors -------------------------------------------------------
 
   enum : int {
-    kDimsFieldNumber = 1,
+    kDimsFieldNumber = 3,
     kFloatDataFieldNumber = 4,
-    kInt32DataFieldNumber = 5,
-    kStringDataFieldNumber = 6,
-    kInt64DataFieldNumber = 7,
-    kUint64DataFieldNumber = 11,
-    kNameFieldNumber = 8,
-    kSegmentFieldNumber = 3,
-    kDataTypeFieldNumber = 2,
+    kNameFieldNumber = 1,
+    kTypeFieldNumber = 2,
   };
-  // repeated int32 dims = 1;
+  // repeated int32 dims = 3;
   int dims_size() const;
   private:
   int _internal_dims_size() const;
@@ -692,97 +240,7 @@ class MWNNTensorProto :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
       mutable_float_data();
 
-  // repeated int32 int32_data = 5 [packed = true];
-  int int32_data_size() const;
-  private:
-  int _internal_int32_data_size() const;
-  public:
-  void clear_int32_data();
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_int32_data(int index) const;
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-      _internal_int32_data() const;
-  void _internal_add_int32_data(::PROTOBUF_NAMESPACE_ID::int32 value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-      _internal_mutable_int32_data();
-  public:
-  ::PROTOBUF_NAMESPACE_ID::int32 int32_data(int index) const;
-  void set_int32_data(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
-  void add_int32_data(::PROTOBUF_NAMESPACE_ID::int32 value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-      int32_data() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-      mutable_int32_data();
-
-  // repeated bytes string_data = 6;
-  int string_data_size() const;
-  private:
-  int _internal_string_data_size() const;
-  public:
-  void clear_string_data();
-  const std::string& string_data(int index) const;
-  std::string* mutable_string_data(int index);
-  void set_string_data(int index, const std::string& value);
-  void set_string_data(int index, std::string&& value);
-  void set_string_data(int index, const char* value);
-  void set_string_data(int index, const void* value, size_t size);
-  std::string* add_string_data();
-  void add_string_data(const std::string& value);
-  void add_string_data(std::string&& value);
-  void add_string_data(const char* value);
-  void add_string_data(const void* value, size_t size);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& string_data() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_string_data();
-  private:
-  const std::string& _internal_string_data(int index) const;
-  std::string* _internal_add_string_data();
-  public:
-
-  // repeated int64 int64_data = 7 [packed = true];
-  int int64_data_size() const;
-  private:
-  int _internal_int64_data_size() const;
-  public:
-  void clear_int64_data();
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int64 _internal_int64_data(int index) const;
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >&
-      _internal_int64_data() const;
-  void _internal_add_int64_data(::PROTOBUF_NAMESPACE_ID::int64 value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >*
-      _internal_mutable_int64_data();
-  public:
-  ::PROTOBUF_NAMESPACE_ID::int64 int64_data(int index) const;
-  void set_int64_data(int index, ::PROTOBUF_NAMESPACE_ID::int64 value);
-  void add_int64_data(::PROTOBUF_NAMESPACE_ID::int64 value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >&
-      int64_data() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >*
-      mutable_int64_data();
-
-  // repeated uint64 uint64_data = 11 [packed = true];
-  int uint64_data_size() const;
-  private:
-  int _internal_uint64_data_size() const;
-  public:
-  void clear_uint64_data();
-  private:
-  ::PROTOBUF_NAMESPACE_ID::uint64 _internal_uint64_data(int index) const;
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint64 >&
-      _internal_uint64_data() const;
-  void _internal_add_uint64_data(::PROTOBUF_NAMESPACE_ID::uint64 value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint64 >*
-      _internal_mutable_uint64_data();
-  public:
-  ::PROTOBUF_NAMESPACE_ID::uint64 uint64_data(int index) const;
-  void set_uint64_data(int index, ::PROTOBUF_NAMESPACE_ID::uint64 value);
-  void add_uint64_data(::PROTOBUF_NAMESPACE_ID::uint64 value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint64 >&
-      uint64_data() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint64 >*
-      mutable_uint64_data();
-
-  // optional string name = 8;
+  // optional string name = 1;
   bool has_name() const;
   private:
   bool _internal_has_name() const;
@@ -802,32 +260,17 @@ class MWNNTensorProto :
   std::string* _internal_mutable_name();
   public:
 
-  // optional .MWNN.MWNNTensorProto.Segment segment = 3;
-  bool has_segment() const;
+  // optional int32 type = 2;
+  bool has_type() const;
   private:
-  bool _internal_has_segment() const;
+  bool _internal_has_type() const;
   public:
-  void clear_segment();
-  const ::MWNN::MWNNTensorProto_Segment& segment() const;
-  ::MWNN::MWNNTensorProto_Segment* release_segment();
-  ::MWNN::MWNNTensorProto_Segment* mutable_segment();
-  void set_allocated_segment(::MWNN::MWNNTensorProto_Segment* segment);
+  void clear_type();
+  ::PROTOBUF_NAMESPACE_ID::int32 type() const;
+  void set_type(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
-  const ::MWNN::MWNNTensorProto_Segment& _internal_segment() const;
-  ::MWNN::MWNNTensorProto_Segment* _internal_mutable_segment();
-  public:
-
-  // optional int32 data_type = 2;
-  bool has_data_type() const;
-  private:
-  bool _internal_has_data_type() const;
-  public:
-  void clear_data_type();
-  ::PROTOBUF_NAMESPACE_ID::int32 data_type() const;
-  void set_data_type(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_data_type() const;
-  void _internal_set_data_type(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_type() const;
+  void _internal_set_type(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // @@protoc_insertion_point(class_scope:MWNN.MWNNTensorProto)
@@ -840,16 +283,8 @@ class MWNNTensorProto :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > dims_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > float_data_;
   mutable std::atomic<int> _float_data_cached_byte_size_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > int32_data_;
-  mutable std::atomic<int> _int32_data_cached_byte_size_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> string_data_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 > int64_data_;
-  mutable std::atomic<int> _int64_data_cached_byte_size_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint64 > uint64_data_;
-  mutable std::atomic<int> _uint64_data_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
-  ::MWNN::MWNNTensorProto_Segment* segment_;
-  ::PROTOBUF_NAMESPACE_ID::int32 data_type_;
+  ::PROTOBUF_NAMESPACE_ID::int32 type_;
   friend struct ::TableStruct_MWNN_2eproto;
 };
 // -------------------------------------------------------------------
@@ -903,7 +338,7 @@ class MWNNAttributeProto :
                &_MWNNAttributeProto_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    1;
 
   friend void swap(MWNNAttributeProto& a, MWNNAttributeProto& b) {
     a.Swap(&b);
@@ -967,55 +402,78 @@ class MWNNAttributeProto :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kIntsFieldNumber = 8,
-    kDataFieldNumber = 9,
+    kIntDataFieldNumber = 3,
+    kFloatDataFieldNumber = 4,
+    kStringDataFieldNumber = 5,
     kNameFieldNumber = 1,
-    kTypeFieldNumber = 20,
+    kTypeFieldNumber = 2,
   };
-  // repeated int32 ints = 8;
-  int ints_size() const;
+  // repeated int32 int_data = 3;
+  int int_data_size() const;
   private:
-  int _internal_ints_size() const;
+  int _internal_int_data_size() const;
   public:
-  void clear_ints();
+  void clear_int_data();
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_ints(int index) const;
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_int_data(int index) const;
   const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-      _internal_ints() const;
-  void _internal_add_ints(::PROTOBUF_NAMESPACE_ID::int32 value);
+      _internal_int_data() const;
+  void _internal_add_int_data(::PROTOBUF_NAMESPACE_ID::int32 value);
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-      _internal_mutable_ints();
+      _internal_mutable_int_data();
   public:
-  ::PROTOBUF_NAMESPACE_ID::int32 ints(int index) const;
-  void set_ints(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
-  void add_ints(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int32 int_data(int index) const;
+  void set_int_data(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
+  void add_int_data(::PROTOBUF_NAMESPACE_ID::int32 value);
   const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-      ints() const;
+      int_data() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-      mutable_ints();
+      mutable_int_data();
 
-  // repeated string data = 9;
-  int data_size() const;
+  // repeated float float_data = 4;
+  int float_data_size() const;
   private:
-  int _internal_data_size() const;
+  int _internal_float_data_size() const;
   public:
-  void clear_data();
-  const std::string& data(int index) const;
-  std::string* mutable_data(int index);
-  void set_data(int index, const std::string& value);
-  void set_data(int index, std::string&& value);
-  void set_data(int index, const char* value);
-  void set_data(int index, const char* value, size_t size);
-  std::string* add_data();
-  void add_data(const std::string& value);
-  void add_data(std::string&& value);
-  void add_data(const char* value);
-  void add_data(const char* value, size_t size);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& data() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_data();
+  void clear_float_data();
   private:
-  const std::string& _internal_data(int index) const;
-  std::string* _internal_add_data();
+  float _internal_float_data(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_float_data() const;
+  void _internal_add_float_data(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_float_data();
+  public:
+  float float_data(int index) const;
+  void set_float_data(int index, float value);
+  void add_float_data(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      float_data() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_float_data();
+
+  // repeated string string_data = 5;
+  int string_data_size() const;
+  private:
+  int _internal_string_data_size() const;
+  public:
+  void clear_string_data();
+  const std::string& string_data(int index) const;
+  std::string* mutable_string_data(int index);
+  void set_string_data(int index, const std::string& value);
+  void set_string_data(int index, std::string&& value);
+  void set_string_data(int index, const char* value);
+  void set_string_data(int index, const char* value, size_t size);
+  std::string* add_string_data();
+  void add_string_data(const std::string& value);
+  void add_string_data(std::string&& value);
+  void add_string_data(const char* value);
+  void add_string_data(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& string_data() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_string_data();
+  private:
+  const std::string& _internal_string_data(int index) const;
+  std::string* _internal_add_string_data();
   public:
 
   // optional string name = 1;
@@ -1038,7 +496,7 @@ class MWNNAttributeProto :
   std::string* _internal_mutable_name();
   public:
 
-  // optional int32 type = 20;
+  // optional int32 type = 2;
   bool has_type() const;
   private:
   bool _internal_has_type() const;
@@ -1058,8 +516,9 @@ class MWNNAttributeProto :
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > ints_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> data_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > int_data_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > float_data_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> string_data_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::int32 type_;
   friend struct ::TableStruct_MWNN_2eproto;
@@ -1115,7 +574,7 @@ class MWNNNodeProto :
                &_MWNNNodeProto_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    2;
 
   friend void swap(MWNNNodeProto& a, MWNNNodeProto& b) {
     a.Swap(&b);
@@ -1179,59 +638,58 @@ class MWNNNodeProto :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kInputFieldNumber = 1,
-    kOutputFieldNumber = 2,
+    kIpNameFieldNumber = 3,
+    kOpNameFieldNumber = 4,
     kAttributeFieldNumber = 5,
-    kNameFieldNumber = 3,
-    kOpTypeFieldNumber = 4,
-    kDomainFieldNumber = 7,
+    kNameFieldNumber = 1,
+    kOpTypeFieldNumber = 2,
   };
-  // repeated string input = 1;
-  int input_size() const;
+  // repeated string ip_name = 3;
+  int ip_name_size() const;
   private:
-  int _internal_input_size() const;
+  int _internal_ip_name_size() const;
   public:
-  void clear_input();
-  const std::string& input(int index) const;
-  std::string* mutable_input(int index);
-  void set_input(int index, const std::string& value);
-  void set_input(int index, std::string&& value);
-  void set_input(int index, const char* value);
-  void set_input(int index, const char* value, size_t size);
-  std::string* add_input();
-  void add_input(const std::string& value);
-  void add_input(std::string&& value);
-  void add_input(const char* value);
-  void add_input(const char* value, size_t size);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& input() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_input();
+  void clear_ip_name();
+  const std::string& ip_name(int index) const;
+  std::string* mutable_ip_name(int index);
+  void set_ip_name(int index, const std::string& value);
+  void set_ip_name(int index, std::string&& value);
+  void set_ip_name(int index, const char* value);
+  void set_ip_name(int index, const char* value, size_t size);
+  std::string* add_ip_name();
+  void add_ip_name(const std::string& value);
+  void add_ip_name(std::string&& value);
+  void add_ip_name(const char* value);
+  void add_ip_name(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& ip_name() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_ip_name();
   private:
-  const std::string& _internal_input(int index) const;
-  std::string* _internal_add_input();
+  const std::string& _internal_ip_name(int index) const;
+  std::string* _internal_add_ip_name();
   public:
 
-  // repeated string output = 2;
-  int output_size() const;
+  // repeated string op_name = 4;
+  int op_name_size() const;
   private:
-  int _internal_output_size() const;
+  int _internal_op_name_size() const;
   public:
-  void clear_output();
-  const std::string& output(int index) const;
-  std::string* mutable_output(int index);
-  void set_output(int index, const std::string& value);
-  void set_output(int index, std::string&& value);
-  void set_output(int index, const char* value);
-  void set_output(int index, const char* value, size_t size);
-  std::string* add_output();
-  void add_output(const std::string& value);
-  void add_output(std::string&& value);
-  void add_output(const char* value);
-  void add_output(const char* value, size_t size);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& output() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_output();
+  void clear_op_name();
+  const std::string& op_name(int index) const;
+  std::string* mutable_op_name(int index);
+  void set_op_name(int index, const std::string& value);
+  void set_op_name(int index, std::string&& value);
+  void set_op_name(int index, const char* value);
+  void set_op_name(int index, const char* value, size_t size);
+  std::string* add_op_name();
+  void add_op_name(const std::string& value);
+  void add_op_name(std::string&& value);
+  void add_op_name(const char* value);
+  void add_op_name(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& op_name() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_op_name();
   private:
-  const std::string& _internal_output(int index) const;
-  std::string* _internal_add_output();
+  const std::string& _internal_op_name(int index) const;
+  std::string* _internal_add_op_name();
   public:
 
   // repeated .MWNN.MWNNAttributeProto attribute = 5;
@@ -1252,7 +710,7 @@ class MWNNNodeProto :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNAttributeProto >&
       attribute() const;
 
-  // optional string name = 3;
+  // optional string name = 1;
   bool has_name() const;
   private:
   bool _internal_has_name() const;
@@ -1272,7 +730,7 @@ class MWNNNodeProto :
   std::string* _internal_mutable_name();
   public:
 
-  // optional string op_type = 4;
+  // optional string op_type = 2;
   bool has_op_type() const;
   private:
   bool _internal_has_op_type() const;
@@ -1292,26 +750,6 @@ class MWNNNodeProto :
   std::string* _internal_mutable_op_type();
   public:
 
-  // optional string domain = 7;
-  bool has_domain() const;
-  private:
-  bool _internal_has_domain() const;
-  public:
-  void clear_domain();
-  const std::string& domain() const;
-  void set_domain(const std::string& value);
-  void set_domain(std::string&& value);
-  void set_domain(const char* value);
-  void set_domain(const char* value, size_t size);
-  std::string* mutable_domain();
-  std::string* release_domain();
-  void set_allocated_domain(std::string* domain);
-  private:
-  const std::string& _internal_domain() const;
-  void _internal_set_domain(const std::string& value);
-  std::string* _internal_mutable_domain();
-  public:
-
   // @@protoc_insertion_point(class_scope:MWNN.MWNNNodeProto)
  private:
   class _Internal;
@@ -1319,12 +757,11 @@ class MWNNNodeProto :
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> input_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> output_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> ip_name_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> op_name_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNAttributeProto > attribute_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr op_type_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr domain_;
   friend struct ::TableStruct_MWNN_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1378,7 +815,7 @@ class MWNNGraphProto :
                &_MWNNGraphProto_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    3;
 
   friend void swap(MWNNGraphProto& a, MWNNGraphProto& b) {
     a.Swap(&b);
@@ -1442,15 +879,63 @@ class MWNNGraphProto :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kNodeFieldNumber = 1,
+    kIpNameFieldNumber = 2,
+    kOpNameFieldNumber = 3,
+    kNodeFieldNumber = 4,
     kInitializerFieldNumber = 5,
-    kInputFieldNumber = 11,
-    kOutputFieldNumber = 12,
-    kNameFieldNumber = 2,
-    kGraphInputFieldNumber = 3,
-    kGraphOutputFieldNumber = 4,
+    kInputFieldNumber = 6,
+    kOutputFieldNumber = 7,
+    kNameFieldNumber = 1,
   };
-  // repeated .MWNN.MWNNNodeProto node = 1;
+  // repeated string ip_name = 2;
+  int ip_name_size() const;
+  private:
+  int _internal_ip_name_size() const;
+  public:
+  void clear_ip_name();
+  const std::string& ip_name(int index) const;
+  std::string* mutable_ip_name(int index);
+  void set_ip_name(int index, const std::string& value);
+  void set_ip_name(int index, std::string&& value);
+  void set_ip_name(int index, const char* value);
+  void set_ip_name(int index, const char* value, size_t size);
+  std::string* add_ip_name();
+  void add_ip_name(const std::string& value);
+  void add_ip_name(std::string&& value);
+  void add_ip_name(const char* value);
+  void add_ip_name(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& ip_name() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_ip_name();
+  private:
+  const std::string& _internal_ip_name(int index) const;
+  std::string* _internal_add_ip_name();
+  public:
+
+  // repeated string op_name = 3;
+  int op_name_size() const;
+  private:
+  int _internal_op_name_size() const;
+  public:
+  void clear_op_name();
+  const std::string& op_name(int index) const;
+  std::string* mutable_op_name(int index);
+  void set_op_name(int index, const std::string& value);
+  void set_op_name(int index, std::string&& value);
+  void set_op_name(int index, const char* value);
+  void set_op_name(int index, const char* value, size_t size);
+  std::string* add_op_name();
+  void add_op_name(const std::string& value);
+  void add_op_name(std::string&& value);
+  void add_op_name(const char* value);
+  void add_op_name(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& op_name() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_op_name();
+  private:
+  const std::string& _internal_op_name(int index) const;
+  std::string* _internal_add_op_name();
+  public:
+
+  // repeated .MWNN.MWNNNodeProto node = 4;
   int node_size() const;
   private:
   int _internal_node_size() const;
@@ -1486,43 +971,43 @@ class MWNNGraphProto :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto >&
       initializer() const;
 
-  // repeated .MWNN.MWNNValueInfoProto input = 11;
+  // repeated .MWNN.MWNNTensorProto input = 6;
   int input_size() const;
   private:
   int _internal_input_size() const;
   public:
   void clear_input();
-  ::MWNN::MWNNValueInfoProto* mutable_input(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto >*
+  ::MWNN::MWNNTensorProto* mutable_input(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto >*
       mutable_input();
   private:
-  const ::MWNN::MWNNValueInfoProto& _internal_input(int index) const;
-  ::MWNN::MWNNValueInfoProto* _internal_add_input();
+  const ::MWNN::MWNNTensorProto& _internal_input(int index) const;
+  ::MWNN::MWNNTensorProto* _internal_add_input();
   public:
-  const ::MWNN::MWNNValueInfoProto& input(int index) const;
-  ::MWNN::MWNNValueInfoProto* add_input();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto >&
+  const ::MWNN::MWNNTensorProto& input(int index) const;
+  ::MWNN::MWNNTensorProto* add_input();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto >&
       input() const;
 
-  // repeated .MWNN.MWNNValueInfoProto output = 12;
+  // repeated .MWNN.MWNNTensorProto output = 7;
   int output_size() const;
   private:
   int _internal_output_size() const;
   public:
   void clear_output();
-  ::MWNN::MWNNValueInfoProto* mutable_output(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto >*
+  ::MWNN::MWNNTensorProto* mutable_output(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto >*
       mutable_output();
   private:
-  const ::MWNN::MWNNValueInfoProto& _internal_output(int index) const;
-  ::MWNN::MWNNValueInfoProto* _internal_add_output();
+  const ::MWNN::MWNNTensorProto& _internal_output(int index) const;
+  ::MWNN::MWNNTensorProto* _internal_add_output();
   public:
-  const ::MWNN::MWNNValueInfoProto& output(int index) const;
-  ::MWNN::MWNNValueInfoProto* add_output();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto >&
+  const ::MWNN::MWNNTensorProto& output(int index) const;
+  ::MWNN::MWNNTensorProto* add_output();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto >&
       output() const;
 
-  // optional string name = 2;
+  // optional string name = 1;
   bool has_name() const;
   private:
   bool _internal_has_name() const;
@@ -1542,46 +1027,6 @@ class MWNNGraphProto :
   std::string* _internal_mutable_name();
   public:
 
-  // optional string graph_input = 3;
-  bool has_graph_input() const;
-  private:
-  bool _internal_has_graph_input() const;
-  public:
-  void clear_graph_input();
-  const std::string& graph_input() const;
-  void set_graph_input(const std::string& value);
-  void set_graph_input(std::string&& value);
-  void set_graph_input(const char* value);
-  void set_graph_input(const char* value, size_t size);
-  std::string* mutable_graph_input();
-  std::string* release_graph_input();
-  void set_allocated_graph_input(std::string* graph_input);
-  private:
-  const std::string& _internal_graph_input() const;
-  void _internal_set_graph_input(const std::string& value);
-  std::string* _internal_mutable_graph_input();
-  public:
-
-  // optional string graph_output = 4;
-  bool has_graph_output() const;
-  private:
-  bool _internal_has_graph_output() const;
-  public:
-  void clear_graph_output();
-  const std::string& graph_output() const;
-  void set_graph_output(const std::string& value);
-  void set_graph_output(std::string&& value);
-  void set_graph_output(const char* value);
-  void set_graph_output(const char* value, size_t size);
-  std::string* mutable_graph_output();
-  std::string* release_graph_output();
-  void set_allocated_graph_output(std::string* graph_output);
-  private:
-  const std::string& _internal_graph_output() const;
-  void _internal_set_graph_output(const std::string& value);
-  std::string* _internal_mutable_graph_output();
-  public:
-
   // @@protoc_insertion_point(class_scope:MWNN.MWNNGraphProto)
  private:
   class _Internal;
@@ -1589,13 +1034,13 @@ class MWNNGraphProto :
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> ip_name_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> op_name_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNNodeProto > node_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto > initializer_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto > input_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto > output_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto > input_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto > output_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr graph_input_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr graph_output_;
   friend struct ::TableStruct_MWNN_2eproto;
 };
 // ===================================================================
@@ -1607,569 +1052,9 @@ class MWNNGraphProto :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// MWNNValueInfoProto
-
-// optional string name = 1;
-inline bool MWNNValueInfoProto::_internal_has_name() const {
-  bool value = (_has_bits_[0] & 0x00000001u) != 0;
-  return value;
-}
-inline bool MWNNValueInfoProto::has_name() const {
-  return _internal_has_name();
-}
-inline void MWNNValueInfoProto::clear_name() {
-  name_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline const std::string& MWNNValueInfoProto::name() const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNValueInfoProto.name)
-  return _internal_name();
-}
-inline void MWNNValueInfoProto::set_name(const std::string& value) {
-  _internal_set_name(value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNValueInfoProto.name)
-}
-inline std::string* MWNNValueInfoProto::mutable_name() {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNValueInfoProto.name)
-  return _internal_mutable_name();
-}
-inline const std::string& MWNNValueInfoProto::_internal_name() const {
-  return name_.GetNoArena();
-}
-inline void MWNNValueInfoProto::_internal_set_name(const std::string& value) {
-  _has_bits_[0] |= 0x00000001u;
-  name_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
-}
-inline void MWNNValueInfoProto::set_name(std::string&& value) {
-  _has_bits_[0] |= 0x00000001u;
-  name_.SetNoArena(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:MWNN.MWNNValueInfoProto.name)
-}
-inline void MWNNValueInfoProto::set_name(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  _has_bits_[0] |= 0x00000001u;
-  name_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:MWNN.MWNNValueInfoProto.name)
-}
-inline void MWNNValueInfoProto::set_name(const char* value, size_t size) {
-  _has_bits_[0] |= 0x00000001u;
-  name_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNValueInfoProto.name)
-}
-inline std::string* MWNNValueInfoProto::_internal_mutable_name() {
-  _has_bits_[0] |= 0x00000001u;
-  return name_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-}
-inline std::string* MWNNValueInfoProto::release_name() {
-  // @@protoc_insertion_point(field_release:MWNN.MWNNValueInfoProto.name)
-  if (!_internal_has_name()) {
-    return nullptr;
-  }
-  _has_bits_[0] &= ~0x00000001u;
-  return name_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-}
-inline void MWNNValueInfoProto::set_allocated_name(std::string* name) {
-  if (name != nullptr) {
-    _has_bits_[0] |= 0x00000001u;
-  } else {
-    _has_bits_[0] &= ~0x00000001u;
-  }
-  name_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name);
-  // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNValueInfoProto.name)
-}
-
-// optional int32 type = 2;
-inline bool MWNNValueInfoProto::_internal_has_type() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
-  return value;
-}
-inline bool MWNNValueInfoProto::has_type() const {
-  return _internal_has_type();
-}
-inline void MWNNValueInfoProto::clear_type() {
-  type_ = 0;
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNValueInfoProto::_internal_type() const {
-  return type_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNValueInfoProto::type() const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNValueInfoProto.type)
-  return _internal_type();
-}
-inline void MWNNValueInfoProto::_internal_set_type(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000002u;
-  type_ = value;
-}
-inline void MWNNValueInfoProto::set_type(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_type(value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNValueInfoProto.type)
-}
-
-// repeated int32 dims = 3;
-inline int MWNNValueInfoProto::_internal_dims_size() const {
-  return dims_.size();
-}
-inline int MWNNValueInfoProto::dims_size() const {
-  return _internal_dims_size();
-}
-inline void MWNNValueInfoProto::clear_dims() {
-  dims_.Clear();
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNValueInfoProto::_internal_dims(int index) const {
-  return dims_.Get(index);
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNValueInfoProto::dims(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNValueInfoProto.dims)
-  return _internal_dims(index);
-}
-inline void MWNNValueInfoProto::set_dims(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
-  dims_.Set(index, value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNValueInfoProto.dims)
-}
-inline void MWNNValueInfoProto::_internal_add_dims(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  dims_.Add(value);
-}
-inline void MWNNValueInfoProto::add_dims(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_add_dims(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNValueInfoProto.dims)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MWNNValueInfoProto::_internal_dims() const {
-  return dims_;
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MWNNValueInfoProto::dims() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNValueInfoProto.dims)
-  return _internal_dims();
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MWNNValueInfoProto::_internal_mutable_dims() {
-  return &dims_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MWNNValueInfoProto::mutable_dims() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNValueInfoProto.dims)
-  return _internal_mutable_dims();
-}
-
-// -------------------------------------------------------------------
-
-// MWNNTensorProto_Segment
-
-// optional int64 begin = 1;
-inline bool MWNNTensorProto_Segment::_internal_has_begin() const {
-  bool value = (_has_bits_[0] & 0x00000001u) != 0;
-  return value;
-}
-inline bool MWNNTensorProto_Segment::has_begin() const {
-  return _internal_has_begin();
-}
-inline void MWNNTensorProto_Segment::clear_begin() {
-  begin_ = PROTOBUF_LONGLONG(0);
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 MWNNTensorProto_Segment::_internal_begin() const {
-  return begin_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 MWNNTensorProto_Segment::begin() const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.Segment.begin)
-  return _internal_begin();
-}
-inline void MWNNTensorProto_Segment::_internal_set_begin(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _has_bits_[0] |= 0x00000001u;
-  begin_ = value;
-}
-inline void MWNNTensorProto_Segment::set_begin(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _internal_set_begin(value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.Segment.begin)
-}
-
-// optional int64 end = 2;
-inline bool MWNNTensorProto_Segment::_internal_has_end() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
-  return value;
-}
-inline bool MWNNTensorProto_Segment::has_end() const {
-  return _internal_has_end();
-}
-inline void MWNNTensorProto_Segment::clear_end() {
-  end_ = PROTOBUF_LONGLONG(0);
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 MWNNTensorProto_Segment::_internal_end() const {
-  return end_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 MWNNTensorProto_Segment::end() const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.Segment.end)
-  return _internal_end();
-}
-inline void MWNNTensorProto_Segment::_internal_set_end(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _has_bits_[0] |= 0x00000002u;
-  end_ = value;
-}
-inline void MWNNTensorProto_Segment::set_end(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _internal_set_end(value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.Segment.end)
-}
-
-// -------------------------------------------------------------------
-
 // MWNNTensorProto
 
-// repeated int32 dims = 1;
-inline int MWNNTensorProto::_internal_dims_size() const {
-  return dims_.size();
-}
-inline int MWNNTensorProto::dims_size() const {
-  return _internal_dims_size();
-}
-inline void MWNNTensorProto::clear_dims() {
-  dims_.Clear();
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::_internal_dims(int index) const {
-  return dims_.Get(index);
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::dims(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.dims)
-  return _internal_dims(index);
-}
-inline void MWNNTensorProto::set_dims(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
-  dims_.Set(index, value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.dims)
-}
-inline void MWNNTensorProto::_internal_add_dims(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  dims_.Add(value);
-}
-inline void MWNNTensorProto::add_dims(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_add_dims(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNTensorProto.dims)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MWNNTensorProto::_internal_dims() const {
-  return dims_;
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MWNNTensorProto::dims() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNTensorProto.dims)
-  return _internal_dims();
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MWNNTensorProto::_internal_mutable_dims() {
-  return &dims_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MWNNTensorProto::mutable_dims() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNTensorProto.dims)
-  return _internal_mutable_dims();
-}
-
-// optional int32 data_type = 2;
-inline bool MWNNTensorProto::_internal_has_data_type() const {
-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
-  return value;
-}
-inline bool MWNNTensorProto::has_data_type() const {
-  return _internal_has_data_type();
-}
-inline void MWNNTensorProto::clear_data_type() {
-  data_type_ = 0;
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::_internal_data_type() const {
-  return data_type_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::data_type() const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.data_type)
-  return _internal_data_type();
-}
-inline void MWNNTensorProto::_internal_set_data_type(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000004u;
-  data_type_ = value;
-}
-inline void MWNNTensorProto::set_data_type(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_data_type(value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.data_type)
-}
-
-// optional .MWNN.MWNNTensorProto.Segment segment = 3;
-inline bool MWNNTensorProto::_internal_has_segment() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
-  PROTOBUF_ASSUME(!value || segment_ != nullptr);
-  return value;
-}
-inline bool MWNNTensorProto::has_segment() const {
-  return _internal_has_segment();
-}
-inline void MWNNTensorProto::clear_segment() {
-  if (segment_ != nullptr) segment_->Clear();
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline const ::MWNN::MWNNTensorProto_Segment& MWNNTensorProto::_internal_segment() const {
-  const ::MWNN::MWNNTensorProto_Segment* p = segment_;
-  return p != nullptr ? *p : *reinterpret_cast<const ::MWNN::MWNNTensorProto_Segment*>(
-      &::MWNN::_MWNNTensorProto_Segment_default_instance_);
-}
-inline const ::MWNN::MWNNTensorProto_Segment& MWNNTensorProto::segment() const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.segment)
-  return _internal_segment();
-}
-inline ::MWNN::MWNNTensorProto_Segment* MWNNTensorProto::release_segment() {
-  // @@protoc_insertion_point(field_release:MWNN.MWNNTensorProto.segment)
-  _has_bits_[0] &= ~0x00000002u;
-  ::MWNN::MWNNTensorProto_Segment* temp = segment_;
-  segment_ = nullptr;
-  return temp;
-}
-inline ::MWNN::MWNNTensorProto_Segment* MWNNTensorProto::_internal_mutable_segment() {
-  _has_bits_[0] |= 0x00000002u;
-  if (segment_ == nullptr) {
-    auto* p = CreateMaybeMessage<::MWNN::MWNNTensorProto_Segment>(GetArenaNoVirtual());
-    segment_ = p;
-  }
-  return segment_;
-}
-inline ::MWNN::MWNNTensorProto_Segment* MWNNTensorProto::mutable_segment() {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNTensorProto.segment)
-  return _internal_mutable_segment();
-}
-inline void MWNNTensorProto::set_allocated_segment(::MWNN::MWNNTensorProto_Segment* segment) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete segment_;
-  }
-  if (segment) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      segment = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, segment, submessage_arena);
-    }
-    _has_bits_[0] |= 0x00000002u;
-  } else {
-    _has_bits_[0] &= ~0x00000002u;
-  }
-  segment_ = segment;
-  // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNTensorProto.segment)
-}
-
-// repeated float float_data = 4 [packed = true];
-inline int MWNNTensorProto::_internal_float_data_size() const {
-  return float_data_.size();
-}
-inline int MWNNTensorProto::float_data_size() const {
-  return _internal_float_data_size();
-}
-inline void MWNNTensorProto::clear_float_data() {
-  float_data_.Clear();
-}
-inline float MWNNTensorProto::_internal_float_data(int index) const {
-  return float_data_.Get(index);
-}
-inline float MWNNTensorProto::float_data(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.float_data)
-  return _internal_float_data(index);
-}
-inline void MWNNTensorProto::set_float_data(int index, float value) {
-  float_data_.Set(index, value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.float_data)
-}
-inline void MWNNTensorProto::_internal_add_float_data(float value) {
-  float_data_.Add(value);
-}
-inline void MWNNTensorProto::add_float_data(float value) {
-  _internal_add_float_data(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNTensorProto.float_data)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-MWNNTensorProto::_internal_float_data() const {
-  return float_data_;
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
-MWNNTensorProto::float_data() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNTensorProto.float_data)
-  return _internal_float_data();
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-MWNNTensorProto::_internal_mutable_float_data() {
-  return &float_data_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
-MWNNTensorProto::mutable_float_data() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNTensorProto.float_data)
-  return _internal_mutable_float_data();
-}
-
-// repeated int32 int32_data = 5 [packed = true];
-inline int MWNNTensorProto::_internal_int32_data_size() const {
-  return int32_data_.size();
-}
-inline int MWNNTensorProto::int32_data_size() const {
-  return _internal_int32_data_size();
-}
-inline void MWNNTensorProto::clear_int32_data() {
-  int32_data_.Clear();
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::_internal_int32_data(int index) const {
-  return int32_data_.Get(index);
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::int32_data(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.int32_data)
-  return _internal_int32_data(index);
-}
-inline void MWNNTensorProto::set_int32_data(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
-  int32_data_.Set(index, value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.int32_data)
-}
-inline void MWNNTensorProto::_internal_add_int32_data(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  int32_data_.Add(value);
-}
-inline void MWNNTensorProto::add_int32_data(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_add_int32_data(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNTensorProto.int32_data)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MWNNTensorProto::_internal_int32_data() const {
-  return int32_data_;
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MWNNTensorProto::int32_data() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNTensorProto.int32_data)
-  return _internal_int32_data();
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MWNNTensorProto::_internal_mutable_int32_data() {
-  return &int32_data_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MWNNTensorProto::mutable_int32_data() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNTensorProto.int32_data)
-  return _internal_mutable_int32_data();
-}
-
-// repeated bytes string_data = 6;
-inline int MWNNTensorProto::_internal_string_data_size() const {
-  return string_data_.size();
-}
-inline int MWNNTensorProto::string_data_size() const {
-  return _internal_string_data_size();
-}
-inline void MWNNTensorProto::clear_string_data() {
-  string_data_.Clear();
-}
-inline std::string* MWNNTensorProto::add_string_data() {
-  // @@protoc_insertion_point(field_add_mutable:MWNN.MWNNTensorProto.string_data)
-  return _internal_add_string_data();
-}
-inline const std::string& MWNNTensorProto::_internal_string_data(int index) const {
-  return string_data_.Get(index);
-}
-inline const std::string& MWNNTensorProto::string_data(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.string_data)
-  return _internal_string_data(index);
-}
-inline std::string* MWNNTensorProto::mutable_string_data(int index) {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNTensorProto.string_data)
-  return string_data_.Mutable(index);
-}
-inline void MWNNTensorProto::set_string_data(int index, const std::string& value) {
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.string_data)
-  string_data_.Mutable(index)->assign(value);
-}
-inline void MWNNTensorProto::set_string_data(int index, std::string&& value) {
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.string_data)
-  string_data_.Mutable(index)->assign(std::move(value));
-}
-inline void MWNNTensorProto::set_string_data(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  string_data_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:MWNN.MWNNTensorProto.string_data)
-}
-inline void MWNNTensorProto::set_string_data(int index, const void* value, size_t size) {
-  string_data_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNTensorProto.string_data)
-}
-inline std::string* MWNNTensorProto::_internal_add_string_data() {
-  return string_data_.Add();
-}
-inline void MWNNTensorProto::add_string_data(const std::string& value) {
-  string_data_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNTensorProto.string_data)
-}
-inline void MWNNTensorProto::add_string_data(std::string&& value) {
-  string_data_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:MWNN.MWNNTensorProto.string_data)
-}
-inline void MWNNTensorProto::add_string_data(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  string_data_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:MWNN.MWNNTensorProto.string_data)
-}
-inline void MWNNTensorProto::add_string_data(const void* value, size_t size) {
-  string_data_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:MWNN.MWNNTensorProto.string_data)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
-MWNNTensorProto::string_data() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNTensorProto.string_data)
-  return string_data_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
-MWNNTensorProto::mutable_string_data() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNTensorProto.string_data)
-  return &string_data_;
-}
-
-// repeated int64 int64_data = 7 [packed = true];
-inline int MWNNTensorProto::_internal_int64_data_size() const {
-  return int64_data_.size();
-}
-inline int MWNNTensorProto::int64_data_size() const {
-  return _internal_int64_data_size();
-}
-inline void MWNNTensorProto::clear_int64_data() {
-  int64_data_.Clear();
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 MWNNTensorProto::_internal_int64_data(int index) const {
-  return int64_data_.Get(index);
-}
-inline ::PROTOBUF_NAMESPACE_ID::int64 MWNNTensorProto::int64_data(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.int64_data)
-  return _internal_int64_data(index);
-}
-inline void MWNNTensorProto::set_int64_data(int index, ::PROTOBUF_NAMESPACE_ID::int64 value) {
-  int64_data_.Set(index, value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.int64_data)
-}
-inline void MWNNTensorProto::_internal_add_int64_data(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  int64_data_.Add(value);
-}
-inline void MWNNTensorProto::add_int64_data(::PROTOBUF_NAMESPACE_ID::int64 value) {
-  _internal_add_int64_data(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNTensorProto.int64_data)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >&
-MWNNTensorProto::_internal_int64_data() const {
-  return int64_data_;
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >&
-MWNNTensorProto::int64_data() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNTensorProto.int64_data)
-  return _internal_int64_data();
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >*
-MWNNTensorProto::_internal_mutable_int64_data() {
-  return &int64_data_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >*
-MWNNTensorProto::mutable_int64_data() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNTensorProto.int64_data)
-  return _internal_mutable_int64_data();
-}
-
-// optional string name = 8;
+// optional string name = 1;
 inline bool MWNNTensorProto::_internal_has_name() const {
   bool value = (_has_bits_[0] & 0x00000001u) != 0;
   return value;
@@ -2240,51 +1125,126 @@ inline void MWNNTensorProto::set_allocated_name(std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNTensorProto.name)
 }
 
-// repeated uint64 uint64_data = 11 [packed = true];
-inline int MWNNTensorProto::_internal_uint64_data_size() const {
-  return uint64_data_.size();
+// optional int32 type = 2;
+inline bool MWNNTensorProto::_internal_has_type() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
 }
-inline int MWNNTensorProto::uint64_data_size() const {
-  return _internal_uint64_data_size();
+inline bool MWNNTensorProto::has_type() const {
+  return _internal_has_type();
 }
-inline void MWNNTensorProto::clear_uint64_data() {
-  uint64_data_.Clear();
+inline void MWNNTensorProto::clear_type() {
+  type_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
 }
-inline ::PROTOBUF_NAMESPACE_ID::uint64 MWNNTensorProto::_internal_uint64_data(int index) const {
-  return uint64_data_.Get(index);
+inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::_internal_type() const {
+  return type_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::uint64 MWNNTensorProto::uint64_data(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.uint64_data)
-  return _internal_uint64_data(index);
+inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::type() const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.type)
+  return _internal_type();
 }
-inline void MWNNTensorProto::set_uint64_data(int index, ::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  uint64_data_.Set(index, value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.uint64_data)
+inline void MWNNTensorProto::_internal_set_type(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000002u;
+  type_ = value;
 }
-inline void MWNNTensorProto::_internal_add_uint64_data(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  uint64_data_.Add(value);
+inline void MWNNTensorProto::set_type(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.type)
 }
-inline void MWNNTensorProto::add_uint64_data(::PROTOBUF_NAMESPACE_ID::uint64 value) {
-  _internal_add_uint64_data(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNTensorProto.uint64_data)
+
+// repeated int32 dims = 3;
+inline int MWNNTensorProto::_internal_dims_size() const {
+  return dims_.size();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint64 >&
-MWNNTensorProto::_internal_uint64_data() const {
-  return uint64_data_;
+inline int MWNNTensorProto::dims_size() const {
+  return _internal_dims_size();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint64 >&
-MWNNTensorProto::uint64_data() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNTensorProto.uint64_data)
-  return _internal_uint64_data();
+inline void MWNNTensorProto::clear_dims() {
+  dims_.Clear();
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint64 >*
-MWNNTensorProto::_internal_mutable_uint64_data() {
-  return &uint64_data_;
+inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::_internal_dims(int index) const {
+  return dims_.Get(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::uint64 >*
-MWNNTensorProto::mutable_uint64_data() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNTensorProto.uint64_data)
-  return _internal_mutable_uint64_data();
+inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNTensorProto::dims(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.dims)
+  return _internal_dims(index);
+}
+inline void MWNNTensorProto::set_dims(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  dims_.Set(index, value);
+  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.dims)
+}
+inline void MWNNTensorProto::_internal_add_dims(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  dims_.Add(value);
+}
+inline void MWNNTensorProto::add_dims(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_dims(value);
+  // @@protoc_insertion_point(field_add:MWNN.MWNNTensorProto.dims)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+MWNNTensorProto::_internal_dims() const {
+  return dims_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+MWNNTensorProto::dims() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNTensorProto.dims)
+  return _internal_dims();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+MWNNTensorProto::_internal_mutable_dims() {
+  return &dims_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+MWNNTensorProto::mutable_dims() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNTensorProto.dims)
+  return _internal_mutable_dims();
+}
+
+// repeated float float_data = 4 [packed = true];
+inline int MWNNTensorProto::_internal_float_data_size() const {
+  return float_data_.size();
+}
+inline int MWNNTensorProto::float_data_size() const {
+  return _internal_float_data_size();
+}
+inline void MWNNTensorProto::clear_float_data() {
+  float_data_.Clear();
+}
+inline float MWNNTensorProto::_internal_float_data(int index) const {
+  return float_data_.Get(index);
+}
+inline float MWNNTensorProto::float_data(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNTensorProto.float_data)
+  return _internal_float_data(index);
+}
+inline void MWNNTensorProto::set_float_data(int index, float value) {
+  float_data_.Set(index, value);
+  // @@protoc_insertion_point(field_set:MWNN.MWNNTensorProto.float_data)
+}
+inline void MWNNTensorProto::_internal_add_float_data(float value) {
+  float_data_.Add(value);
+}
+inline void MWNNTensorProto::add_float_data(float value) {
+  _internal_add_float_data(value);
+  // @@protoc_insertion_point(field_add:MWNN.MWNNTensorProto.float_data)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+MWNNTensorProto::_internal_float_data() const {
+  return float_data_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+MWNNTensorProto::float_data() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNTensorProto.float_data)
+  return _internal_float_data();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+MWNNTensorProto::_internal_mutable_float_data() {
+  return &float_data_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+MWNNTensorProto::mutable_float_data() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNTensorProto.float_data)
+  return _internal_mutable_float_data();
 }
 
 // -------------------------------------------------------------------
@@ -2362,7 +1322,7 @@ inline void MWNNAttributeProto::set_allocated_name(std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNAttributeProto.name)
 }
 
-// optional int32 type = 20;
+// optional int32 type = 2;
 inline bool MWNNAttributeProto::_internal_has_type() const {
   bool value = (_has_bits_[0] & 0x00000002u) != 0;
   return value;
@@ -2390,280 +1350,179 @@ inline void MWNNAttributeProto::set_type(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:MWNN.MWNNAttributeProto.type)
 }
 
-// repeated int32 ints = 8;
-inline int MWNNAttributeProto::_internal_ints_size() const {
-  return ints_.size();
+// repeated int32 int_data = 3;
+inline int MWNNAttributeProto::_internal_int_data_size() const {
+  return int_data_.size();
 }
-inline int MWNNAttributeProto::ints_size() const {
-  return _internal_ints_size();
+inline int MWNNAttributeProto::int_data_size() const {
+  return _internal_int_data_size();
 }
-inline void MWNNAttributeProto::clear_ints() {
-  ints_.Clear();
+inline void MWNNAttributeProto::clear_int_data() {
+  int_data_.Clear();
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNAttributeProto::_internal_ints(int index) const {
-  return ints_.Get(index);
+inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNAttributeProto::_internal_int_data(int index) const {
+  return int_data_.Get(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNAttributeProto::ints(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNAttributeProto.ints)
-  return _internal_ints(index);
+inline ::PROTOBUF_NAMESPACE_ID::int32 MWNNAttributeProto::int_data(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNAttributeProto.int_data)
+  return _internal_int_data(index);
 }
-inline void MWNNAttributeProto::set_ints(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
-  ints_.Set(index, value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNAttributeProto.ints)
+inline void MWNNAttributeProto::set_int_data(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  int_data_.Set(index, value);
+  // @@protoc_insertion_point(field_set:MWNN.MWNNAttributeProto.int_data)
 }
-inline void MWNNAttributeProto::_internal_add_ints(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  ints_.Add(value);
+inline void MWNNAttributeProto::_internal_add_int_data(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  int_data_.Add(value);
 }
-inline void MWNNAttributeProto::add_ints(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_add_ints(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNAttributeProto.ints)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MWNNAttributeProto::_internal_ints() const {
-  return ints_;
+inline void MWNNAttributeProto::add_int_data(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_int_data(value);
+  // @@protoc_insertion_point(field_add:MWNN.MWNNAttributeProto.int_data)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
-MWNNAttributeProto::ints() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNAttributeProto.ints)
-  return _internal_ints();
+MWNNAttributeProto::_internal_int_data() const {
+  return int_data_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+MWNNAttributeProto::int_data() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNAttributeProto.int_data)
+  return _internal_int_data();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MWNNAttributeProto::_internal_mutable_ints() {
-  return &ints_;
+MWNNAttributeProto::_internal_mutable_int_data() {
+  return &int_data_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
-MWNNAttributeProto::mutable_ints() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNAttributeProto.ints)
-  return _internal_mutable_ints();
+MWNNAttributeProto::mutable_int_data() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNAttributeProto.int_data)
+  return _internal_mutable_int_data();
 }
 
-// repeated string data = 9;
-inline int MWNNAttributeProto::_internal_data_size() const {
-  return data_.size();
+// repeated float float_data = 4;
+inline int MWNNAttributeProto::_internal_float_data_size() const {
+  return float_data_.size();
 }
-inline int MWNNAttributeProto::data_size() const {
-  return _internal_data_size();
+inline int MWNNAttributeProto::float_data_size() const {
+  return _internal_float_data_size();
 }
-inline void MWNNAttributeProto::clear_data() {
-  data_.Clear();
+inline void MWNNAttributeProto::clear_float_data() {
+  float_data_.Clear();
 }
-inline std::string* MWNNAttributeProto::add_data() {
-  // @@protoc_insertion_point(field_add_mutable:MWNN.MWNNAttributeProto.data)
-  return _internal_add_data();
+inline float MWNNAttributeProto::_internal_float_data(int index) const {
+  return float_data_.Get(index);
 }
-inline const std::string& MWNNAttributeProto::_internal_data(int index) const {
-  return data_.Get(index);
+inline float MWNNAttributeProto::float_data(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNAttributeProto.float_data)
+  return _internal_float_data(index);
 }
-inline const std::string& MWNNAttributeProto::data(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNAttributeProto.data)
-  return _internal_data(index);
+inline void MWNNAttributeProto::set_float_data(int index, float value) {
+  float_data_.Set(index, value);
+  // @@protoc_insertion_point(field_set:MWNN.MWNNAttributeProto.float_data)
 }
-inline std::string* MWNNAttributeProto::mutable_data(int index) {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNAttributeProto.data)
-  return data_.Mutable(index);
+inline void MWNNAttributeProto::_internal_add_float_data(float value) {
+  float_data_.Add(value);
 }
-inline void MWNNAttributeProto::set_data(int index, const std::string& value) {
-  // @@protoc_insertion_point(field_set:MWNN.MWNNAttributeProto.data)
-  data_.Mutable(index)->assign(value);
+inline void MWNNAttributeProto::add_float_data(float value) {
+  _internal_add_float_data(value);
+  // @@protoc_insertion_point(field_add:MWNN.MWNNAttributeProto.float_data)
 }
-inline void MWNNAttributeProto::set_data(int index, std::string&& value) {
-  // @@protoc_insertion_point(field_set:MWNN.MWNNAttributeProto.data)
-  data_.Mutable(index)->assign(std::move(value));
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+MWNNAttributeProto::_internal_float_data() const {
+  return float_data_;
 }
-inline void MWNNAttributeProto::set_data(int index, const char* value) {
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+MWNNAttributeProto::float_data() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNAttributeProto.float_data)
+  return _internal_float_data();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+MWNNAttributeProto::_internal_mutable_float_data() {
+  return &float_data_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+MWNNAttributeProto::mutable_float_data() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNAttributeProto.float_data)
+  return _internal_mutable_float_data();
+}
+
+// repeated string string_data = 5;
+inline int MWNNAttributeProto::_internal_string_data_size() const {
+  return string_data_.size();
+}
+inline int MWNNAttributeProto::string_data_size() const {
+  return _internal_string_data_size();
+}
+inline void MWNNAttributeProto::clear_string_data() {
+  string_data_.Clear();
+}
+inline std::string* MWNNAttributeProto::add_string_data() {
+  // @@protoc_insertion_point(field_add_mutable:MWNN.MWNNAttributeProto.string_data)
+  return _internal_add_string_data();
+}
+inline const std::string& MWNNAttributeProto::_internal_string_data(int index) const {
+  return string_data_.Get(index);
+}
+inline const std::string& MWNNAttributeProto::string_data(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNAttributeProto.string_data)
+  return _internal_string_data(index);
+}
+inline std::string* MWNNAttributeProto::mutable_string_data(int index) {
+  // @@protoc_insertion_point(field_mutable:MWNN.MWNNAttributeProto.string_data)
+  return string_data_.Mutable(index);
+}
+inline void MWNNAttributeProto::set_string_data(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNAttributeProto.string_data)
+  string_data_.Mutable(index)->assign(value);
+}
+inline void MWNNAttributeProto::set_string_data(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNAttributeProto.string_data)
+  string_data_.Mutable(index)->assign(std::move(value));
+}
+inline void MWNNAttributeProto::set_string_data(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  data_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:MWNN.MWNNAttributeProto.data)
+  string_data_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:MWNN.MWNNAttributeProto.string_data)
 }
-inline void MWNNAttributeProto::set_data(int index, const char* value, size_t size) {
-  data_.Mutable(index)->assign(
+inline void MWNNAttributeProto::set_string_data(int index, const char* value, size_t size) {
+  string_data_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNAttributeProto.data)
+  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNAttributeProto.string_data)
 }
-inline std::string* MWNNAttributeProto::_internal_add_data() {
-  return data_.Add();
+inline std::string* MWNNAttributeProto::_internal_add_string_data() {
+  return string_data_.Add();
 }
-inline void MWNNAttributeProto::add_data(const std::string& value) {
-  data_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNAttributeProto.data)
+inline void MWNNAttributeProto::add_string_data(const std::string& value) {
+  string_data_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:MWNN.MWNNAttributeProto.string_data)
 }
-inline void MWNNAttributeProto::add_data(std::string&& value) {
-  data_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:MWNN.MWNNAttributeProto.data)
+inline void MWNNAttributeProto::add_string_data(std::string&& value) {
+  string_data_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:MWNN.MWNNAttributeProto.string_data)
 }
-inline void MWNNAttributeProto::add_data(const char* value) {
+inline void MWNNAttributeProto::add_string_data(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  data_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:MWNN.MWNNAttributeProto.data)
+  string_data_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:MWNN.MWNNAttributeProto.string_data)
 }
-inline void MWNNAttributeProto::add_data(const char* value, size_t size) {
-  data_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:MWNN.MWNNAttributeProto.data)
+inline void MWNNAttributeProto::add_string_data(const char* value, size_t size) {
+  string_data_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:MWNN.MWNNAttributeProto.string_data)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
-MWNNAttributeProto::data() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNAttributeProto.data)
-  return data_;
+MWNNAttributeProto::string_data() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNAttributeProto.string_data)
+  return string_data_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
-MWNNAttributeProto::mutable_data() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNAttributeProto.data)
-  return &data_;
+MWNNAttributeProto::mutable_string_data() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNAttributeProto.string_data)
+  return &string_data_;
 }
 
 // -------------------------------------------------------------------
 
 // MWNNNodeProto
 
-// repeated string input = 1;
-inline int MWNNNodeProto::_internal_input_size() const {
-  return input_.size();
-}
-inline int MWNNNodeProto::input_size() const {
-  return _internal_input_size();
-}
-inline void MWNNNodeProto::clear_input() {
-  input_.Clear();
-}
-inline std::string* MWNNNodeProto::add_input() {
-  // @@protoc_insertion_point(field_add_mutable:MWNN.MWNNNodeProto.input)
-  return _internal_add_input();
-}
-inline const std::string& MWNNNodeProto::_internal_input(int index) const {
-  return input_.Get(index);
-}
-inline const std::string& MWNNNodeProto::input(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNNodeProto.input)
-  return _internal_input(index);
-}
-inline std::string* MWNNNodeProto::mutable_input(int index) {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNNodeProto.input)
-  return input_.Mutable(index);
-}
-inline void MWNNNodeProto::set_input(int index, const std::string& value) {
-  // @@protoc_insertion_point(field_set:MWNN.MWNNNodeProto.input)
-  input_.Mutable(index)->assign(value);
-}
-inline void MWNNNodeProto::set_input(int index, std::string&& value) {
-  // @@protoc_insertion_point(field_set:MWNN.MWNNNodeProto.input)
-  input_.Mutable(index)->assign(std::move(value));
-}
-inline void MWNNNodeProto::set_input(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  input_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:MWNN.MWNNNodeProto.input)
-}
-inline void MWNNNodeProto::set_input(int index, const char* value, size_t size) {
-  input_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNNodeProto.input)
-}
-inline std::string* MWNNNodeProto::_internal_add_input() {
-  return input_.Add();
-}
-inline void MWNNNodeProto::add_input(const std::string& value) {
-  input_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNNodeProto.input)
-}
-inline void MWNNNodeProto::add_input(std::string&& value) {
-  input_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:MWNN.MWNNNodeProto.input)
-}
-inline void MWNNNodeProto::add_input(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  input_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:MWNN.MWNNNodeProto.input)
-}
-inline void MWNNNodeProto::add_input(const char* value, size_t size) {
-  input_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:MWNN.MWNNNodeProto.input)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
-MWNNNodeProto::input() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNNodeProto.input)
-  return input_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
-MWNNNodeProto::mutable_input() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNNodeProto.input)
-  return &input_;
-}
-
-// repeated string output = 2;
-inline int MWNNNodeProto::_internal_output_size() const {
-  return output_.size();
-}
-inline int MWNNNodeProto::output_size() const {
-  return _internal_output_size();
-}
-inline void MWNNNodeProto::clear_output() {
-  output_.Clear();
-}
-inline std::string* MWNNNodeProto::add_output() {
-  // @@protoc_insertion_point(field_add_mutable:MWNN.MWNNNodeProto.output)
-  return _internal_add_output();
-}
-inline const std::string& MWNNNodeProto::_internal_output(int index) const {
-  return output_.Get(index);
-}
-inline const std::string& MWNNNodeProto::output(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNNodeProto.output)
-  return _internal_output(index);
-}
-inline std::string* MWNNNodeProto::mutable_output(int index) {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNNodeProto.output)
-  return output_.Mutable(index);
-}
-inline void MWNNNodeProto::set_output(int index, const std::string& value) {
-  // @@protoc_insertion_point(field_set:MWNN.MWNNNodeProto.output)
-  output_.Mutable(index)->assign(value);
-}
-inline void MWNNNodeProto::set_output(int index, std::string&& value) {
-  // @@protoc_insertion_point(field_set:MWNN.MWNNNodeProto.output)
-  output_.Mutable(index)->assign(std::move(value));
-}
-inline void MWNNNodeProto::set_output(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  output_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:MWNN.MWNNNodeProto.output)
-}
-inline void MWNNNodeProto::set_output(int index, const char* value, size_t size) {
-  output_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNNodeProto.output)
-}
-inline std::string* MWNNNodeProto::_internal_add_output() {
-  return output_.Add();
-}
-inline void MWNNNodeProto::add_output(const std::string& value) {
-  output_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:MWNN.MWNNNodeProto.output)
-}
-inline void MWNNNodeProto::add_output(std::string&& value) {
-  output_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:MWNN.MWNNNodeProto.output)
-}
-inline void MWNNNodeProto::add_output(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  output_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:MWNN.MWNNNodeProto.output)
-}
-inline void MWNNNodeProto::add_output(const char* value, size_t size) {
-  output_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:MWNN.MWNNNodeProto.output)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
-MWNNNodeProto::output() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNNodeProto.output)
-  return output_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
-MWNNNodeProto::mutable_output() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNNodeProto.output)
-  return &output_;
-}
-
-// optional string name = 3;
+// optional string name = 1;
 inline bool MWNNNodeProto::_internal_has_name() const {
   bool value = (_has_bits_[0] & 0x00000001u) != 0;
   return value;
@@ -2734,7 +1593,7 @@ inline void MWNNNodeProto::set_allocated_name(std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNNodeProto.name)
 }
 
-// optional string op_type = 4;
+// optional string op_type = 2;
 inline bool MWNNNodeProto::_internal_has_op_type() const {
   bool value = (_has_bits_[0] & 0x00000002u) != 0;
   return value;
@@ -2805,75 +1664,152 @@ inline void MWNNNodeProto::set_allocated_op_type(std::string* op_type) {
   // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNNodeProto.op_type)
 }
 
-// optional string domain = 7;
-inline bool MWNNNodeProto::_internal_has_domain() const {
-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
-  return value;
+// repeated string ip_name = 3;
+inline int MWNNNodeProto::_internal_ip_name_size() const {
+  return ip_name_.size();
 }
-inline bool MWNNNodeProto::has_domain() const {
-  return _internal_has_domain();
+inline int MWNNNodeProto::ip_name_size() const {
+  return _internal_ip_name_size();
 }
-inline void MWNNNodeProto::clear_domain() {
-  domain_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  _has_bits_[0] &= ~0x00000004u;
+inline void MWNNNodeProto::clear_ip_name() {
+  ip_name_.Clear();
 }
-inline const std::string& MWNNNodeProto::domain() const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNNodeProto.domain)
-  return _internal_domain();
+inline std::string* MWNNNodeProto::add_ip_name() {
+  // @@protoc_insertion_point(field_add_mutable:MWNN.MWNNNodeProto.ip_name)
+  return _internal_add_ip_name();
 }
-inline void MWNNNodeProto::set_domain(const std::string& value) {
-  _internal_set_domain(value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNNodeProto.domain)
+inline const std::string& MWNNNodeProto::_internal_ip_name(int index) const {
+  return ip_name_.Get(index);
 }
-inline std::string* MWNNNodeProto::mutable_domain() {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNNodeProto.domain)
-  return _internal_mutable_domain();
+inline const std::string& MWNNNodeProto::ip_name(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNNodeProto.ip_name)
+  return _internal_ip_name(index);
 }
-inline const std::string& MWNNNodeProto::_internal_domain() const {
-  return domain_.GetNoArena();
+inline std::string* MWNNNodeProto::mutable_ip_name(int index) {
+  // @@protoc_insertion_point(field_mutable:MWNN.MWNNNodeProto.ip_name)
+  return ip_name_.Mutable(index);
 }
-inline void MWNNNodeProto::_internal_set_domain(const std::string& value) {
-  _has_bits_[0] |= 0x00000004u;
-  domain_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+inline void MWNNNodeProto::set_ip_name(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNNodeProto.ip_name)
+  ip_name_.Mutable(index)->assign(value);
 }
-inline void MWNNNodeProto::set_domain(std::string&& value) {
-  _has_bits_[0] |= 0x00000004u;
-  domain_.SetNoArena(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:MWNN.MWNNNodeProto.domain)
+inline void MWNNNodeProto::set_ip_name(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNNodeProto.ip_name)
+  ip_name_.Mutable(index)->assign(std::move(value));
 }
-inline void MWNNNodeProto::set_domain(const char* value) {
+inline void MWNNNodeProto::set_ip_name(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  _has_bits_[0] |= 0x00000004u;
-  domain_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:MWNN.MWNNNodeProto.domain)
+  ip_name_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:MWNN.MWNNNodeProto.ip_name)
 }
-inline void MWNNNodeProto::set_domain(const char* value, size_t size) {
-  _has_bits_[0] |= 0x00000004u;
-  domain_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNNodeProto.domain)
+inline void MWNNNodeProto::set_ip_name(int index, const char* value, size_t size) {
+  ip_name_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNNodeProto.ip_name)
 }
-inline std::string* MWNNNodeProto::_internal_mutable_domain() {
-  _has_bits_[0] |= 0x00000004u;
-  return domain_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline std::string* MWNNNodeProto::_internal_add_ip_name() {
+  return ip_name_.Add();
 }
-inline std::string* MWNNNodeProto::release_domain() {
-  // @@protoc_insertion_point(field_release:MWNN.MWNNNodeProto.domain)
-  if (!_internal_has_domain()) {
-    return nullptr;
-  }
-  _has_bits_[0] &= ~0x00000004u;
-  return domain_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline void MWNNNodeProto::add_ip_name(const std::string& value) {
+  ip_name_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:MWNN.MWNNNodeProto.ip_name)
 }
-inline void MWNNNodeProto::set_allocated_domain(std::string* domain) {
-  if (domain != nullptr) {
-    _has_bits_[0] |= 0x00000004u;
-  } else {
-    _has_bits_[0] &= ~0x00000004u;
-  }
-  domain_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), domain);
-  // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNNodeProto.domain)
+inline void MWNNNodeProto::add_ip_name(std::string&& value) {
+  ip_name_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:MWNN.MWNNNodeProto.ip_name)
+}
+inline void MWNNNodeProto::add_ip_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  ip_name_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:MWNN.MWNNNodeProto.ip_name)
+}
+inline void MWNNNodeProto::add_ip_name(const char* value, size_t size) {
+  ip_name_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:MWNN.MWNNNodeProto.ip_name)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+MWNNNodeProto::ip_name() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNNodeProto.ip_name)
+  return ip_name_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+MWNNNodeProto::mutable_ip_name() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNNodeProto.ip_name)
+  return &ip_name_;
+}
+
+// repeated string op_name = 4;
+inline int MWNNNodeProto::_internal_op_name_size() const {
+  return op_name_.size();
+}
+inline int MWNNNodeProto::op_name_size() const {
+  return _internal_op_name_size();
+}
+inline void MWNNNodeProto::clear_op_name() {
+  op_name_.Clear();
+}
+inline std::string* MWNNNodeProto::add_op_name() {
+  // @@protoc_insertion_point(field_add_mutable:MWNN.MWNNNodeProto.op_name)
+  return _internal_add_op_name();
+}
+inline const std::string& MWNNNodeProto::_internal_op_name(int index) const {
+  return op_name_.Get(index);
+}
+inline const std::string& MWNNNodeProto::op_name(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNNodeProto.op_name)
+  return _internal_op_name(index);
+}
+inline std::string* MWNNNodeProto::mutable_op_name(int index) {
+  // @@protoc_insertion_point(field_mutable:MWNN.MWNNNodeProto.op_name)
+  return op_name_.Mutable(index);
+}
+inline void MWNNNodeProto::set_op_name(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNNodeProto.op_name)
+  op_name_.Mutable(index)->assign(value);
+}
+inline void MWNNNodeProto::set_op_name(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNNodeProto.op_name)
+  op_name_.Mutable(index)->assign(std::move(value));
+}
+inline void MWNNNodeProto::set_op_name(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  op_name_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:MWNN.MWNNNodeProto.op_name)
+}
+inline void MWNNNodeProto::set_op_name(int index, const char* value, size_t size) {
+  op_name_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNNodeProto.op_name)
+}
+inline std::string* MWNNNodeProto::_internal_add_op_name() {
+  return op_name_.Add();
+}
+inline void MWNNNodeProto::add_op_name(const std::string& value) {
+  op_name_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:MWNN.MWNNNodeProto.op_name)
+}
+inline void MWNNNodeProto::add_op_name(std::string&& value) {
+  op_name_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:MWNN.MWNNNodeProto.op_name)
+}
+inline void MWNNNodeProto::add_op_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  op_name_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:MWNN.MWNNNodeProto.op_name)
+}
+inline void MWNNNodeProto::add_op_name(const char* value, size_t size) {
+  op_name_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:MWNN.MWNNNodeProto.op_name)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+MWNNNodeProto::op_name() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNNodeProto.op_name)
+  return op_name_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+MWNNNodeProto::mutable_op_name() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNNodeProto.op_name)
+  return &op_name_;
 }
 
 // repeated .MWNN.MWNNAttributeProto attribute = 5;
@@ -2919,46 +1855,7 @@ MWNNNodeProto::attribute() const {
 
 // MWNNGraphProto
 
-// repeated .MWNN.MWNNNodeProto node = 1;
-inline int MWNNGraphProto::_internal_node_size() const {
-  return node_.size();
-}
-inline int MWNNGraphProto::node_size() const {
-  return _internal_node_size();
-}
-inline void MWNNGraphProto::clear_node() {
-  node_.Clear();
-}
-inline ::MWNN::MWNNNodeProto* MWNNGraphProto::mutable_node(int index) {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNGraphProto.node)
-  return node_.Mutable(index);
-}
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNNodeProto >*
-MWNNGraphProto::mutable_node() {
-  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNGraphProto.node)
-  return &node_;
-}
-inline const ::MWNN::MWNNNodeProto& MWNNGraphProto::_internal_node(int index) const {
-  return node_.Get(index);
-}
-inline const ::MWNN::MWNNNodeProto& MWNNGraphProto::node(int index) const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNGraphProto.node)
-  return _internal_node(index);
-}
-inline ::MWNN::MWNNNodeProto* MWNNGraphProto::_internal_add_node() {
-  return node_.Add();
-}
-inline ::MWNN::MWNNNodeProto* MWNNGraphProto::add_node() {
-  // @@protoc_insertion_point(field_add:MWNN.MWNNGraphProto.node)
-  return _internal_add_node();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNNodeProto >&
-MWNNGraphProto::node() const {
-  // @@protoc_insertion_point(field_list:MWNN.MWNNGraphProto.node)
-  return node_;
-}
-
-// optional string name = 2;
+// optional string name = 1;
 inline bool MWNNGraphProto::_internal_has_name() const {
   bool value = (_has_bits_[0] & 0x00000001u) != 0;
   return value;
@@ -3029,146 +1926,191 @@ inline void MWNNGraphProto::set_allocated_name(std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNGraphProto.name)
 }
 
-// optional string graph_input = 3;
-inline bool MWNNGraphProto::_internal_has_graph_input() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
-  return value;
+// repeated string ip_name = 2;
+inline int MWNNGraphProto::_internal_ip_name_size() const {
+  return ip_name_.size();
 }
-inline bool MWNNGraphProto::has_graph_input() const {
-  return _internal_has_graph_input();
+inline int MWNNGraphProto::ip_name_size() const {
+  return _internal_ip_name_size();
 }
-inline void MWNNGraphProto::clear_graph_input() {
-  graph_input_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  _has_bits_[0] &= ~0x00000002u;
+inline void MWNNGraphProto::clear_ip_name() {
+  ip_name_.Clear();
 }
-inline const std::string& MWNNGraphProto::graph_input() const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNGraphProto.graph_input)
-  return _internal_graph_input();
+inline std::string* MWNNGraphProto::add_ip_name() {
+  // @@protoc_insertion_point(field_add_mutable:MWNN.MWNNGraphProto.ip_name)
+  return _internal_add_ip_name();
 }
-inline void MWNNGraphProto::set_graph_input(const std::string& value) {
-  _internal_set_graph_input(value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNGraphProto.graph_input)
+inline const std::string& MWNNGraphProto::_internal_ip_name(int index) const {
+  return ip_name_.Get(index);
 }
-inline std::string* MWNNGraphProto::mutable_graph_input() {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNGraphProto.graph_input)
-  return _internal_mutable_graph_input();
+inline const std::string& MWNNGraphProto::ip_name(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNGraphProto.ip_name)
+  return _internal_ip_name(index);
 }
-inline const std::string& MWNNGraphProto::_internal_graph_input() const {
-  return graph_input_.GetNoArena();
+inline std::string* MWNNGraphProto::mutable_ip_name(int index) {
+  // @@protoc_insertion_point(field_mutable:MWNN.MWNNGraphProto.ip_name)
+  return ip_name_.Mutable(index);
 }
-inline void MWNNGraphProto::_internal_set_graph_input(const std::string& value) {
-  _has_bits_[0] |= 0x00000002u;
-  graph_input_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+inline void MWNNGraphProto::set_ip_name(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNGraphProto.ip_name)
+  ip_name_.Mutable(index)->assign(value);
 }
-inline void MWNNGraphProto::set_graph_input(std::string&& value) {
-  _has_bits_[0] |= 0x00000002u;
-  graph_input_.SetNoArena(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:MWNN.MWNNGraphProto.graph_input)
+inline void MWNNGraphProto::set_ip_name(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNGraphProto.ip_name)
+  ip_name_.Mutable(index)->assign(std::move(value));
 }
-inline void MWNNGraphProto::set_graph_input(const char* value) {
+inline void MWNNGraphProto::set_ip_name(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  _has_bits_[0] |= 0x00000002u;
-  graph_input_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:MWNN.MWNNGraphProto.graph_input)
+  ip_name_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:MWNN.MWNNGraphProto.ip_name)
 }
-inline void MWNNGraphProto::set_graph_input(const char* value, size_t size) {
-  _has_bits_[0] |= 0x00000002u;
-  graph_input_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNGraphProto.graph_input)
+inline void MWNNGraphProto::set_ip_name(int index, const char* value, size_t size) {
+  ip_name_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNGraphProto.ip_name)
 }
-inline std::string* MWNNGraphProto::_internal_mutable_graph_input() {
-  _has_bits_[0] |= 0x00000002u;
-  return graph_input_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline std::string* MWNNGraphProto::_internal_add_ip_name() {
+  return ip_name_.Add();
 }
-inline std::string* MWNNGraphProto::release_graph_input() {
-  // @@protoc_insertion_point(field_release:MWNN.MWNNGraphProto.graph_input)
-  if (!_internal_has_graph_input()) {
-    return nullptr;
-  }
-  _has_bits_[0] &= ~0x00000002u;
-  return graph_input_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline void MWNNGraphProto::add_ip_name(const std::string& value) {
+  ip_name_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:MWNN.MWNNGraphProto.ip_name)
 }
-inline void MWNNGraphProto::set_allocated_graph_input(std::string* graph_input) {
-  if (graph_input != nullptr) {
-    _has_bits_[0] |= 0x00000002u;
-  } else {
-    _has_bits_[0] &= ~0x00000002u;
-  }
-  graph_input_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), graph_input);
-  // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNGraphProto.graph_input)
+inline void MWNNGraphProto::add_ip_name(std::string&& value) {
+  ip_name_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:MWNN.MWNNGraphProto.ip_name)
+}
+inline void MWNNGraphProto::add_ip_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  ip_name_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:MWNN.MWNNGraphProto.ip_name)
+}
+inline void MWNNGraphProto::add_ip_name(const char* value, size_t size) {
+  ip_name_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:MWNN.MWNNGraphProto.ip_name)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+MWNNGraphProto::ip_name() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNGraphProto.ip_name)
+  return ip_name_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+MWNNGraphProto::mutable_ip_name() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNGraphProto.ip_name)
+  return &ip_name_;
 }
 
-// optional string graph_output = 4;
-inline bool MWNNGraphProto::_internal_has_graph_output() const {
-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
-  return value;
+// repeated string op_name = 3;
+inline int MWNNGraphProto::_internal_op_name_size() const {
+  return op_name_.size();
 }
-inline bool MWNNGraphProto::has_graph_output() const {
-  return _internal_has_graph_output();
+inline int MWNNGraphProto::op_name_size() const {
+  return _internal_op_name_size();
 }
-inline void MWNNGraphProto::clear_graph_output() {
-  graph_output_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  _has_bits_[0] &= ~0x00000004u;
+inline void MWNNGraphProto::clear_op_name() {
+  op_name_.Clear();
 }
-inline const std::string& MWNNGraphProto::graph_output() const {
-  // @@protoc_insertion_point(field_get:MWNN.MWNNGraphProto.graph_output)
-  return _internal_graph_output();
+inline std::string* MWNNGraphProto::add_op_name() {
+  // @@protoc_insertion_point(field_add_mutable:MWNN.MWNNGraphProto.op_name)
+  return _internal_add_op_name();
 }
-inline void MWNNGraphProto::set_graph_output(const std::string& value) {
-  _internal_set_graph_output(value);
-  // @@protoc_insertion_point(field_set:MWNN.MWNNGraphProto.graph_output)
+inline const std::string& MWNNGraphProto::_internal_op_name(int index) const {
+  return op_name_.Get(index);
 }
-inline std::string* MWNNGraphProto::mutable_graph_output() {
-  // @@protoc_insertion_point(field_mutable:MWNN.MWNNGraphProto.graph_output)
-  return _internal_mutable_graph_output();
+inline const std::string& MWNNGraphProto::op_name(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNGraphProto.op_name)
+  return _internal_op_name(index);
 }
-inline const std::string& MWNNGraphProto::_internal_graph_output() const {
-  return graph_output_.GetNoArena();
+inline std::string* MWNNGraphProto::mutable_op_name(int index) {
+  // @@protoc_insertion_point(field_mutable:MWNN.MWNNGraphProto.op_name)
+  return op_name_.Mutable(index);
 }
-inline void MWNNGraphProto::_internal_set_graph_output(const std::string& value) {
-  _has_bits_[0] |= 0x00000004u;
-  graph_output_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+inline void MWNNGraphProto::set_op_name(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNGraphProto.op_name)
+  op_name_.Mutable(index)->assign(value);
 }
-inline void MWNNGraphProto::set_graph_output(std::string&& value) {
-  _has_bits_[0] |= 0x00000004u;
-  graph_output_.SetNoArena(
-    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:MWNN.MWNNGraphProto.graph_output)
+inline void MWNNGraphProto::set_op_name(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:MWNN.MWNNGraphProto.op_name)
+  op_name_.Mutable(index)->assign(std::move(value));
 }
-inline void MWNNGraphProto::set_graph_output(const char* value) {
+inline void MWNNGraphProto::set_op_name(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  _has_bits_[0] |= 0x00000004u;
-  graph_output_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:MWNN.MWNNGraphProto.graph_output)
+  op_name_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:MWNN.MWNNGraphProto.op_name)
 }
-inline void MWNNGraphProto::set_graph_output(const char* value, size_t size) {
-  _has_bits_[0] |= 0x00000004u;
-  graph_output_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNGraphProto.graph_output)
+inline void MWNNGraphProto::set_op_name(int index, const char* value, size_t size) {
+  op_name_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:MWNN.MWNNGraphProto.op_name)
 }
-inline std::string* MWNNGraphProto::_internal_mutable_graph_output() {
-  _has_bits_[0] |= 0x00000004u;
-  return graph_output_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline std::string* MWNNGraphProto::_internal_add_op_name() {
+  return op_name_.Add();
 }
-inline std::string* MWNNGraphProto::release_graph_output() {
-  // @@protoc_insertion_point(field_release:MWNN.MWNNGraphProto.graph_output)
-  if (!_internal_has_graph_output()) {
-    return nullptr;
-  }
-  _has_bits_[0] &= ~0x00000004u;
-  return graph_output_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+inline void MWNNGraphProto::add_op_name(const std::string& value) {
+  op_name_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:MWNN.MWNNGraphProto.op_name)
 }
-inline void MWNNGraphProto::set_allocated_graph_output(std::string* graph_output) {
-  if (graph_output != nullptr) {
-    _has_bits_[0] |= 0x00000004u;
-  } else {
-    _has_bits_[0] &= ~0x00000004u;
-  }
-  graph_output_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), graph_output);
-  // @@protoc_insertion_point(field_set_allocated:MWNN.MWNNGraphProto.graph_output)
+inline void MWNNGraphProto::add_op_name(std::string&& value) {
+  op_name_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:MWNN.MWNNGraphProto.op_name)
+}
+inline void MWNNGraphProto::add_op_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  op_name_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:MWNN.MWNNGraphProto.op_name)
+}
+inline void MWNNGraphProto::add_op_name(const char* value, size_t size) {
+  op_name_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:MWNN.MWNNGraphProto.op_name)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+MWNNGraphProto::op_name() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNGraphProto.op_name)
+  return op_name_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+MWNNGraphProto::mutable_op_name() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNGraphProto.op_name)
+  return &op_name_;
+}
+
+// repeated .MWNN.MWNNNodeProto node = 4;
+inline int MWNNGraphProto::_internal_node_size() const {
+  return node_.size();
+}
+inline int MWNNGraphProto::node_size() const {
+  return _internal_node_size();
+}
+inline void MWNNGraphProto::clear_node() {
+  node_.Clear();
+}
+inline ::MWNN::MWNNNodeProto* MWNNGraphProto::mutable_node(int index) {
+  // @@protoc_insertion_point(field_mutable:MWNN.MWNNGraphProto.node)
+  return node_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNNodeProto >*
+MWNNGraphProto::mutable_node() {
+  // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNGraphProto.node)
+  return &node_;
+}
+inline const ::MWNN::MWNNNodeProto& MWNNGraphProto::_internal_node(int index) const {
+  return node_.Get(index);
+}
+inline const ::MWNN::MWNNNodeProto& MWNNGraphProto::node(int index) const {
+  // @@protoc_insertion_point(field_get:MWNN.MWNNGraphProto.node)
+  return _internal_node(index);
+}
+inline ::MWNN::MWNNNodeProto* MWNNGraphProto::_internal_add_node() {
+  return node_.Add();
+}
+inline ::MWNN::MWNNNodeProto* MWNNGraphProto::add_node() {
+  // @@protoc_insertion_point(field_add:MWNN.MWNNGraphProto.node)
+  return _internal_add_node();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNNodeProto >&
+MWNNGraphProto::node() const {
+  // @@protoc_insertion_point(field_list:MWNN.MWNNGraphProto.node)
+  return node_;
 }
 
 // repeated .MWNN.MWNNTensorProto initializer = 5;
@@ -3210,7 +2152,7 @@ MWNNGraphProto::initializer() const {
   return initializer_;
 }
 
-// repeated .MWNN.MWNNValueInfoProto input = 11;
+// repeated .MWNN.MWNNTensorProto input = 6;
 inline int MWNNGraphProto::_internal_input_size() const {
   return input_.size();
 }
@@ -3220,36 +2162,36 @@ inline int MWNNGraphProto::input_size() const {
 inline void MWNNGraphProto::clear_input() {
   input_.Clear();
 }
-inline ::MWNN::MWNNValueInfoProto* MWNNGraphProto::mutable_input(int index) {
+inline ::MWNN::MWNNTensorProto* MWNNGraphProto::mutable_input(int index) {
   // @@protoc_insertion_point(field_mutable:MWNN.MWNNGraphProto.input)
   return input_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto >*
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto >*
 MWNNGraphProto::mutable_input() {
   // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNGraphProto.input)
   return &input_;
 }
-inline const ::MWNN::MWNNValueInfoProto& MWNNGraphProto::_internal_input(int index) const {
+inline const ::MWNN::MWNNTensorProto& MWNNGraphProto::_internal_input(int index) const {
   return input_.Get(index);
 }
-inline const ::MWNN::MWNNValueInfoProto& MWNNGraphProto::input(int index) const {
+inline const ::MWNN::MWNNTensorProto& MWNNGraphProto::input(int index) const {
   // @@protoc_insertion_point(field_get:MWNN.MWNNGraphProto.input)
   return _internal_input(index);
 }
-inline ::MWNN::MWNNValueInfoProto* MWNNGraphProto::_internal_add_input() {
+inline ::MWNN::MWNNTensorProto* MWNNGraphProto::_internal_add_input() {
   return input_.Add();
 }
-inline ::MWNN::MWNNValueInfoProto* MWNNGraphProto::add_input() {
+inline ::MWNN::MWNNTensorProto* MWNNGraphProto::add_input() {
   // @@protoc_insertion_point(field_add:MWNN.MWNNGraphProto.input)
   return _internal_add_input();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto >&
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto >&
 MWNNGraphProto::input() const {
   // @@protoc_insertion_point(field_list:MWNN.MWNNGraphProto.input)
   return input_;
 }
 
-// repeated .MWNN.MWNNValueInfoProto output = 12;
+// repeated .MWNN.MWNNTensorProto output = 7;
 inline int MWNNGraphProto::_internal_output_size() const {
   return output_.size();
 }
@@ -3259,30 +2201,30 @@ inline int MWNNGraphProto::output_size() const {
 inline void MWNNGraphProto::clear_output() {
   output_.Clear();
 }
-inline ::MWNN::MWNNValueInfoProto* MWNNGraphProto::mutable_output(int index) {
+inline ::MWNN::MWNNTensorProto* MWNNGraphProto::mutable_output(int index) {
   // @@protoc_insertion_point(field_mutable:MWNN.MWNNGraphProto.output)
   return output_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto >*
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto >*
 MWNNGraphProto::mutable_output() {
   // @@protoc_insertion_point(field_mutable_list:MWNN.MWNNGraphProto.output)
   return &output_;
 }
-inline const ::MWNN::MWNNValueInfoProto& MWNNGraphProto::_internal_output(int index) const {
+inline const ::MWNN::MWNNTensorProto& MWNNGraphProto::_internal_output(int index) const {
   return output_.Get(index);
 }
-inline const ::MWNN::MWNNValueInfoProto& MWNNGraphProto::output(int index) const {
+inline const ::MWNN::MWNNTensorProto& MWNNGraphProto::output(int index) const {
   // @@protoc_insertion_point(field_get:MWNN.MWNNGraphProto.output)
   return _internal_output(index);
 }
-inline ::MWNN::MWNNValueInfoProto* MWNNGraphProto::_internal_add_output() {
+inline ::MWNN::MWNNTensorProto* MWNNGraphProto::_internal_add_output() {
   return output_.Add();
 }
-inline ::MWNN::MWNNValueInfoProto* MWNNGraphProto::add_output() {
+inline ::MWNN::MWNNTensorProto* MWNNGraphProto::add_output() {
   // @@protoc_insertion_point(field_add:MWNN.MWNNGraphProto.output)
   return _internal_add_output();
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNValueInfoProto >&
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::MWNN::MWNNTensorProto >&
 MWNNGraphProto::output() const {
   // @@protoc_insertion_point(field_list:MWNN.MWNNGraphProto.output)
   return output_;
@@ -3297,24 +2239,10 @@ MWNNGraphProto::output() const {
 
 // -------------------------------------------------------------------
 
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace MWNN
-
-PROTOBUF_NAMESPACE_OPEN
-
-template <> struct is_proto_enum< ::MWNN::MWNNTensorProto_DataType> : ::std::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::MWNN::MWNNTensorProto_DataType>() {
-  return ::MWNN::MWNNTensorProto_DataType_descriptor();
-}
-
-PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
 

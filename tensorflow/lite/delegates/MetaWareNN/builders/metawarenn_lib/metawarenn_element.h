@@ -14,24 +14,24 @@ class ElementType {
     enum class element_type
       {
           //Common Types
-          boolean_,
-          double_,
-          float16_,
-          float_,
-          int8_,
-          int16_,
-          int32_,
-          int64_,
-          uint8_,
+          boolean_,   //0
+          double_,    //1
+          float16_,   //2
+          float_,     //3
+          int8_,      //4
+          int16_,     //5
+          int32_,     //6
+          int64_,     //7
+          uint8_,     //8
           //ONNX & TVM Specific
-          uint16_,
-          uint32_,
-          uint64_,
+          uint16_,    //9
+          uint32_,    //10
+          uint64_,    //11
           //TF Specific
-          string_,
-          complex64_,
+          string_,    //12
+          complex64_, //13
           //Common ONNX & TF Types
-          dynamic_
+          dynamic_    //14
       };
 
     #if ONNX
@@ -63,6 +63,25 @@ class ElementType {
                 return element_type::uint64_;
             case onnx::TensorProto_DataType_UNDEFINED:
                 return element_type::dynamic_;
+            default:
+                return element_type::dynamic_;
+        }
+    }
+
+    static element_type get_mwnn_attr_type_onnx(int onnx_attr_type) {
+        switch (onnx_attr_type) {
+            case onnx::AttributeProto_AttributeType_FLOAT:
+                return element_type::float_;
+            case onnx::AttributeProto_AttributeType_INT:
+                return element_type::int32_;
+            case onnx::AttributeProto_AttributeType_STRING:
+                return element_type::string_;
+            case onnx::AttributeProto_AttributeType_FLOATS:
+                return element_type::float_;
+            case onnx::AttributeProto_AttributeType_INTS:
+                return element_type::int32_;
+            case onnx::AttributeProto_AttributeType_STRINGS:
+                return element_type::string_;
             default:
                 return element_type::dynamic_;
         }

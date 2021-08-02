@@ -68,11 +68,11 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
 
     metawarenn::MWNNInferenceApi mwapi;
 
-    std::string ip_name = mwnn_graph_->get_graph_ip_name();
+    std::vector<std::string> ip_names = mwnn_graph_->get_graph_ip_names();
     auto ip_shape = mwnn_graph_->get_graph_ip_tensor()[0].get_dims();
 
-    mwapi.prepareInput(graph_inputs[ip_name], ip_shape);
-    std::string op_name = mwnn_graph_->get_graph_op_name();
+    mwapi.prepareInput(graph_inputs[ip_names[0]], ip_shape);
+    std::vector<std::string> op_names = mwnn_graph_->get_graph_op_names();
     auto op_shape = mwnn_graph_->get_graph_op_tensor()[0].get_dims();
 
     mwapi.prepareOutput(op_shape);
@@ -81,7 +81,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
 
     mwapi.runGraph();
 
-    mwapi.getOutput(graph_outputs[op_name], op_shape);
+    mwapi.getOutput(graph_outputs[op_names[0]], op_shape);
 
     // ******************************************* Call to invoke the local run function *****************************************
 

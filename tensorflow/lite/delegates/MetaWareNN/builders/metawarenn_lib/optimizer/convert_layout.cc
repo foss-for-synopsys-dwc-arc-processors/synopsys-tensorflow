@@ -7,24 +7,16 @@ namespace optimizer {
 ConvertLayout::ConvertLayout() {
   set_name("ConvertLayout");
 }
-ConvertLayout::ConvertLayout(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNTensor mwnn_tensor, bool to_hwc, bool to_chw) {
+ConvertLayout::ConvertLayout(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNTensor mwnn_tensor, bool to_hwc, bool to_chw, bool initializer) {
   set_name("ConvertLayout");
   graph = mwnn_graph;
   tensor = mwnn_tensor;
   CHW_to_HWC = to_hwc;
   HWC_to_CHW = to_chw;
-  is_tensor = true;
-}
-ConvertLayout::ConvertLayout(std::shared_ptr<MWNNGraph> mwnn_graph, MWNNValueInfo mwnn_value_info, bool to_hwc, bool to_chw) {
-  set_name("ConvertLayout");
-  graph = mwnn_graph;
-  value_info = mwnn_value_info;
-  CHW_to_HWC = to_hwc;
-  HWC_to_CHW = to_chw;
-  is_value_info = true;
+  const_initializer = initializer;
 }
 void ConvertLayout::RunPass() {
-  if(is_tensor) {
+  if(const_initializer) {
     if(CHW_to_HWC) {
       std::vector<int> dims = tensor.get_dims();
       std::vector<int> new_dims{dims[0], dims[2], dims[3], dims[1]};
@@ -83,22 +75,22 @@ void ConvertLayout::RunPass() {
 
     }
   }
-  else if(is_value_info) {
+  else {
     if(CHW_to_HWC) {
-      std::vector<int> dims = value_info.get_dims();
+      std::vector<int> dims = tensor.get_dims();
       std::vector<int> new_dims{dims[0], dims[2], dims[3], dims[1]};
-      graph->update_inputs(value_info.get_name(), new_dims);
+      graph->update_inputs(tensor.get_name(), new_dims);
 
-      auto& node = graph->mwnn_graph_nodes[value_info.get_name()];
+      auto& node = graph->mwnn_graph_nodes[tensor.get_name()];
       if (auto input_data_node = std::dynamic_pointer_cast<::metawarenn::op::InputData>(node))
         input_data_node->shape = new_dims;
     }
     else if(HWC_to_CHW) {
-      std::vector<int> dims = value_info.get_dims();
+      std::vector<int> dims = tensor.get_dims();
       std::vector<int> new_dims{dims[0], dims[3], dims[1], dims[2]};
-      graph->update_inputs(value_info.get_name(), new_dims);
+      graph->update_inputs(tensor.get_name(), new_dims);
 
-      auto& node = graph->mwnn_graph_nodes[value_info.get_name()];
+      auto& node = graph->mwnn_graph_nodes[tensor.get_name()];
       if (auto input_data_node = std::dynamic_pointer_cast<::metawarenn::op::InputData>(node))
         input_data_node->shape = new_dims;
     }

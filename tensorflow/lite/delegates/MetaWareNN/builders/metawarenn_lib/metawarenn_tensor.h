@@ -45,6 +45,9 @@ class MWNNTensor {
       dims = n_dims;
       tensor = n_tensor;
     }
+    void update_dims(std::vector<int> n_dims) {
+      dims = n_dims;
+    }
   private:
     std::string name;
     uint32_t index = 1; //used to maintain the constant initializers order index

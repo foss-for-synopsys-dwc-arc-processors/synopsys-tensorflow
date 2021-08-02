@@ -7,16 +7,17 @@ namespace metawarenn {
 #if ONNX
 MWNNAttribute::MWNNAttribute(AttributeProto& onnx_attribute_proto) {
   name = onnx_attribute_proto.name();
+  type = (int)ElementType::get_mwnn_attr_type_onnx(onnx_attribute_proto.type());
   set_data(onnx_attribute_proto);
 }
 
 void MWNNAttribute::set_data(AttributeProto& onnx_attribute_proto) {
   switch(onnx_attribute_proto.type()) {
     case AttributeProto_AttributeType_FLOAT:
-      data.push_back(onnx_attribute_proto.f());
+      float_data.push_back(onnx_attribute_proto.f());
       break;
     case AttributeProto_AttributeType_INT:
-      data.push_back(onnx_attribute_proto.i());
+      int_data.push_back(onnx_attribute_proto.i());
       break;
     case AttributeProto_AttributeType_STRING:
       string_data.push_back(onnx_attribute_proto.s());
@@ -30,10 +31,10 @@ void MWNNAttribute::set_data(AttributeProto& onnx_attribute_proto) {
       exit(1);
       break;
     case AttributeProto_AttributeType_FLOATS:
-      data.assign(std::begin(onnx_attribute_proto.floats()), std::end(onnx_attribute_proto.floats()));
+      float_data.assign(std::begin(onnx_attribute_proto.floats()), std::end(onnx_attribute_proto.floats()));
       break;
     case AttributeProto_AttributeType_INTS:
-      data.assign(std::begin(onnx_attribute_proto.ints()), std::end(onnx_attribute_proto.ints()));
+      int_data.assign(std::begin(onnx_attribute_proto.ints()), std::end(onnx_attribute_proto.ints()));
       break;
     case AttributeProto_AttributeType_STRINGS:
       string_data.assign(std::begin(onnx_attribute_proto.strings()), std::end(onnx_attribute_proto.strings()));
@@ -57,17 +58,19 @@ void MWNNAttribute::set_data(AttributeProto& onnx_attribute_proto) {
 //TFConstructor, GLOWConstructor & TVMConstructor
 MWNNAttribute::MWNNAttribute(std::string m_name, std::vector<int> m_data) {
   name = m_name;
-  data = m_data;
+  int_data = m_data;
+  type = 6;
 }
 
 //TVMConstructor
 MWNNAttribute::MWNNAttribute(std::string m_name, std::vector<float> m_data) {
   name = m_name;
   float_data = m_data;
+  type = 3;
 }
 
 void MWNNAttribute::set_data(int m_data) {
-    data.clear();
-    data.push_back(m_data);
+    int_data.clear();
+    int_data.push_back(m_data);
 }
 } //namespace metawarenn

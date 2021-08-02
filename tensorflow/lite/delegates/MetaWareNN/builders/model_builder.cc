@@ -61,19 +61,19 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
             /*std::cout << "\t Dims : ";
             for (auto dim : g_t.get_dims())
               std::cout << dim << ",";*/
-            ::metawarenn::optimizer::ConvertLayout cl(mwnn_graph, g_t, 0, HWC_TO_CHW);
+            ::metawarenn::optimizer::ConvertLayout cl(mwnn_graph, g_t, 0, HWC_TO_CHW, true);
             manager.register_pass(cl);
           }
         }
       }
     }
-    for (auto g_t : mwnn_graph->get_graph_inputs()) {
+    for (auto g_t : mwnn_graph->get_graph_ip_tensor()) {
       if(g_t.get_dims().size() == 4) {
         /*std::cout << "\n Name : " << g_t.get_name();
         std::cout << "\t Dims : ";
         for (auto dim : g_t.get_dims())
           std::cout << dim << ",";*/
-        ::metawarenn::optimizer::ConvertLayout cl(mwnn_graph, g_t, 0, HWC_TO_CHW);
+        ::metawarenn::optimizer::ConvertLayout cl(mwnn_graph, g_t, 0, HWC_TO_CHW, false);
         manager.register_pass(cl);
       }
     }
@@ -101,32 +101,36 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
     std::cout << "\n Graph Name : " << mwnn_graph->get_name();
     ::MWNN::MWNNGraphProto mwnn_graph_proto;
     mwnn_graph_proto.set_name(mwnn_graph->get_name());
-    mwnn_graph_proto.set_graph_input(mwnn_graph->get_graph_ip_name());
-    mwnn_graph_proto.set_graph_output(mwnn_graph->get_graph_op_name());
+    for (auto g_ip : mwnn_graph->get_graph_ip_names())
+      mwnn_graph_proto.add_ip_name((g_ip));
+    for (auto g_op : mwnn_graph->get_graph_op_names())
+      mwnn_graph_proto.add_op_name((g_op));
 
     std::cout << "\n -----------------------Graph Inputs-------------------------- \n";
-    for (auto g_ip : mwnn_graph->get_graph_inputs()) {
+    for (auto g_ip : mwnn_graph->get_graph_ip_tensor()) {
       std::cout << "\n Input Name : " << g_ip.get_name();
       std::cout << "\n Data Type : " << g_ip.get_type();
       std::cout << "\n Input Dims : ";
       auto input = mwnn_graph_proto.add_input();
       input->set_name(g_ip.get_name());
       input->set_type(g_ip.get_type());
-
-      for (auto dim : g_ip.get_dims())
+      for (auto dim : g_ip.get_dims()) {
+        std::cout << dim << ",";
         input->add_dims(dim);
+      }
     }
     std::cout << "\n -----------------------Graph Outputs-------------------------- \n";
-    for (auto g_op : mwnn_graph->get_graph_outputs()) {
+    for (auto g_op : mwnn_graph->get_graph_op_tensor()) {
       std::cout << "\n Output Name : " << g_op.get_name();
       std::cout << "\n Data Type : " << g_op.get_type();
       std::cout << "\n Output Dims : ";
       auto output = mwnn_graph_proto.add_output();
       output->set_name(g_op.get_name());
       output->set_type(g_op.get_type());
-      for (auto dim : g_op.get_dims())
+      for (auto dim : g_op.get_dims()) {
+        std::cout << dim << ",";
         output->add_dims(dim);
-
+      }
     }
     std::cout << "\n -----------------------Graph Nodes-------------------------- \n";
     for (auto g_n : mwnn_graph->get_graph_nodes()) {
@@ -137,27 +141,37 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
       node->set_name(g_n.get_name());
       auto op_type = g_n.get_op_type();
       node->set_op_type(op_type == "DepthwiseConv" ? "Conv" : op_type);
-      for (auto n_ip : g_n.get_inputs())
-        node->add_input((n_ip));
-      for (auto n_op : g_n.get_outputs())
-        node->add_output((n_op));
+      for (auto n_ip : g_n.get_inputs()) {
+        std::cout << "\n Input : n_ip : " << n_ip;
+        node->add_ip_name((n_ip));
+      }
+      for (auto n_op : g_n.get_outputs()) {
+        std::cout << "\n Output : n_op : " << n_op;
+        node->add_op_name((n_op));
+      }
       std::cout << "\n ---------------------------------------------------------------- ";
       for (auto attribute : g_n.get_attributes()) {
         std::cout << "\n Attribute Name : " << attribute.get_name();
-        std::cout << "\n Attribute Data Type : " << attribute.get_type();
         std::cout << "\n Attribute Data : ";
         auto attr = node->add_attribute();
         attr->set_name(attribute.get_name());
         attr->set_type(attribute.get_type());
-        if(attribute.get_type() == 3 || attribute.get_type() == 8) {
-          for(int i = 0; i < attribute.get_string_data().size(); i++){
-            auto data = attr->add_data();
-            data = &attribute.get_string_data()[i];}
+        if(attribute.get_type() == 6) { //int data
+          for(int i = 0; i < attribute.get_int_data().size(); i++){
+            attr->add_int_data(attribute.get_int_data()[i]);
+            std::cout << attribute.get_int_data()[i] << ",";
+          }
         }
-        else {
-          for(int i = 0; i < attribute.get_data().size(); i++){
-            std::cout << attribute.get_data()[i] << ",";
-            attr->add_ints(attribute.get_data()[i]);
+        else if(attribute.get_type() == 3) { //float data
+          for(int i = 0; i < attribute.get_float_data().size(); i++){
+            attr->add_float_data(attribute.get_float_data()[i]);
+            std::cout << attribute.get_float_data()[i] << ",";
+          }
+        }
+        else if(attribute.get_type() == 12) { //string data
+          for(int i = 0; i < attribute.get_string_data().size(); i++){
+            attr->add_string_data(attribute.get_string_data()[i]);
+            std::cout << attribute.get_string_data()[i] << ",";
           }
         }
       }
@@ -166,16 +180,19 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
     for (auto g_t : mwnn_graph->get_graph_initializers()) {
       auto initializer = mwnn_graph_proto.add_initializer();
       initializer->set_name(g_t.get_name());
-      initializer->set_data_type(g_t.get_type());
+      initializer->set_type(g_t.get_type());
       std::cout << "\n Name : " << g_t.get_name();
       std::cout << "\n Type : " << g_t.get_type();
-      std::cout << "\n Dim : ";
-      for (auto dim : g_t.get_dims()){
+      std::cout << "\n Dims : ";
+      for (auto dim : g_t.get_dims()) {
         std::cout << dim << ",";
         initializer->add_dims(dim);
       }
-      for (auto t_val : g_t.get_tensor())
+      //std::cout << "\n Tensor values : ";
+      for (auto t_val : g_t.get_tensor()) {
+        //std::cout << t_val << ",";
         initializer->add_float_data(t_val);
+      }
     }
 
     std::cout << "\n Graph Name : " << mwnn_graph->get_name();
@@ -192,40 +209,6 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
     std::string cmd = "bash /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh " + mwnn_proto_bin + " " + mwnn_op_path + " " + g_name + " " + std::to_string(subgraph_counter);;
     const char *command = cmd.c_str();
     system(command);
-    std::ifstream in;
-    in.open("/path/to/ARC/cnn_tools/utils/tools/evgencnn/scripts/cnn_bin_" + g_name + ".bin", std::ios::in | std::ios::binary);
-    if(in.is_open())
-    {
-        std::streampos start = in.tellg();
-        in.seekg(0, std::ios::end);
-        std::streampos end = in.tellg();
-        in.seekg(0, std::ios::beg);
-        std::vector<char> contents;
-        contents.resize(static_cast<size_t>(end - start));
-        in.read(&contents[0], contents.size());
-        auto data = contents.data();
-        int shmid;
-        struct shmseg *shmp;
-        //Create unique key
-        key_t key = ftok("/tmp/",subgraph_counter);
-        std::cout << "\nkey: " << key;
-        shmid = shmget(key, sizeof(struct shmseg), 0644|IPC_CREAT);
-        if (shmid == -1) {
-            perror("Shared memory");
-            exit(1);
-        }
-        shmp = (shmseg*)shmat(shmid, NULL, 0);
-        if (shmp == (void *) -1) {
-            perror("Shared memory attach");
-            exit(1);
-        }
-        memcpy(shmp->buf, data, contents.size());
-        shmp->cnt = contents.size();
-        printf("\nWriting Process: Shared Memory Write: Wrote %d bytes\n", shmp->cnt);
-        sleep(3);
-        printf("\nWriting Process: Complete\n");
-    }
-
   #endif
 
   return kTfLiteOk;

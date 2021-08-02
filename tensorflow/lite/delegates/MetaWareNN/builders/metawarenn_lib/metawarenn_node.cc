@@ -28,7 +28,7 @@ MWNNNode::MWNNNode(NodeProto& onnx_node_proto) {
     mwnn_attributes.emplace_back(mwnn_attribute);
     if(mwnn_attribute.get_name() == "group")
     {
-      op_type = (int)mwnn_attribute.get_data()[0] == 1 ? "Conv" : "DepthwiseConv";
+      op_type = mwnn_attribute.get_int_data()[0] == 1 ? "Conv" : "DepthwiseConv";
     }
   }
   if(op_type == "Conv" or op_type == "DepthwiseConv") {

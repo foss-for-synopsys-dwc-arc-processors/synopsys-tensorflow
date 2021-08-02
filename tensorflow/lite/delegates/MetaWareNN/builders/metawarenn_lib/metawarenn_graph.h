@@ -29,9 +29,9 @@ class MWNNGraph {
     void set_graph_outputs(std::string name, std::vector<int> dims, int type);
     #endif
     std::string get_name() { return name; }
-    std::string get_graph_ip_name() { return ip_name; }
-    std::string get_graph_op_name() { return op_name; }
-    void set_graph_op_name(std::string name) { op_name = name; }
+    std::vector<std::string> get_graph_ip_names() { return mwnn_graph_ip_names; }
+    std::vector<std::string> get_graph_op_names() { return mwnn_graph_op_names; }
+    void set_graph_op_name(std::string op_name) { mwnn_graph_op_names.emplace_back(op_name); }
     std::vector<MWNNTensor> get_graph_initializers() { return mwnn_initializer_tensors; }
     MWNNTensor get_initializer_tensor(std::string name) {
       auto it = std::find_if(
@@ -42,6 +42,13 @@ class MWNNGraph {
           std::cout << "\n ERROR : End of Initializers!!! - Couldn't find " << name;
       }
       return *it;
+    }
+    void remove_graph_op_names(std::string name){
+      auto it = std::find_if(
+      std::begin(mwnn_graph_op_names), std::end(mwnn_graph_op_names), [&](std::string op_name) {
+          return op_name == name;
+      });
+      mwnn_graph_op_names.erase(it);
     }
     void remove_initializer_names(std::string name){
       auto it = mwnn_initializer_names.find(name);
@@ -61,20 +68,6 @@ class MWNNGraph {
           return node.get_name() == name;
       });
       mwnn_nodes.erase(it);
-    }
-     void remove_inputs(std::string name){
-      auto it = std::find_if(
-      std::begin(mwnn_inputs), std::end(mwnn_inputs), [&](MWNNValueInfo& valueinfo) {
-          return valueinfo.get_name() == name;
-      });
-      mwnn_inputs.erase(it);
-    }
-     void remove_outputs(std::string name){
-      auto it = std::find_if(
-      std::begin(mwnn_outputs), std::end(mwnn_outputs), [&](MWNNValueInfo& valueinfo) {
-          return valueinfo.get_name() == name;
-      });
-      mwnn_outputs.erase(it);
     }
      void remove_graph_nodes(std::string name){
       mwnn_graph_nodes.erase(name);
@@ -160,30 +153,26 @@ class MWNNGraph {
         }
       }
     }
-    void update_inputs(std::string value_info_name, std::vector<int> n_dims) {
+    void update_inputs(std::string ip_tensor_name, std::vector<int> n_dims) {
       auto it = std::find_if(
-      std::begin(mwnn_inputs), std::end(mwnn_inputs), [&](MWNNValueInfo& valueinfo) {
-          return valueinfo.get_name() == value_info_name;
+      std::begin(mwnn_graph_ip_tensors), std::end(mwnn_graph_ip_tensors), [&](MWNNTensor& tensor) {
+          return tensor.get_name() == ip_tensor_name;
       });
       return it->update_dims(n_dims);
     }
     std::vector<MWNNNode> get_graph_nodes() { return mwnn_nodes; }
-    std::vector<MWNNValueInfo> get_graph_inputs() { return mwnn_inputs; }
-    std::vector<MWNNValueInfo> get_graph_outputs() { return mwnn_outputs; }
     std::vector <MWNNTensor> get_graph_ip_tensor() { return mwnn_graph_ip_tensors; }
     std::vector <MWNNTensor> get_graph_op_tensor() { return mwnn_graph_op_tensors; }
     std::set<std::string> mwnn_initializer_names;
     std::map<std::string, std::shared_ptr<op::Node>> mwnn_graph_nodes;
   private:
     std::string name;
-    std::string ip_name;
-    std::string op_name;
+    std::vector<std::string> mwnn_graph_ip_names;
+    std::vector<std::string> mwnn_graph_op_names;
+    std::vector<MWNNNode> mwnn_nodes;
     std::vector<MWNNTensor> mwnn_initializer_tensors;
     std::vector<MWNNTensor> mwnn_graph_ip_tensors;
     std::vector<MWNNTensor> mwnn_graph_op_tensors;
-    std::vector<MWNNNode> mwnn_nodes;
-    std::vector<MWNNValueInfo> mwnn_inputs;
-    std::vector<MWNNValueInfo> mwnn_outputs;
 };
 
 } //namespace metawarenn

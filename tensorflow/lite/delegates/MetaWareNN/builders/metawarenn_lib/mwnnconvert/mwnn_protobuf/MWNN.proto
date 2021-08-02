@@ -1,73 +1,35 @@
 syntax = "proto2";
 package MWNN;
 
-message MWNNValueInfoProto {
-  optional string name = 1;     // namespace Value
-  optional int32  type = 2;
-  repeated int32 dims = 3;
-}
-
 message MWNNTensorProto {
-  enum DataType {
-    UNDEFINED = 0;
-    // Basic types.
-    FLOAT = 1;   // float
-    UINT8 = 2;   // uint8_t
-    INT8 = 3;    // int8_t
-    UINT16 = 4;  // uint16_t
-    INT16 = 5;   // int16_t
-    INT32 = 6;   // int32_t
-    INT64 = 7;   // int64_t
-    STRING = 8;  // string
-    BOOL = 9;    // bool
-    FLOAT16 = 10;
-    DOUBLE = 11;
-    UINT32 = 12;
-    UINT64 = 13;
-    COMPLEX64 = 14;     // complex with float32 real and imaginary components
-    COMPLEX128 = 15;    // complex with float64 real and imaginary components
-  }
-
-  // The shape of the tensor.
-  repeated int32 dims = 1;
-  optional int32 data_type = 2;
-  message Segment {
-    optional int64 begin = 1;
-    optional int64 end = 2;
-  }
-  optional Segment segment = 3;
-  repeated float float_data = 4 [packed = true];
-  repeated int32 int32_data = 5 [packed = true];
-  repeated bytes string_data = 6;
-  repeated int64 int64_data = 7 [packed = true];
-  optional string name = 8; // namespace Value
-  optional bytes raw_data = 9;
-  repeated uint64 uint64_data = 11 [packed = true];
-
+  optional string name = 1;                      //Name of the Tensor
+  optional int32 type = 2;                       //MWNN Datatype of the Tensor
+  repeated int32 dims = 3;                       //Shape of the Tensor
+  repeated float float_data = 4 [packed = true]; //Values of the Tensor
 }
 
 message MWNNAttributeProto {
-  optional string name = 1;           // namespace Attribute
-  optional int32 type = 20;  // discriminator that indicates which field below is in use
-  repeated int32 ints = 8;            // list of ints
-  repeated string data = 9;
+  optional string name = 1;        //Name of the Attribute
+  optional int32 type = 2;         //MWNN Datatype of the Attribute
+  repeated int32 int_data = 3;     //Int values of the Attribute
+  repeated float float_data = 4;   //Float values of the Attribute
+  repeated string string_data = 5; //String values of the Attribute
 }
 
 message MWNNNodeProto {
-  repeated string input = 1;    // namespace Value
-  repeated string output = 2;   // namespace Value
-  optional string name = 3;     // namespace Node
-  optional string op_type = 4;  // namespace Operator
-  optional string domain = 7;   // namespace Domain
-  repeated MWNNAttributeProto attribute = 5;
+  optional string name = 1;                  // Name of the Node
+  optional string op_type = 2;               // OpType of the node
+  repeated string ip_name = 3;               // Node Inputs name
+  repeated string op_name = 4;               // Node Outputs name
+  repeated MWNNAttributeProto attribute = 5; // Node Attributes
 }
 
 message MWNNGraphProto {
-  repeated MWNNNodeProto node = 1;
-  optional string name = 2;   // namespace Graph
-  optional string graph_input = 3;
-  optional string graph_output = 4;
-  repeated MWNNTensorProto initializer = 5;
-  repeated MWNNValueInfoProto input = 11;
-  repeated MWNNValueInfoProto output = 12;
+  optional string name = 1;                 // Name of the graph
+  repeated string ip_name = 2;              // Graph Inputs name
+  repeated string op_name = 3;              // Graph Outputs name
+  repeated MWNNNodeProto node = 4;          // Graph Nodes
+  repeated MWNNTensorProto initializer = 5; // Graph Constant Initializers
+  repeated MWNNTensorProto input = 6;       // Graph Input Tensor
+  repeated MWNNTensorProto output = 7;      // Graph Output Tensor
 }

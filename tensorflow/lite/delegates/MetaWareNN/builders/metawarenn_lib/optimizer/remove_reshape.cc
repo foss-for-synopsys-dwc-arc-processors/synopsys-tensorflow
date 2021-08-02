@@ -16,7 +16,6 @@ void RemoveReshape::RunPass() {
   //Remove initializer tensor from graph
   graph->remove_initializer_tensor(node.get_inputs()[1]);
   graph->remove_initializer_names(node.get_inputs()[1]);
-  graph->remove_inputs(node.get_inputs()[1]);
 
   for (auto g_n : graph->get_graph_nodes()) {
     //To get consumer of current op
@@ -34,9 +33,12 @@ void RemoveReshape::RunPass() {
     }
   }
   for (auto n_op : node.get_outputs()) {
-    graph->remove_outputs(n_op);
-    if(n_op == graph->get_graph_op_name())
-      graph->set_graph_op_name(node.get_inputs()[0]);
+    for (auto op_name : graph->get_graph_op_names()) {
+      if(n_op == op_name) {
+        graph->remove_graph_op_names(op_name);
+        graph->set_graph_op_name(node.get_inputs()[0]);
+      }
+    }
   }
   /*for (auto itr = consumers.begin(); itr != consumers.end(); ++itr) {
     std::cout << "\nConsumers : " << *itr;

@@ -16,18 +16,8 @@
 #include <google/protobuf/port_def.inc>
 extern PROTOBUF_INTERNAL_EXPORT_MWNN_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MWNNAttributeProto_MWNN_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_MWNN_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MWNNNodeProto_MWNN_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_MWNN_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MWNNTensorProto_MWNN_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_MWNN_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MWNNTensorProto_Segment_MWNN_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_MWNN_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MWNNValueInfoProto_MWNN_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_MWNN_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MWNNTensorProto_MWNN_2eproto;
 namespace MWNN {
-class MWNNValueInfoProtoDefaultTypeInternal {
- public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MWNNValueInfoProto> _instance;
-} _MWNNValueInfoProto_default_instance_;
-class MWNNTensorProto_SegmentDefaultTypeInternal {
- public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MWNNTensorProto_Segment> _instance;
-} _MWNNTensorProto_Segment_default_instance_;
 class MWNNTensorProtoDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MWNNTensorProto> _instance;
@@ -70,11 +60,10 @@ static void InitDefaultsscc_info_MWNNGraphProto_MWNN_2eproto() {
   ::MWNN::MWNNGraphProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<3> scc_info_MWNNGraphProto_MWNN_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 3, 0, InitDefaultsscc_info_MWNNGraphProto_MWNN_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<2> scc_info_MWNNGraphProto_MWNN_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 2, 0, InitDefaultsscc_info_MWNNGraphProto_MWNN_2eproto}, {
       &scc_info_MWNNNodeProto_MWNN_2eproto.base,
-      &scc_info_MWNNTensorProto_MWNN_2eproto.base,
-      &scc_info_MWNNValueInfoProto_MWNN_2eproto.base,}};
+      &scc_info_MWNNTensorProto_MWNN_2eproto.base,}};
 
 static void InitDefaultsscc_info_MWNNNodeProto_MWNN_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -102,85 +91,26 @@ static void InitDefaultsscc_info_MWNNTensorProto_MWNN_2eproto() {
   ::MWNN::MWNNTensorProto::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_MWNNTensorProto_MWNN_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_MWNNTensorProto_MWNN_2eproto}, {
-      &scc_info_MWNNTensorProto_Segment_MWNN_2eproto.base,}};
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MWNNTensorProto_MWNN_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_MWNNTensorProto_MWNN_2eproto}, {}};
 
-static void InitDefaultsscc_info_MWNNTensorProto_Segment_MWNN_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::MWNN::_MWNNTensorProto_Segment_default_instance_;
-    new (ptr) ::MWNN::MWNNTensorProto_Segment();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::MWNN::MWNNTensorProto_Segment::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MWNNTensorProto_Segment_MWNN_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_MWNNTensorProto_Segment_MWNN_2eproto}, {}};
-
-static void InitDefaultsscc_info_MWNNValueInfoProto_MWNN_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::MWNN::_MWNNValueInfoProto_default_instance_;
-    new (ptr) ::MWNN::MWNNValueInfoProto();
-    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::MWNN::MWNNValueInfoProto::InitAsDefaultInstance();
-}
-
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MWNNValueInfoProto_MWNN_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_MWNNValueInfoProto_MWNN_2eproto}, {}};
-
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_MWNN_2eproto[6];
-static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_MWNN_2eproto[1];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_MWNN_2eproto[4];
+static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_MWNN_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_MWNN_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_MWNN_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNValueInfoProto, _has_bits_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNValueInfoProto, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNValueInfoProto, name_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNValueInfoProto, type_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNValueInfoProto, dims_),
-  0,
-  1,
-  ~0u,
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto_Segment, _has_bits_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto_Segment, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto_Segment, begin_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto_Segment, end_),
-  0,
-  1,
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, dims_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, data_type_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, segment_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, float_data_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, int32_data_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, string_data_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, int64_data_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, name_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, uint64_data_),
-  ~0u,
-  2,
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, type_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, dims_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNTensorProto, float_data_),
+  0,
   1,
   ~0u,
-  ~0u,
-  ~0u,
-  ~0u,
-  0,
   ~0u,
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNAttributeProto, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNAttributeProto, _internal_metadata_),
@@ -189,10 +119,12 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_MWNN_2eproto::offsets[] PROTOB
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNAttributeProto, name_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNAttributeProto, type_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNAttributeProto, ints_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNAttributeProto, data_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNAttributeProto, int_data_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNAttributeProto, float_data_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNAttributeProto, string_data_),
   0,
   1,
+  ~0u,
   ~0u,
   ~0u,
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNNodeProto, _has_bits_),
@@ -200,50 +132,44 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_MWNN_2eproto::offsets[] PROTOB
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNNodeProto, input_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNNodeProto, output_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNNodeProto, name_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNNodeProto, op_type_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNNodeProto, domain_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNNodeProto, ip_name_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNNodeProto, op_name_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNNodeProto, attribute_),
-  ~0u,
-  ~0u,
   0,
   1,
-  2,
+  ~0u,
+  ~0u,
   ~0u,
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, node_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, name_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, graph_input_),
-  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, graph_output_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, ip_name_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, op_name_),
+  PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, node_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, initializer_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, input_),
   PROTOBUF_FIELD_OFFSET(::MWNN::MWNNGraphProto, output_),
-  ~0u,
   0,
-  1,
-  2,
+  ~0u,
+  ~0u,
+  ~0u,
   ~0u,
   ~0u,
   ~0u,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 8, sizeof(::MWNN::MWNNValueInfoProto)},
-  { 11, 18, sizeof(::MWNN::MWNNTensorProto_Segment)},
-  { 20, 34, sizeof(::MWNN::MWNNTensorProto)},
-  { 43, 52, sizeof(::MWNN::MWNNAttributeProto)},
-  { 56, 67, sizeof(::MWNN::MWNNNodeProto)},
-  { 73, 85, sizeof(::MWNN::MWNNGraphProto)},
+  { 0, 9, sizeof(::MWNN::MWNNTensorProto)},
+  { 13, 23, sizeof(::MWNN::MWNNAttributeProto)},
+  { 28, 38, sizeof(::MWNN::MWNNNodeProto)},
+  { 43, 55, sizeof(::MWNN::MWNNGraphProto)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::MWNN::_MWNNValueInfoProto_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::MWNN::_MWNNTensorProto_Segment_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::MWNN::_MWNNTensorProto_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::MWNN::_MWNNAttributeProto_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::MWNN::_MWNNNodeProto_default_instance_),
@@ -251,112 +177,50 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_MWNN_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\nMWNN.proto\022\004MWNN\">\n\022MWNNValueInfoProto"
-  "\022\014\n\004name\030\001 \001(\t\022\014\n\004type\030\002 \001(\005\022\014\n\004dims\030\003 \003"
-  "(\005\"\334\003\n\017MWNNTensorProto\022\014\n\004dims\030\001 \003(\005\022\021\n\t"
-  "data_type\030\002 \001(\005\022.\n\007segment\030\003 \001(\0132\035.MWNN."
-  "MWNNTensorProto.Segment\022\026\n\nfloat_data\030\004 "
-  "\003(\002B\002\020\001\022\026\n\nint32_data\030\005 \003(\005B\002\020\001\022\023\n\013strin"
-  "g_data\030\006 \003(\014\022\026\n\nint64_data\030\007 \003(\003B\002\020\001\022\014\n\004"
-  "name\030\010 \001(\t\022\027\n\013uint64_data\030\013 \003(\004B\002\020\001\032%\n\007S"
-  "egment\022\r\n\005begin\030\001 \001(\003\022\013\n\003end\030\002 \001(\003\"\314\001\n\010D"
-  "ataType\022\r\n\tUNDEFINED\020\000\022\t\n\005FLOAT\020\001\022\t\n\005UIN"
-  "T8\020\002\022\010\n\004INT8\020\003\022\n\n\006UINT16\020\004\022\t\n\005INT16\020\005\022\t\n"
-  "\005INT32\020\006\022\t\n\005INT64\020\007\022\n\n\006STRING\020\010\022\010\n\004BOOL\020"
-  "\t\022\013\n\007FLOAT16\020\n\022\n\n\006DOUBLE\020\013\022\n\n\006UINT32\020\014\022\n"
-  "\n\006UINT64\020\r\022\r\n\tCOMPLEX64\020\016\022\016\n\nCOMPLEX128\020"
-  "\017\"L\n\022MWNNAttributeProto\022\014\n\004name\030\001 \001(\t\022\014\n"
-  "\004type\030\024 \001(\005\022\014\n\004ints\030\010 \003(\005\022\014\n\004data\030\t \003(\t\""
-  "\212\001\n\rMWNNNodeProto\022\r\n\005input\030\001 \003(\t\022\016\n\006outp"
-  "ut\030\002 \003(\t\022\014\n\004name\030\003 \001(\t\022\017\n\007op_type\030\004 \001(\t\022"
-  "\016\n\006domain\030\007 \001(\t\022+\n\tattribute\030\005 \003(\0132\030.MWN"
-  "N.MWNNAttributeProto\"\353\001\n\016MWNNGraphProto\022"
-  "!\n\004node\030\001 \003(\0132\023.MWNN.MWNNNodeProto\022\014\n\004na"
-  "me\030\002 \001(\t\022\023\n\013graph_input\030\003 \001(\t\022\024\n\014graph_o"
-  "utput\030\004 \001(\t\022*\n\013initializer\030\005 \003(\0132\025.MWNN."
-  "MWNNTensorProto\022\'\n\005input\030\013 \003(\0132\030.MWNN.MW"
-  "NNValueInfoProto\022(\n\006output\030\014 \003(\0132\030.MWNN."
-  "MWNNValueInfoProto"
+  "\n\nMWNN.proto\022\004MWNN\"S\n\017MWNNTensorProto\022\014\n"
+  "\004name\030\001 \001(\t\022\014\n\004type\030\002 \001(\005\022\014\n\004dims\030\003 \003(\005\022"
+  "\026\n\nfloat_data\030\004 \003(\002B\002\020\001\"k\n\022MWNNAttribute"
+  "Proto\022\014\n\004name\030\001 \001(\t\022\014\n\004type\030\002 \001(\005\022\020\n\010int"
+  "_data\030\003 \003(\005\022\022\n\nfloat_data\030\004 \003(\002\022\023\n\013strin"
+  "g_data\030\005 \003(\t\"}\n\rMWNNNodeProto\022\014\n\004name\030\001 "
+  "\001(\t\022\017\n\007op_type\030\002 \001(\t\022\017\n\007ip_name\030\003 \003(\t\022\017\n"
+  "\007op_name\030\004 \003(\t\022+\n\tattribute\030\005 \003(\0132\030.MWNN"
+  ".MWNNAttributeProto\"\334\001\n\016MWNNGraphProto\022\014"
+  "\n\004name\030\001 \001(\t\022\017\n\007ip_name\030\002 \003(\t\022\017\n\007op_name"
+  "\030\003 \003(\t\022!\n\004node\030\004 \003(\0132\023.MWNN.MWNNNodeProt"
+  "o\022*\n\013initializer\030\005 \003(\0132\025.MWNN.MWNNTensor"
+  "Proto\022$\n\005input\030\006 \003(\0132\025.MWNN.MWNNTensorPr"
+  "oto\022%\n\006output\030\007 \003(\0132\025.MWNN.MWNNTensorPro"
+  "to"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_MWNN_2eproto_deps[1] = {
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_MWNN_2eproto_sccs[6] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_MWNN_2eproto_sccs[4] = {
   &scc_info_MWNNAttributeProto_MWNN_2eproto.base,
   &scc_info_MWNNGraphProto_MWNN_2eproto.base,
   &scc_info_MWNNNodeProto_MWNN_2eproto.base,
   &scc_info_MWNNTensorProto_MWNN_2eproto.base,
-  &scc_info_MWNNTensorProto_Segment_MWNN_2eproto.base,
-  &scc_info_MWNNValueInfoProto_MWNN_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_MWNN_2eproto_once;
 static bool descriptor_table_MWNN_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_MWNN_2eproto = {
-  &descriptor_table_MWNN_2eproto_initialized, descriptor_table_protodef_MWNN_2eproto, "MWNN.proto", 1018,
-  &descriptor_table_MWNN_2eproto_once, descriptor_table_MWNN_2eproto_sccs, descriptor_table_MWNN_2eproto_deps, 6, 0,
+  &descriptor_table_MWNN_2eproto_initialized, descriptor_table_protodef_MWNN_2eproto, "MWNN.proto", 562,
+  &descriptor_table_MWNN_2eproto_once, descriptor_table_MWNN_2eproto_sccs, descriptor_table_MWNN_2eproto_deps, 4, 0,
   schemas, file_default_instances, TableStruct_MWNN_2eproto::offsets,
-  file_level_metadata_MWNN_2eproto, 6, file_level_enum_descriptors_MWNN_2eproto, file_level_service_descriptors_MWNN_2eproto,
+  file_level_metadata_MWNN_2eproto, 4, file_level_enum_descriptors_MWNN_2eproto, file_level_service_descriptors_MWNN_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_MWNN_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_MWNN_2eproto), true);
 namespace MWNN {
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MWNNTensorProto_DataType_descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_MWNN_2eproto);
-  return file_level_enum_descriptors_MWNN_2eproto[0];
-}
-bool MWNNTensorProto_DataType_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-    case 15:
-      return true;
-    default:
-      return false;
-  }
-}
-
-#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
-constexpr MWNNTensorProto_DataType MWNNTensorProto::UNDEFINED;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::FLOAT;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::UINT8;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::INT8;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::UINT16;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::INT16;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::INT32;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::INT64;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::STRING;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::BOOL;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::FLOAT16;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::DOUBLE;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::UINT32;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::UINT64;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::COMPLEX64;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::COMPLEX128;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::DataType_MIN;
-constexpr MWNNTensorProto_DataType MWNNTensorProto::DataType_MAX;
-constexpr int MWNNTensorProto::DataType_ARRAYSIZE;
-#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
 
 // ===================================================================
 
-void MWNNValueInfoProto::InitAsDefaultInstance() {
+void MWNNTensorProto::InitAsDefaultInstance() {
 }
-class MWNNValueInfoProto::_Internal {
+class MWNNTensorProto::_Internal {
  public:
-  using HasBits = decltype(std::declval<MWNNValueInfoProto>()._has_bits_);
+  using HasBits = decltype(std::declval<MWNNTensorProto>()._has_bits_);
   static void set_has_name(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -365,56 +229,58 @@ class MWNNValueInfoProto::_Internal {
   }
 };
 
-MWNNValueInfoProto::MWNNValueInfoProto()
+MWNNTensorProto::MWNNTensorProto()
   : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:MWNN.MWNNValueInfoProto)
+  // @@protoc_insertion_point(constructor:MWNN.MWNNTensorProto)
 }
-MWNNValueInfoProto::MWNNValueInfoProto(const MWNNValueInfoProto& from)
+MWNNTensorProto::MWNNTensorProto(const MWNNTensorProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
-      dims_(from.dims_) {
+      dims_(from.dims_),
+      float_data_(from.float_data_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_name()) {
     name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
   type_ = from.type_;
-  // @@protoc_insertion_point(copy_constructor:MWNN.MWNNValueInfoProto)
+  // @@protoc_insertion_point(copy_constructor:MWNN.MWNNTensorProto)
 }
 
-void MWNNValueInfoProto::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MWNNValueInfoProto_MWNN_2eproto.base);
+void MWNNTensorProto::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MWNNTensorProto_MWNN_2eproto.base);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   type_ = 0;
 }
 
-MWNNValueInfoProto::~MWNNValueInfoProto() {
-  // @@protoc_insertion_point(destructor:MWNN.MWNNValueInfoProto)
+MWNNTensorProto::~MWNNTensorProto() {
+  // @@protoc_insertion_point(destructor:MWNN.MWNNTensorProto)
   SharedDtor();
 }
 
-void MWNNValueInfoProto::SharedDtor() {
+void MWNNTensorProto::SharedDtor() {
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
-void MWNNValueInfoProto::SetCachedSize(int size) const {
+void MWNNTensorProto::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const MWNNValueInfoProto& MWNNValueInfoProto::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MWNNValueInfoProto_MWNN_2eproto.base);
+const MWNNTensorProto& MWNNTensorProto::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MWNNTensorProto_MWNN_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void MWNNValueInfoProto::Clear() {
-// @@protoc_insertion_point(message_clear_start:MWNN.MWNNValueInfoProto)
+void MWNNTensorProto::Clear() {
+// @@protoc_insertion_point(message_clear_start:MWNN.MWNNTensorProto)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   dims_.Clear();
+  float_data_.Clear();
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
     name_.ClearNonDefaultToEmptyNoArena();
@@ -424,7 +290,7 @@ void MWNNValueInfoProto::Clear() {
   _internal_metadata_.Clear();
 }
 
-const char* MWNNValueInfoProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* MWNNTensorProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
@@ -438,7 +304,7 @@ const char* MWNNValueInfoProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNValueInfoProto.name");
+          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNTensorProto.name");
           #endif  // !NDEBUG
           CHK_(ptr);
         } else goto handle_unusual;
@@ -466,563 +332,6 @@ const char* MWNNValueInfoProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
-    }  // switch
-  }  // while
-success:
-  _has_bits_.Or(has_bits);
-  return ptr;
-failure:
-  ptr = nullptr;
-  goto success;
-#undef CHK_
-}
-
-::PROTOBUF_NAMESPACE_ID::uint8* MWNNValueInfoProto::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:MWNN.MWNNValueInfoProto)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // optional string name = 1;
-  if (cached_has_bits & 0x00000001u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "MWNN.MWNNValueInfoProto.name");
-    target = stream->WriteStringMaybeAliased(
-        1, this->_internal_name(), target);
-  }
-
-  // optional int32 type = 2;
-  if (cached_has_bits & 0x00000002u) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_type(), target);
-  }
-
-  // repeated int32 dims = 3;
-  for (int i = 0, n = this->_internal_dims_size(); i < n; i++) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_dims(i), target);
-  }
-
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:MWNN.MWNNValueInfoProto)
-  return target;
-}
-
-size_t MWNNValueInfoProto::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:MWNN.MWNNValueInfoProto)
-  size_t total_size = 0;
-
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // repeated int32 dims = 3;
-  {
-    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      Int32Size(this->dims_);
-    total_size += 1 *
-                  ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_dims_size());
-    total_size += data_size;
-  }
-
-  cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
-    // optional string name = 1;
-    if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_name());
-    }
-
-    // optional int32 type = 2;
-    if (cached_has_bits & 0x00000002u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-          this->_internal_type());
-    }
-
-  }
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void MWNNValueInfoProto::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:MWNN.MWNNValueInfoProto)
-  GOOGLE_DCHECK_NE(&from, this);
-  const MWNNValueInfoProto* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MWNNValueInfoProto>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:MWNN.MWNNValueInfoProto)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:MWNN.MWNNValueInfoProto)
-    MergeFrom(*source);
-  }
-}
-
-void MWNNValueInfoProto::MergeFrom(const MWNNValueInfoProto& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:MWNN.MWNNValueInfoProto)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  dims_.MergeFrom(from.dims_);
-  cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
-    if (cached_has_bits & 0x00000001u) {
-      _has_bits_[0] |= 0x00000001u;
-      name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
-    }
-    if (cached_has_bits & 0x00000002u) {
-      type_ = from.type_;
-    }
-    _has_bits_[0] |= cached_has_bits;
-  }
-}
-
-void MWNNValueInfoProto::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:MWNN.MWNNValueInfoProto)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void MWNNValueInfoProto::CopyFrom(const MWNNValueInfoProto& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:MWNN.MWNNValueInfoProto)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool MWNNValueInfoProto::IsInitialized() const {
-  return true;
-}
-
-void MWNNValueInfoProto::InternalSwap(MWNNValueInfoProto* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  dims_.InternalSwap(&other->dims_);
-  name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(type_, other->type_);
-}
-
-::PROTOBUF_NAMESPACE_ID::Metadata MWNNValueInfoProto::GetMetadata() const {
-  return GetMetadataStatic();
-}
-
-
-// ===================================================================
-
-void MWNNTensorProto_Segment::InitAsDefaultInstance() {
-}
-class MWNNTensorProto_Segment::_Internal {
- public:
-  using HasBits = decltype(std::declval<MWNNTensorProto_Segment>()._has_bits_);
-  static void set_has_begin(HasBits* has_bits) {
-    (*has_bits)[0] |= 1u;
-  }
-  static void set_has_end(HasBits* has_bits) {
-    (*has_bits)[0] |= 2u;
-  }
-};
-
-MWNNTensorProto_Segment::MWNNTensorProto_Segment()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:MWNN.MWNNTensorProto.Segment)
-}
-MWNNTensorProto_Segment::MWNNTensorProto_Segment(const MWNNTensorProto_Segment& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
-      _has_bits_(from._has_bits_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::memcpy(&begin_, &from.begin_,
-    static_cast<size_t>(reinterpret_cast<char*>(&end_) -
-    reinterpret_cast<char*>(&begin_)) + sizeof(end_));
-  // @@protoc_insertion_point(copy_constructor:MWNN.MWNNTensorProto.Segment)
-}
-
-void MWNNTensorProto_Segment::SharedCtor() {
-  ::memset(&begin_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&end_) -
-      reinterpret_cast<char*>(&begin_)) + sizeof(end_));
-}
-
-MWNNTensorProto_Segment::~MWNNTensorProto_Segment() {
-  // @@protoc_insertion_point(destructor:MWNN.MWNNTensorProto.Segment)
-  SharedDtor();
-}
-
-void MWNNTensorProto_Segment::SharedDtor() {
-}
-
-void MWNNTensorProto_Segment::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const MWNNTensorProto_Segment& MWNNTensorProto_Segment::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MWNNTensorProto_Segment_MWNN_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void MWNNTensorProto_Segment::Clear() {
-// @@protoc_insertion_point(message_clear_start:MWNN.MWNNTensorProto.Segment)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
-    ::memset(&begin_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&end_) -
-        reinterpret_cast<char*>(&begin_)) + sizeof(end_));
-  }
-  _has_bits_.Clear();
-  _internal_metadata_.Clear();
-}
-
-const char* MWNNTensorProto_Segment::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
-    switch (tag >> 3) {
-      // optional int64 begin = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          _Internal::set_has_begin(&has_bits);
-          begin_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // optional int64 end = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          _Internal::set_has_end(&has_bits);
-          end_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
-    }  // switch
-  }  // while
-success:
-  _has_bits_.Or(has_bits);
-  return ptr;
-failure:
-  ptr = nullptr;
-  goto success;
-#undef CHK_
-}
-
-::PROTOBUF_NAMESPACE_ID::uint8* MWNNTensorProto_Segment::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:MWNN.MWNNTensorProto.Segment)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // optional int64 begin = 1;
-  if (cached_has_bits & 0x00000001u) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(1, this->_internal_begin(), target);
-  }
-
-  // optional int64 end = 2;
-  if (cached_has_bits & 0x00000002u) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(2, this->_internal_end(), target);
-  }
-
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:MWNN.MWNNTensorProto.Segment)
-  return target;
-}
-
-size_t MWNNTensorProto_Segment::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:MWNN.MWNNTensorProto.Segment)
-  size_t total_size = 0;
-
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
-    // optional int64 begin = 1;
-    if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
-          this->_internal_begin());
-    }
-
-    // optional int64 end = 2;
-    if (cached_has_bits & 0x00000002u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
-          this->_internal_end());
-    }
-
-  }
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void MWNNTensorProto_Segment::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:MWNN.MWNNTensorProto.Segment)
-  GOOGLE_DCHECK_NE(&from, this);
-  const MWNNTensorProto_Segment* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MWNNTensorProto_Segment>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:MWNN.MWNNTensorProto.Segment)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:MWNN.MWNNTensorProto.Segment)
-    MergeFrom(*source);
-  }
-}
-
-void MWNNTensorProto_Segment::MergeFrom(const MWNNTensorProto_Segment& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:MWNN.MWNNTensorProto.Segment)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
-    if (cached_has_bits & 0x00000001u) {
-      begin_ = from.begin_;
-    }
-    if (cached_has_bits & 0x00000002u) {
-      end_ = from.end_;
-    }
-    _has_bits_[0] |= cached_has_bits;
-  }
-}
-
-void MWNNTensorProto_Segment::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:MWNN.MWNNTensorProto.Segment)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void MWNNTensorProto_Segment::CopyFrom(const MWNNTensorProto_Segment& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:MWNN.MWNNTensorProto.Segment)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool MWNNTensorProto_Segment::IsInitialized() const {
-  return true;
-}
-
-void MWNNTensorProto_Segment::InternalSwap(MWNNTensorProto_Segment* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  swap(begin_, other->begin_);
-  swap(end_, other->end_);
-}
-
-::PROTOBUF_NAMESPACE_ID::Metadata MWNNTensorProto_Segment::GetMetadata() const {
-  return GetMetadataStatic();
-}
-
-
-// ===================================================================
-
-void MWNNTensorProto::InitAsDefaultInstance() {
-  ::MWNN::_MWNNTensorProto_default_instance_._instance.get_mutable()->segment_ = const_cast< ::MWNN::MWNNTensorProto_Segment*>(
-      ::MWNN::MWNNTensorProto_Segment::internal_default_instance());
-}
-class MWNNTensorProto::_Internal {
- public:
-  using HasBits = decltype(std::declval<MWNNTensorProto>()._has_bits_);
-  static void set_has_data_type(HasBits* has_bits) {
-    (*has_bits)[0] |= 4u;
-  }
-  static const ::MWNN::MWNNTensorProto_Segment& segment(const MWNNTensorProto* msg);
-  static void set_has_segment(HasBits* has_bits) {
-    (*has_bits)[0] |= 2u;
-  }
-  static void set_has_name(HasBits* has_bits) {
-    (*has_bits)[0] |= 1u;
-  }
-};
-
-const ::MWNN::MWNNTensorProto_Segment&
-MWNNTensorProto::_Internal::segment(const MWNNTensorProto* msg) {
-  return *msg->segment_;
-}
-MWNNTensorProto::MWNNTensorProto()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:MWNN.MWNNTensorProto)
-}
-MWNNTensorProto::MWNNTensorProto(const MWNNTensorProto& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
-      _has_bits_(from._has_bits_),
-      dims_(from.dims_),
-      float_data_(from.float_data_),
-      int32_data_(from.int32_data_),
-      string_data_(from.string_data_),
-      int64_data_(from.int64_data_),
-      uint64_data_(from.uint64_data_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (from._internal_has_name()) {
-    name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
-  }
-  if (from._internal_has_segment()) {
-    segment_ = new ::MWNN::MWNNTensorProto_Segment(*from.segment_);
-  } else {
-    segment_ = nullptr;
-  }
-  data_type_ = from.data_type_;
-  // @@protoc_insertion_point(copy_constructor:MWNN.MWNNTensorProto)
-}
-
-void MWNNTensorProto::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MWNNTensorProto_MWNN_2eproto.base);
-  name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&segment_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&data_type_) -
-      reinterpret_cast<char*>(&segment_)) + sizeof(data_type_));
-}
-
-MWNNTensorProto::~MWNNTensorProto() {
-  // @@protoc_insertion_point(destructor:MWNN.MWNNTensorProto)
-  SharedDtor();
-}
-
-void MWNNTensorProto::SharedDtor() {
-  name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete segment_;
-}
-
-void MWNNTensorProto::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const MWNNTensorProto& MWNNTensorProto::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MWNNTensorProto_MWNN_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void MWNNTensorProto::Clear() {
-// @@protoc_insertion_point(message_clear_start:MWNN.MWNNTensorProto)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  dims_.Clear();
-  float_data_.Clear();
-  int32_data_.Clear();
-  string_data_.Clear();
-  int64_data_.Clear();
-  uint64_data_.Clear();
-  cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
-    if (cached_has_bits & 0x00000001u) {
-      name_.ClearNonDefaultToEmptyNoArena();
-    }
-    if (cached_has_bits & 0x00000002u) {
-      GOOGLE_DCHECK(segment_ != nullptr);
-      segment_->Clear();
-    }
-  }
-  data_type_ = 0;
-  _has_bits_.Clear();
-  _internal_metadata_.Clear();
-}
-
-const char* MWNNTensorProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    CHK_(ptr);
-    switch (tag >> 3) {
-      // repeated int32 dims = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            _internal_add_dims(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<8>(ptr));
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_dims(), ptr, ctx);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // optional int32 data_type = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
-          _Internal::set_has_data_type(&has_bits);
-          data_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // optional .MWNN.MWNNTensorProto.Segment segment = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_segment(), ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
       // repeated float float_data = 4 [packed = true];
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
@@ -1031,60 +340,6 @@ const char* MWNNTensorProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37) {
           _internal_add_float_data(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
           ptr += sizeof(float);
-        } else goto handle_unusual;
-        continue;
-      // repeated int32 int32_data = 5 [packed = true];
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_int32_data(), ptr, ctx);
-          CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40) {
-          _internal_add_int32_data(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // repeated bytes string_data = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            auto str = _internal_add_string_data();
-            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
-        } else goto handle_unusual;
-        continue;
-      // repeated int64 int64_data = 7 [packed = true];
-      case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt64Parser(_internal_mutable_int64_data(), ptr, ctx);
-          CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 56) {
-          _internal_add_int64_data(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // optional string name = 8;
-      case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
-          auto str = _internal_mutable_name();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNTensorProto.name");
-          #endif  // !NDEBUG
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // repeated uint64 uint64_data = 11 [packed = true];
-      case 11:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedUInt64Parser(_internal_mutable_uint64_data(), ptr, ctx);
-          CHK_(ptr);
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 88) {
-          _internal_add_uint64_data(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
-          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -1114,73 +369,32 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated int32 dims = 1;
-  for (int i = 0, n = this->_internal_dims_size(); i < n; i++) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_dims(i), target);
-  }
-
   cached_has_bits = _has_bits_[0];
-  // optional int32 data_type = 2;
-  if (cached_has_bits & 0x00000004u) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_data_type(), target);
-  }
-
-  // optional .MWNN.MWNNTensorProto.Segment segment = 3;
-  if (cached_has_bits & 0x00000002u) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(
-        3, _Internal::segment(this), target, stream);
-  }
-
-  // repeated float float_data = 4 [packed = true];
-  if (this->_internal_float_data_size() > 0) {
-    target = stream->WriteFixedPacked(4, _internal_float_data(), target);
-  }
-
-  // repeated int32 int32_data = 5 [packed = true];
-  {
-    int byte_size = _int32_data_cached_byte_size_.load(std::memory_order_relaxed);
-    if (byte_size > 0) {
-      target = stream->WriteInt32Packed(
-          5, _internal_int32_data(), byte_size, target);
-    }
-  }
-
-  // repeated bytes string_data = 6;
-  for (int i = 0, n = this->_internal_string_data_size(); i < n; i++) {
-    const auto& s = this->_internal_string_data(i);
-    target = stream->WriteBytes(6, s, target);
-  }
-
-  // repeated int64 int64_data = 7 [packed = true];
-  {
-    int byte_size = _int64_data_cached_byte_size_.load(std::memory_order_relaxed);
-    if (byte_size > 0) {
-      target = stream->WriteInt64Packed(
-          7, _internal_int64_data(), byte_size, target);
-    }
-  }
-
-  // optional string name = 8;
+  // optional string name = 1;
   if (cached_has_bits & 0x00000001u) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
       this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
       "MWNN.MWNNTensorProto.name");
     target = stream->WriteStringMaybeAliased(
-        8, this->_internal_name(), target);
+        1, this->_internal_name(), target);
   }
 
-  // repeated uint64 uint64_data = 11 [packed = true];
-  {
-    int byte_size = _uint64_data_cached_byte_size_.load(std::memory_order_relaxed);
-    if (byte_size > 0) {
-      target = stream->WriteUInt64Packed(
-          11, _internal_uint64_data(), byte_size, target);
-    }
+  // optional int32 type = 2;
+  if (cached_has_bits & 0x00000002u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_type(), target);
+  }
+
+  // repeated int32 dims = 3;
+  for (int i = 0, n = this->_internal_dims_size(); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_dims(i), target);
+  }
+
+  // repeated float float_data = 4 [packed = true];
+  if (this->_internal_float_data_size() > 0) {
+    target = stream->WriteFixedPacked(4, _internal_float_data(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1199,7 +413,7 @@ size_t MWNNTensorProto::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated int32 dims = 1;
+  // repeated int32 dims = 3;
   {
     size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       Int32Size(this->dims_);
@@ -1223,80 +437,20 @@ size_t MWNNTensorProto::ByteSizeLong() const {
     total_size += data_size;
   }
 
-  // repeated int32 int32_data = 5 [packed = true];
-  {
-    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      Int32Size(this->int32_data_);
-    if (data_size > 0) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
-    }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _int32_data_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
-    total_size += data_size;
-  }
-
-  // repeated bytes string_data = 6;
-  total_size += 1 *
-      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(string_data_.size());
-  for (int i = 0, n = string_data_.size(); i < n; i++) {
-    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
-      string_data_.Get(i));
-  }
-
-  // repeated int64 int64_data = 7 [packed = true];
-  {
-    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      Int64Size(this->int64_data_);
-    if (data_size > 0) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
-    }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _int64_data_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
-    total_size += data_size;
-  }
-
-  // repeated uint64 uint64_data = 11 [packed = true];
-  {
-    size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      UInt64Size(this->uint64_data_);
-    if (data_size > 0) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
-    }
-    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
-    _uint64_data_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
-    total_size += data_size;
-  }
-
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
-    // optional string name = 8;
+  if (cached_has_bits & 0x00000003u) {
+    // optional string name = 1;
     if (cached_has_bits & 0x00000001u) {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
           this->_internal_name());
     }
 
-    // optional .MWNN.MWNNTensorProto.Segment segment = 3;
+    // optional int32 type = 2;
     if (cached_has_bits & 0x00000002u) {
       total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *segment_);
-    }
-
-    // optional int32 data_type = 2;
-    if (cached_has_bits & 0x00000004u) {
-      total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-          this->_internal_data_type());
+          this->_internal_type());
     }
 
   }
@@ -1333,21 +487,14 @@ void MWNNTensorProto::MergeFrom(const MWNNTensorProto& from) {
 
   dims_.MergeFrom(from.dims_);
   float_data_.MergeFrom(from.float_data_);
-  int32_data_.MergeFrom(from.int32_data_);
-  string_data_.MergeFrom(from.string_data_);
-  int64_data_.MergeFrom(from.int64_data_);
-  uint64_data_.MergeFrom(from.uint64_data_);
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
+  if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
       _has_bits_[0] |= 0x00000001u;
       name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
     }
     if (cached_has_bits & 0x00000002u) {
-      _internal_mutable_segment()->::MWNN::MWNNTensorProto_Segment::MergeFrom(from._internal_segment());
-    }
-    if (cached_has_bits & 0x00000004u) {
-      data_type_ = from.data_type_;
+      type_ = from.type_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
@@ -1377,14 +524,9 @@ void MWNNTensorProto::InternalSwap(MWNNTensorProto* other) {
   swap(_has_bits_[0], other->_has_bits_[0]);
   dims_.InternalSwap(&other->dims_);
   float_data_.InternalSwap(&other->float_data_);
-  int32_data_.InternalSwap(&other->int32_data_);
-  string_data_.InternalSwap(&other->string_data_);
-  int64_data_.InternalSwap(&other->int64_data_);
-  uint64_data_.InternalSwap(&other->uint64_data_);
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(segment_, other->segment_);
-  swap(data_type_, other->data_type_);
+  swap(type_, other->type_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata MWNNTensorProto::GetMetadata() const {
@@ -1416,8 +558,9 @@ MWNNAttributeProto::MWNNAttributeProto(const MWNNAttributeProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
-      ints_(from.ints_),
-      data_(from.data_) {
+      int_data_(from.int_data_),
+      float_data_(from.float_data_),
+      string_data_(from.string_data_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_name()) {
@@ -1457,8 +600,9 @@ void MWNNAttributeProto::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  ints_.Clear();
-  data_.Clear();
+  int_data_.Clear();
+  float_data_.Clear();
+  string_data_.Clear();
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
     name_.ClearNonDefaultToEmptyNoArena();
@@ -1487,43 +631,58 @@ const char* MWNNAttributeProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // repeated int32 ints = 8;
-      case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            _internal_add_ints(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<64>(ptr));
-        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_ints(), ptr, ctx);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      // repeated string data = 9;
-      case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 74)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            auto str = _internal_add_data();
-            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-            #ifndef NDEBUG
-            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNAttributeProto.data");
-            #endif  // !NDEBUG
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<74>(ptr));
-        } else goto handle_unusual;
-        continue;
-      // optional int32 type = 20;
-      case 20:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 160)) {
+      // optional int32 type = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
           _Internal::set_has_type(&has_bits);
           type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated int32 int_data = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            _internal_add_int_data(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<24>(ptr));
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedInt32Parser(_internal_mutable_int_data(), ptr, ctx);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated float float_data = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            _internal_add_float_data(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+            ptr += sizeof(float);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<37>(ptr));
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_float_data(), ptr, ctx);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated string string_data = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_string_data();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            #ifndef NDEBUG
+            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNAttributeProto.string_data");
+            #endif  // !NDEBUG
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<42>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -1564,26 +723,32 @@ failure:
         1, this->_internal_name(), target);
   }
 
-  // repeated int32 ints = 8;
-  for (int i = 0, n = this->_internal_ints_size(); i < n; i++) {
+  // optional int32 type = 2;
+  if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(8, this->_internal_ints(i), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_type(), target);
   }
 
-  // repeated string data = 9;
-  for (int i = 0, n = this->_internal_data_size(); i < n; i++) {
-    const auto& s = this->_internal_data(i);
+  // repeated int32 int_data = 3;
+  for (int i = 0, n = this->_internal_int_data_size(); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_int_data(i), target);
+  }
+
+  // repeated float float_data = 4;
+  for (int i = 0, n = this->_internal_float_data_size(); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(4, this->_internal_float_data(i), target);
+  }
+
+  // repeated string string_data = 5;
+  for (int i = 0, n = this->_internal_string_data_size(); i < n; i++) {
+    const auto& s = this->_internal_string_data(i);
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
       s.data(), static_cast<int>(s.length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "MWNN.MWNNAttributeProto.data");
-    target = stream->WriteString(9, s, target);
-  }
-
-  // optional int32 type = 20;
-  if (cached_has_bits & 0x00000002u) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(20, this->_internal_type(), target);
+      "MWNN.MWNNAttributeProto.string_data");
+    target = stream->WriteString(5, s, target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1602,21 +767,30 @@ size_t MWNNAttributeProto::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated int32 ints = 8;
+  // repeated int32 int_data = 3;
   {
     size_t data_size = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      Int32Size(this->ints_);
+      Int32Size(this->int_data_);
     total_size += 1 *
-                  ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_ints_size());
+                  ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_int_data_size());
     total_size += data_size;
   }
 
-  // repeated string data = 9;
+  // repeated float float_data = 4;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_float_data_size());
+    size_t data_size = 4UL * count;
+    total_size += 1 *
+                  ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_float_data_size());
+    total_size += data_size;
+  }
+
+  // repeated string string_data = 5;
   total_size += 1 *
-      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(data_.size());
-  for (int i = 0, n = data_.size(); i < n; i++) {
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(string_data_.size());
+  for (int i = 0, n = string_data_.size(); i < n; i++) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-      data_.Get(i));
+      string_data_.Get(i));
   }
 
   cached_has_bits = _has_bits_[0];
@@ -1628,9 +802,9 @@ size_t MWNNAttributeProto::ByteSizeLong() const {
           this->_internal_name());
     }
 
-    // optional int32 type = 20;
+    // optional int32 type = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += 2 +
+      total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
           this->_internal_type());
     }
@@ -1667,8 +841,9 @@ void MWNNAttributeProto::MergeFrom(const MWNNAttributeProto& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  ints_.MergeFrom(from.ints_);
-  data_.MergeFrom(from.data_);
+  int_data_.MergeFrom(from.int_data_);
+  float_data_.MergeFrom(from.float_data_);
+  string_data_.MergeFrom(from.string_data_);
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
@@ -1704,8 +879,9 @@ void MWNNAttributeProto::InternalSwap(MWNNAttributeProto* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
-  ints_.InternalSwap(&other->ints_);
-  data_.InternalSwap(&other->data_);
+  int_data_.InternalSwap(&other->int_data_);
+  float_data_.InternalSwap(&other->float_data_);
+  string_data_.InternalSwap(&other->string_data_);
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(type_, other->type_);
@@ -1729,9 +905,6 @@ class MWNNNodeProto::_Internal {
   static void set_has_op_type(HasBits* has_bits) {
     (*has_bits)[0] |= 2u;
   }
-  static void set_has_domain(HasBits* has_bits) {
-    (*has_bits)[0] |= 4u;
-  }
 };
 
 MWNNNodeProto::MWNNNodeProto()
@@ -1743,8 +916,8 @@ MWNNNodeProto::MWNNNodeProto(const MWNNNodeProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
-      input_(from.input_),
-      output_(from.output_),
+      ip_name_(from.ip_name_),
+      op_name_(from.op_name_),
       attribute_(from.attribute_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
@@ -1755,10 +928,6 @@ MWNNNodeProto::MWNNNodeProto(const MWNNNodeProto& from)
   if (from._internal_has_op_type()) {
     op_type_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.op_type_);
   }
-  domain_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (from._internal_has_domain()) {
-    domain_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.domain_);
-  }
   // @@protoc_insertion_point(copy_constructor:MWNN.MWNNNodeProto)
 }
 
@@ -1766,7 +935,6 @@ void MWNNNodeProto::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MWNNNodeProto_MWNN_2eproto.base);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   op_type_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  domain_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 MWNNNodeProto::~MWNNNodeProto() {
@@ -1777,7 +945,6 @@ MWNNNodeProto::~MWNNNodeProto() {
 void MWNNNodeProto::SharedDtor() {
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   op_type_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  domain_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void MWNNNodeProto::SetCachedSize(int size) const {
@@ -1795,19 +962,16 @@ void MWNNNodeProto::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  input_.Clear();
-  output_.Clear();
+  ip_name_.Clear();
+  op_name_.Clear();
   attribute_.Clear();
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
+  if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
       name_.ClearNonDefaultToEmptyNoArena();
     }
     if (cached_has_bits & 0x00000002u) {
       op_type_.ClearNonDefaultToEmptyNoArena();
-    }
-    if (cached_has_bits & 0x00000004u) {
-      domain_.ClearNonDefaultToEmptyNoArena();
     }
   }
   _has_bits_.Clear();
@@ -1822,41 +986,9 @@ const char* MWNNNodeProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // repeated string input = 1;
+      // optional string name = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            auto str = _internal_add_input();
-            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-            #ifndef NDEBUG
-            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNNodeProto.input");
-            #endif  // !NDEBUG
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
-        } else goto handle_unusual;
-        continue;
-      // repeated string output = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            auto str = _internal_add_output();
-            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-            #ifndef NDEBUG
-            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNNodeProto.output");
-            #endif  // !NDEBUG
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
-        } else goto handle_unusual;
-        continue;
-      // optional string name = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
@@ -1865,15 +997,47 @@ const char* MWNNNodeProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional string op_type = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+      // optional string op_type = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           auto str = _internal_mutable_op_type();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
           ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNNodeProto.op_type");
           #endif  // !NDEBUG
           CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated string ip_name = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_ip_name();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            #ifndef NDEBUG
+            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNNodeProto.ip_name");
+            #endif  // !NDEBUG
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated string op_name = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_op_name();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            #ifndef NDEBUG
+            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNNodeProto.op_name");
+            #endif  // !NDEBUG
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
         } else goto handle_unusual;
         continue;
       // repeated .MWNN.MWNNAttributeProto attribute = 5;
@@ -1886,17 +1050,6 @@ const char* MWNNNodeProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<42>(ptr));
-        } else goto handle_unusual;
-        continue;
-      // optional string domain = 7;
-      case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
-          auto str = _internal_mutable_domain();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNNodeProto.domain");
-          #endif  // !NDEBUG
-          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -1926,45 +1079,45 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated string input = 1;
-  for (int i = 0, n = this->_internal_input_size(); i < n; i++) {
-    const auto& s = this->_internal_input(i);
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      s.data(), static_cast<int>(s.length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "MWNN.MWNNNodeProto.input");
-    target = stream->WriteString(1, s, target);
-  }
-
-  // repeated string output = 2;
-  for (int i = 0, n = this->_internal_output_size(); i < n; i++) {
-    const auto& s = this->_internal_output(i);
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      s.data(), static_cast<int>(s.length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "MWNN.MWNNNodeProto.output");
-    target = stream->WriteString(2, s, target);
-  }
-
   cached_has_bits = _has_bits_[0];
-  // optional string name = 3;
+  // optional string name = 1;
   if (cached_has_bits & 0x00000001u) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
       this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
       "MWNN.MWNNNodeProto.name");
     target = stream->WriteStringMaybeAliased(
-        3, this->_internal_name(), target);
+        1, this->_internal_name(), target);
   }
 
-  // optional string op_type = 4;
+  // optional string op_type = 2;
   if (cached_has_bits & 0x00000002u) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
       this->_internal_op_type().data(), static_cast<int>(this->_internal_op_type().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
       "MWNN.MWNNNodeProto.op_type");
     target = stream->WriteStringMaybeAliased(
-        4, this->_internal_op_type(), target);
+        2, this->_internal_op_type(), target);
+  }
+
+  // repeated string ip_name = 3;
+  for (int i = 0, n = this->_internal_ip_name_size(); i < n; i++) {
+    const auto& s = this->_internal_ip_name(i);
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      s.data(), static_cast<int>(s.length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "MWNN.MWNNNodeProto.ip_name");
+    target = stream->WriteString(3, s, target);
+  }
+
+  // repeated string op_name = 4;
+  for (int i = 0, n = this->_internal_op_name_size(); i < n; i++) {
+    const auto& s = this->_internal_op_name(i);
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      s.data(), static_cast<int>(s.length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "MWNN.MWNNNodeProto.op_name");
+    target = stream->WriteString(4, s, target);
   }
 
   // repeated .MWNN.MWNNAttributeProto attribute = 5;
@@ -1973,16 +1126,6 @@ failure:
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(5, this->_internal_attribute(i), target, stream);
-  }
-
-  // optional string domain = 7;
-  if (cached_has_bits & 0x00000004u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_domain().data(), static_cast<int>(this->_internal_domain().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "MWNN.MWNNNodeProto.domain");
-    target = stream->WriteStringMaybeAliased(
-        7, this->_internal_domain(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -2001,20 +1144,20 @@ size_t MWNNNodeProto::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated string input = 1;
+  // repeated string ip_name = 3;
   total_size += 1 *
-      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(input_.size());
-  for (int i = 0, n = input_.size(); i < n; i++) {
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(ip_name_.size());
+  for (int i = 0, n = ip_name_.size(); i < n; i++) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-      input_.Get(i));
+      ip_name_.Get(i));
   }
 
-  // repeated string output = 2;
+  // repeated string op_name = 4;
   total_size += 1 *
-      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(output_.size());
-  for (int i = 0, n = output_.size(); i < n; i++) {
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(op_name_.size());
+  for (int i = 0, n = op_name_.size(); i < n; i++) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-      output_.Get(i));
+      op_name_.Get(i));
   }
 
   // repeated .MWNN.MWNNAttributeProto attribute = 5;
@@ -2025,26 +1168,19 @@ size_t MWNNNodeProto::ByteSizeLong() const {
   }
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
-    // optional string name = 3;
+  if (cached_has_bits & 0x00000003u) {
+    // optional string name = 1;
     if (cached_has_bits & 0x00000001u) {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
           this->_internal_name());
     }
 
-    // optional string op_type = 4;
+    // optional string op_type = 2;
     if (cached_has_bits & 0x00000002u) {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
           this->_internal_op_type());
-    }
-
-    // optional string domain = 7;
-    if (cached_has_bits & 0x00000004u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_domain());
     }
 
   }
@@ -2079,11 +1215,11 @@ void MWNNNodeProto::MergeFrom(const MWNNNodeProto& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  input_.MergeFrom(from.input_);
-  output_.MergeFrom(from.output_);
+  ip_name_.MergeFrom(from.ip_name_);
+  op_name_.MergeFrom(from.op_name_);
   attribute_.MergeFrom(from.attribute_);
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
+  if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
       _has_bits_[0] |= 0x00000001u;
       name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
@@ -2091,10 +1227,6 @@ void MWNNNodeProto::MergeFrom(const MWNNNodeProto& from) {
     if (cached_has_bits & 0x00000002u) {
       _has_bits_[0] |= 0x00000002u;
       op_type_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.op_type_);
-    }
-    if (cached_has_bits & 0x00000004u) {
-      _has_bits_[0] |= 0x00000004u;
-      domain_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.domain_);
     }
   }
 }
@@ -2121,14 +1253,12 @@ void MWNNNodeProto::InternalSwap(MWNNNodeProto* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
-  input_.InternalSwap(&other->input_);
-  output_.InternalSwap(&other->output_);
+  ip_name_.InternalSwap(&other->ip_name_);
+  op_name_.InternalSwap(&other->op_name_);
   attribute_.InternalSwap(&other->attribute_);
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   op_type_.Swap(&other->op_type_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  domain_.Swap(&other->domain_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 
@@ -2147,12 +1277,6 @@ class MWNNGraphProto::_Internal {
   static void set_has_name(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
-  static void set_has_graph_input(HasBits* has_bits) {
-    (*has_bits)[0] |= 2u;
-  }
-  static void set_has_graph_output(HasBits* has_bits) {
-    (*has_bits)[0] |= 4u;
-  }
 };
 
 MWNNGraphProto::MWNNGraphProto()
@@ -2164,6 +1288,8 @@ MWNNGraphProto::MWNNGraphProto(const MWNNGraphProto& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
+      ip_name_(from.ip_name_),
+      op_name_(from.op_name_),
       node_(from.node_),
       initializer_(from.initializer_),
       input_(from.input_),
@@ -2173,22 +1299,12 @@ MWNNGraphProto::MWNNGraphProto(const MWNNGraphProto& from)
   if (from._internal_has_name()) {
     name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
-  graph_input_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (from._internal_has_graph_input()) {
-    graph_input_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.graph_input_);
-  }
-  graph_output_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (from._internal_has_graph_output()) {
-    graph_output_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.graph_output_);
-  }
   // @@protoc_insertion_point(copy_constructor:MWNN.MWNNGraphProto)
 }
 
 void MWNNGraphProto::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_MWNNGraphProto_MWNN_2eproto.base);
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  graph_input_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  graph_output_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 MWNNGraphProto::~MWNNGraphProto() {
@@ -2198,8 +1314,6 @@ MWNNGraphProto::~MWNNGraphProto() {
 
 void MWNNGraphProto::SharedDtor() {
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  graph_input_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  graph_output_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void MWNNGraphProto::SetCachedSize(int size) const {
@@ -2217,21 +1331,15 @@ void MWNNGraphProto::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  ip_name_.Clear();
+  op_name_.Clear();
   node_.Clear();
   initializer_.Clear();
   input_.Clear();
   output_.Clear();
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
-    if (cached_has_bits & 0x00000001u) {
-      name_.ClearNonDefaultToEmptyNoArena();
-    }
-    if (cached_has_bits & 0x00000002u) {
-      graph_input_.ClearNonDefaultToEmptyNoArena();
-    }
-    if (cached_has_bits & 0x00000004u) {
-      graph_output_.ClearNonDefaultToEmptyNoArena();
-    }
+  if (cached_has_bits & 0x00000001u) {
+    name_.ClearNonDefaultToEmptyNoArena();
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -2245,21 +1353,9 @@ const char* MWNNGraphProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // repeated .MWNN.MWNNNodeProto node = 1;
+      // optional string name = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_node(), ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
-        } else goto handle_unusual;
-        continue;
-      // optional string name = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           auto str = _internal_mutable_name();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
@@ -2268,26 +1364,48 @@ const char* MWNNGraphProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional string graph_input = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
-          auto str = _internal_mutable_graph_input();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNGraphProto.graph_input");
-          #endif  // !NDEBUG
-          CHK_(ptr);
+      // repeated string ip_name = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_ip_name();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            #ifndef NDEBUG
+            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNGraphProto.ip_name");
+            #endif  // !NDEBUG
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
         } else goto handle_unusual;
         continue;
-      // optional string graph_output = 4;
+      // repeated string op_name = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_op_name();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            #ifndef NDEBUG
+            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNGraphProto.op_name");
+            #endif  // !NDEBUG
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated .MWNN.MWNNNodeProto node = 4;
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
-          auto str = _internal_mutable_graph_output();
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          #ifndef NDEBUG
-          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "MWNN.MWNNGraphProto.graph_output");
-          #endif  // !NDEBUG
-          CHK_(ptr);
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_node(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
         } else goto handle_unusual;
         continue;
       // repeated .MWNN.MWNNTensorProto initializer = 5;
@@ -2302,28 +1420,28 @@ const char* MWNNGraphProto::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<42>(ptr));
         } else goto handle_unusual;
         continue;
-      // repeated .MWNN.MWNNValueInfoProto input = 11;
-      case 11:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
+      // repeated .MWNN.MWNNTensorProto input = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
           ptr -= 1;
           do {
             ptr += 1;
             ptr = ctx->ParseMessage(_internal_add_input(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<90>(ptr));
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
         } else goto handle_unusual;
         continue;
-      // repeated .MWNN.MWNNValueInfoProto output = 12;
-      case 12:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
+      // repeated .MWNN.MWNNTensorProto output = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
           ptr -= 1;
           do {
             ptr += 1;
             ptr = ctx->ParseMessage(_internal_add_output(), ptr);
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<98>(ptr));
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<58>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -2353,43 +1471,43 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .MWNN.MWNNNodeProto node = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->_internal_node_size()); i < n; i++) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(1, this->_internal_node(i), target, stream);
-  }
-
   cached_has_bits = _has_bits_[0];
-  // optional string name = 2;
+  // optional string name = 1;
   if (cached_has_bits & 0x00000001u) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
       this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
       "MWNN.MWNNGraphProto.name");
     target = stream->WriteStringMaybeAliased(
-        2, this->_internal_name(), target);
+        1, this->_internal_name(), target);
   }
 
-  // optional string graph_input = 3;
-  if (cached_has_bits & 0x00000002u) {
+  // repeated string ip_name = 2;
+  for (int i = 0, n = this->_internal_ip_name_size(); i < n; i++) {
+    const auto& s = this->_internal_ip_name(i);
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_graph_input().data(), static_cast<int>(this->_internal_graph_input().length()),
+      s.data(), static_cast<int>(s.length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "MWNN.MWNNGraphProto.graph_input");
-    target = stream->WriteStringMaybeAliased(
-        3, this->_internal_graph_input(), target);
+      "MWNN.MWNNGraphProto.ip_name");
+    target = stream->WriteString(2, s, target);
   }
 
-  // optional string graph_output = 4;
-  if (cached_has_bits & 0x00000004u) {
+  // repeated string op_name = 3;
+  for (int i = 0, n = this->_internal_op_name_size(); i < n; i++) {
+    const auto& s = this->_internal_op_name(i);
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_graph_output().data(), static_cast<int>(this->_internal_graph_output().length()),
+      s.data(), static_cast<int>(s.length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "MWNN.MWNNGraphProto.graph_output");
-    target = stream->WriteStringMaybeAliased(
-        4, this->_internal_graph_output(), target);
+      "MWNN.MWNNGraphProto.op_name");
+    target = stream->WriteString(3, s, target);
+  }
+
+  // repeated .MWNN.MWNNNodeProto node = 4;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_node_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(4, this->_internal_node(i), target, stream);
   }
 
   // repeated .MWNN.MWNNTensorProto initializer = 5;
@@ -2400,20 +1518,20 @@ failure:
       InternalWriteMessage(5, this->_internal_initializer(i), target, stream);
   }
 
-  // repeated .MWNN.MWNNValueInfoProto input = 11;
+  // repeated .MWNN.MWNNTensorProto input = 6;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_input_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(11, this->_internal_input(i), target, stream);
+      InternalWriteMessage(6, this->_internal_input(i), target, stream);
   }
 
-  // repeated .MWNN.MWNNValueInfoProto output = 12;
+  // repeated .MWNN.MWNNTensorProto output = 7;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->_internal_output_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(12, this->_internal_output(i), target, stream);
+      InternalWriteMessage(7, this->_internal_output(i), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -2432,7 +1550,23 @@ size_t MWNNGraphProto::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .MWNN.MWNNNodeProto node = 1;
+  // repeated string ip_name = 2;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(ip_name_.size());
+  for (int i = 0, n = ip_name_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      ip_name_.Get(i));
+  }
+
+  // repeated string op_name = 3;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(op_name_.size());
+  for (int i = 0, n = op_name_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      op_name_.Get(i));
+  }
+
+  // repeated .MWNN.MWNNNodeProto node = 4;
   total_size += 1UL * this->_internal_node_size();
   for (const auto& msg : this->node_) {
     total_size +=
@@ -2446,44 +1580,28 @@ size_t MWNNGraphProto::ByteSizeLong() const {
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  // repeated .MWNN.MWNNValueInfoProto input = 11;
+  // repeated .MWNN.MWNNTensorProto input = 6;
   total_size += 1UL * this->_internal_input_size();
   for (const auto& msg : this->input_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
-  // repeated .MWNN.MWNNValueInfoProto output = 12;
+  // repeated .MWNN.MWNNTensorProto output = 7;
   total_size += 1UL * this->_internal_output_size();
   for (const auto& msg : this->output_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
+  // optional string name = 1;
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
-    // optional string name = 2;
-    if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_name());
-    }
-
-    // optional string graph_input = 3;
-    if (cached_has_bits & 0x00000002u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_graph_input());
-    }
-
-    // optional string graph_output = 4;
-    if (cached_has_bits & 0x00000004u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_graph_output());
-    }
-
+  if (cached_has_bits & 0x00000001u) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_name());
   }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -2515,24 +1633,15 @@ void MWNNGraphProto::MergeFrom(const MWNNGraphProto& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  ip_name_.MergeFrom(from.ip_name_);
+  op_name_.MergeFrom(from.op_name_);
   node_.MergeFrom(from.node_);
   initializer_.MergeFrom(from.initializer_);
   input_.MergeFrom(from.input_);
   output_.MergeFrom(from.output_);
-  cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
-    if (cached_has_bits & 0x00000001u) {
-      _has_bits_[0] |= 0x00000001u;
-      name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
-    }
-    if (cached_has_bits & 0x00000002u) {
-      _has_bits_[0] |= 0x00000002u;
-      graph_input_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.graph_input_);
-    }
-    if (cached_has_bits & 0x00000004u) {
-      _has_bits_[0] |= 0x00000004u;
-      graph_output_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.graph_output_);
-    }
+  if (from._internal_has_name()) {
+    _has_bits_[0] |= 0x00000001u;
+    name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
 }
 
@@ -2558,15 +1667,13 @@ void MWNNGraphProto::InternalSwap(MWNNGraphProto* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
+  ip_name_.InternalSwap(&other->ip_name_);
+  op_name_.InternalSwap(&other->op_name_);
   node_.InternalSwap(&other->node_);
   initializer_.InternalSwap(&other->initializer_);
   input_.InternalSwap(&other->input_);
   output_.InternalSwap(&other->output_);
   name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  graph_input_.Swap(&other->graph_input_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  graph_output_.Swap(&other->graph_output_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 
@@ -2578,12 +1685,6 @@ void MWNNGraphProto::InternalSwap(MWNNGraphProto* other) {
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace MWNN
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::MWNN::MWNNValueInfoProto* Arena::CreateMaybeMessage< ::MWNN::MWNNValueInfoProto >(Arena* arena) {
-  return Arena::CreateInternal< ::MWNN::MWNNValueInfoProto >(arena);
-}
-template<> PROTOBUF_NOINLINE ::MWNN::MWNNTensorProto_Segment* Arena::CreateMaybeMessage< ::MWNN::MWNNTensorProto_Segment >(Arena* arena) {
-  return Arena::CreateInternal< ::MWNN::MWNNTensorProto_Segment >(arena);
-}
 template<> PROTOBUF_NOINLINE ::MWNN::MWNNTensorProto* Arena::CreateMaybeMessage< ::MWNN::MWNNTensorProto >(Arena* arena) {
   return Arena::CreateInternal< ::MWNN::MWNNTensorProto >(arena);
 }
