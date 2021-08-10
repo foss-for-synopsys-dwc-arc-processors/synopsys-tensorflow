@@ -20,7 +20,7 @@ int main(){
     std::unique_ptr<tflite::Interpreter> interpreter;
     tflite::InterpreterBuilder(*model.get(), resolver)(&interpreter);
 
-    TfLiteMetaWareNNDelegateOptions* options;
+    TfLiteMetaWareNNDelegateOptions* options = nullptr;
     // NEW: Prepare MetaWareNN delegate.
     auto* delegate = TfLiteMetaWareNNDelegateCreate(options);
     if (interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) return false;
