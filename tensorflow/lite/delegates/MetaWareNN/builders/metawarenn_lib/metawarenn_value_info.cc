@@ -14,7 +14,7 @@ MWNNValueInfo::MWNNValueInfo(ValueInfoProto& onnx_value_info_proto) {
         dims.emplace_back(onnx_dim.dim_value());
       }
       else {
-        dims.emplace_back(0);
+        dims.emplace_back(1);
       }
     }
   }

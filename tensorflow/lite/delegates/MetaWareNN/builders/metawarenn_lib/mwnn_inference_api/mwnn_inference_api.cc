@@ -3,13 +3,13 @@
 namespace metawarenn {
 
 int MWNNInferenceApi::graph_count = 0;
-unsigned long int MWNNInferenceApi::available_bytes = TOTAL_MEMORY_SIZE;
-unsigned long int MWNNInferenceApi::used_bytes = 0;
 
 MWNNInferenceApi::MWNNInferenceApi() {
   std::cout << "\n In MWNNInferenceApi";
   if(graph_count == 0)
       mwnn_shm = MWNNSharedMemory();
+  used_bytes = 0;
+  available_bytes = TOTAL_MEMORY_SIZE;
   graph_count++;
 }
 
@@ -48,7 +48,9 @@ void MWNNInferenceApi::prepareOutput(std::vector<int> shape) {
 void MWNNInferenceApi::prepareGraph(std::string name) {
   std::cout << "\n In prepareGraph";
   std::ifstream in;
-  in.open("/Path/to/MWNNExecutableNetwork.bin", std::ios::in | std::ios::binary);
+  auto bin_path = "/Path/to/stored/ExecutableGraph/";
+  std::string mwnn_exec_bin = bin_path + name + "_exec.bin";
+  in.open(mwnn_exec_bin, std::ios::in | std::ios::binary);
   if(in.is_open()) {
     std::streampos start = in.tellg();
     in.seekg(0, std::ios::end);
@@ -64,6 +66,11 @@ void MWNNInferenceApi::prepareGraph(std::string name) {
       memcpy(this->exe_graph, data, model_size);
       this->used_bytes = this->used_bytes + model_size;
       this->available_bytes = this->available_bytes - model_size;
+    }
+    else
+    {
+      std::cout << "\n Model Size is larger than available shared memory!!";
+      exit(1);
     }
   }
   else {

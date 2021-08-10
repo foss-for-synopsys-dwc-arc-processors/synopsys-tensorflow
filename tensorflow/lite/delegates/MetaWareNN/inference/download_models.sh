@@ -1,3 +1,5 @@
+mkdir tflite_models
+cd tflite_models
 wget https://storage.googleapis.com/download.tensorflow.org/models/tflite/model_zoo/upload_20180427/densenet_2018_04_27.tgz
 tar -xvf densenet_2018_04_27.tgz
 rm densenet_2018_04_27.tgz

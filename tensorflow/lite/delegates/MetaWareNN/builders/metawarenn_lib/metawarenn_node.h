@@ -64,7 +64,9 @@ class MWNNNode {
           return attribute.get_name() == name;
       });
       if (it == std::end(mwnn_attributes)) {
+          std::vector<int> empty_attr(0);
           std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name;
+          return empty_attr;
       }
       return it->get_int_data();
     }
@@ -74,7 +76,9 @@ class MWNNNode {
           return attribute.get_name() == name;
       });
       if (it == std::end(mwnn_attributes)) {
+          std::vector<float> empty_attr(0);
           std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name;
+          return empty_attr;
       }
       return it->get_float_data();
     }
@@ -107,7 +111,11 @@ class MWNNNode {
         return std::make_shared<op::Relu>(name, inputs, outputs);
       }
       else if(op_type == "Gemm") {
-        return std::make_shared<op::Gemm>(name, inputs, outputs);
+        return std::make_shared<op::Gemm>(name, inputs, outputs,
+                                                  get_attribute_value_int("transA"),
+                                                  get_attribute_value_int("transB"),
+                                                  get_attribute_value_int("alpha"),
+                                                  get_attribute_value_int("beta"));
       }
       else if(op_type == "Clip") {
         return std::make_shared<op::Clip>(name, inputs, outputs);
@@ -122,10 +130,16 @@ class MWNNNode {
         return std::make_shared<op::GlobalAvgPool>(name, inputs, outputs);
       }
       else if(op_type == "MaxPool") {
-        return std::make_shared<op::MaxPool>(name, inputs, outputs);
+        return std::make_shared<op::MaxPool>(name, inputs, outputs,
+                                                  get_attribute_value_int("kernel_shape"),
+                                                  get_attribute_value_int("strides"),
+                                                  get_attribute_value_int("pads"));
       }
       else if(op_type == "AveragePool") {
-        return std::make_shared<op::AvgPool>(name, inputs, outputs);
+        return std::make_shared<op::AvgPool>(name, inputs, outputs,
+                                                  get_attribute_value_int("kernel_shape"),
+                                                  get_attribute_value_int("strides"),
+                                                  get_attribute_value_int("pads"));
       }
       else if(op_type == "Dense") {
         return std::make_shared<op::Dense>(name, inputs, outputs);
@@ -135,22 +149,32 @@ class MWNNNode {
       }
 
       else if(op_type == "Concat") {
-        return std::make_shared<op::Concat>(name, inputs, outputs);
+        return std::make_shared<op::Concat>(name, inputs, outputs,
+                                                  get_attribute_value_int("axis"));
       }
       else if(op_type == "LRN") {
-        return std::make_shared<op::LRN>(name, inputs, outputs);
+        return std::make_shared<op::LRN>(name, inputs, outputs,
+                                                  get_attribute_value_int("alpha"),
+                                                  get_attribute_value_int("beta"),
+                                                  get_attribute_value_int("axis"),
+                                                  get_attribute_value_int("size"),
+                                                  get_attribute_value_int("bias"));
       }
       else if(op_type == "Flatten") {
-        return std::make_shared<op::Flatten>(name, inputs, outputs);
+        return std::make_shared<op::Flatten>(name, inputs, outputs,
+                                                  get_attribute_value_int("axis"));
       }
       else if(op_type == "Squeeze") {
-        return std::make_shared<op::Squeeze>(name, inputs, outputs);
+        return std::make_shared<op::Squeeze>(name, inputs, outputs,
+                                                  get_attribute_value_int("axis"));
       }
       else if(op_type == "Unsqueeze") {
-        return std::make_shared<op::Unsqueeze>(name, inputs, outputs);
+        return std::make_shared<op::Unsqueeze>(name, inputs, outputs,
+                                                  get_attribute_value_int("axes"));
       }
       else if(op_type == "Gather") {
-        return std::make_shared<op::Gather>(name, inputs, outputs);
+        return std::make_shared<op::Gather>(name, inputs, outputs,
+                                                  get_attribute_value_int("axis"));
       }
       else if(op_type == "Shape") {
         return std::make_shared<op::Shape>(name, inputs, outputs);
@@ -175,7 +199,8 @@ class MWNNNode {
           return std::make_shared<op::Divide>(name, inputs, outputs);
       }
       else if(op_type == "Split") {
-        return std::make_shared<op::Split>(name, inputs, outputs);
+        return std::make_shared<op::Split>(name, inputs, outputs,
+                                                 get_attribute_value_int("num_splits"));
       }
       else if(op_type == "Maximum") {
         return std::make_shared<op::Maximum>(name, inputs, outputs);
@@ -190,13 +215,24 @@ class MWNNNode {
         return std::make_shared<op::Pad>(name, inputs, outputs);
       }
       else if(op_type == "StridedSlice") {
-        return std::make_shared<op::StridedSlice>(name, inputs, outputs);
+        return std::make_shared<op::StridedSlice>(name, inputs, outputs,
+                                                        get_attribute_value_int("begin_mask"), 
+                                                        get_attribute_value_int("ellipsis_mask"),
+                                                        get_attribute_value_int("end_mask"),
+                                                        get_attribute_value_int("new_axis_mask"),
+                                                        get_attribute_value_int("shrink_axis_mask"));
       }
       else if(op_type == "ChannelShuffle") {
         return std::make_shared<op::ChannelShuffle>(name, inputs, outputs);
       }
       else if(op_type == "FullyConnected") {
-        return std::make_shared<op::FullyConnected>(name, inputs, outputs);
+        return std::make_shared<op::FullyConnected>(name, inputs, outputs,
+                                                          get_attribute_value_int("asymmetric_quantize_inputs"),
+                                                          get_attribute_value_int("keep_num_dims"),
+                                                          get_attribute_value_int("weights_format"));
+      }
+      else if(op_type == "Transpose") {
+        return std::make_shared<op::Transpose>(name, inputs, outputs);
       }
       else if(op_type == "Reshape") {
         return std::make_shared<op::Reshape>(name, inputs, outputs);

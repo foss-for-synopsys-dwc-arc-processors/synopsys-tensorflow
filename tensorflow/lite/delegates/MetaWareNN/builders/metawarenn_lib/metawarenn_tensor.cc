@@ -16,12 +16,36 @@ MWNNTensor::MWNNTensor(TensorProto& onnx_tensor_proto) {
 
 void MWNNTensor::set_tensor(TensorProto& onnx_tensor_proto) {
   switch (in_type) {
-    case onnx::TensorProto_DataType_FLOAT:
-      tensor = get_data<float>(onnx_tensor_proto.float_data());
+    case onnx::TensorProto_DataType_FLOAT: {
+      // Checks for valid float data from tensor proto
+      if(onnx_tensor_proto.float_data().size() > 0)
+          tensor = get_data<float>(onnx_tensor_proto.float_data());
+      // Copy from float based raw data and memcpy the bytes to MWNN vector
+      else if(onnx_tensor_proto.has_raw_data()) {
+        auto raw_data = onnx_tensor_proto.raw_data();
+        char* bytes = const_cast<char*>(onnx_tensor_proto.raw_data().c_str());
+        const size_t raw_data_size = raw_data.size();
+        tensor.resize(raw_data_size / sizeof(float));
+        memcpy(reinterpret_cast<char*>(tensor.data()), bytes, raw_data_size);
+      }
       break;
-    case onnx::TensorProto_DataType_INT64:
-      tensor = get_data<float>(onnx_tensor_proto.int64_data());
+    }
+    case onnx::TensorProto_DataType_INT64: {
+      // Checks for valid int data from tensor proto
+      if(onnx_tensor_proto.int64_data().size() > 0)
+        tensor = get_data<float>(onnx_tensor_proto.int64_data());
+      // Copy from int based raw data and memcpy the bytes to MWNN vector
+      else if(onnx_tensor_proto.has_raw_data()) {
+        auto raw_data = onnx_tensor_proto.raw_data();
+        char* bytes = const_cast<char*>(onnx_tensor_proto.raw_data().c_str());
+        const size_t raw_data_size = raw_data.size();
+        std::vector<int64_t> int_vector(raw_data_size / sizeof(int64_t));
+        memcpy(reinterpret_cast<char*>(int_vector.data()), bytes, raw_data_size);
+        for (int i = 0; i < int_vector.size(); i++)
+            tensor.emplace_back((float)int_vector.data()[i]);
+      }
       break;
+    }
     default:
       break;
   }

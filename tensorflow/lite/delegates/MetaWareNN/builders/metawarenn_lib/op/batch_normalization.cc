@@ -7,7 +7,7 @@ namespace op {
 BatchNormalization::BatchNormalization() { std::cout << "\n In BatchNormalization Constructor!!!"; }
 
 BatchNormalization::BatchNormalization(std::string n_name, std::vector<std::string> n_inputs,
-                 std::vector<std::string> n_outputs, float n_epsilon) : Node(n_name, "BatchNorm") {
+                 std::vector<std::string> n_outputs, float n_epsilon) : Node(n_name, "BatchNormalization") {
   inputs = n_inputs;
   outputs = n_outputs;
   epsilon = n_epsilon;

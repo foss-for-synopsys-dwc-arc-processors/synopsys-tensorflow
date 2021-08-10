@@ -63,6 +63,7 @@ void fill_blob_serializer(DataSerialization &data_serializer, std::vector<MWNNTe
 }
 
 void fill_layer_serializer(DataSerialization &layer_serializer, std::vector<MWNNNode> node, std::vector<MWNNTensor> const_tensors, std::set<std::string> const_names) {
+  auto const_names_var = const_names;
   unsigned int count = 0;
   uint32_t const_offset = 0;
   for (auto data : node) {
@@ -98,8 +99,104 @@ void fill_layer_serializer(DataSerialization &layer_serializer, std::vector<MWNN
       l_hdr.layer_type = 8;
       node = std::dynamic_pointer_cast<op::BatchNormalization>(node);
     }
+    else if(op_type == "AveragePool") {
+      l_hdr.layer_type = 9;
+      node = std::dynamic_pointer_cast<op::AvgPool>(node);
+    }
+    else if(op_type == "MaxPool") {
+      l_hdr.layer_type = 10;
+      node = std::dynamic_pointer_cast<op::MaxPool>(node);
+    }
+    else if(op_type == "BatchFlatten") {
+      l_hdr.layer_type = 11;
+    }
+    else if(op_type == "Dense") {
+      l_hdr.layer_type = 12;
+    }
+    else if(op_type == "Concat") {
+      l_hdr.layer_type = 13;
+      node = std::dynamic_pointer_cast<op::Concat>(node);
+    }
+    else if(op_type == "LRN") {
+      l_hdr.layer_type = 14;
+      node = std::dynamic_pointer_cast<op::LRN>(node);
+    }
+    else if(op_type == "Squeeze") {
+      l_hdr.layer_type = 15;
+      node = std::dynamic_pointer_cast<op::Squeeze>(node);
+    }
+    else if(op_type == "BiasAdd") {
+      l_hdr.layer_type = 16;
+    }
+    else if(op_type == "Max") {
+      l_hdr.layer_type = 17;
+    }
+    else if(op_type == "Maximum") {
+      l_hdr.layer_type = 18;
+    }
+    else if(op_type == "Minimum") {
+      l_hdr.layer_type = 19;
+    }
+    else if(op_type == "Exp") {
+      l_hdr.layer_type = 20;
+    }
+    else if(op_type == "Sum") {
+      l_hdr.layer_type = 21;
+    }
+    else if(op_type == "Subtract") {
+      l_hdr.layer_type = 22;
+    }
+    else if(op_type == "Divide") {
+      l_hdr.layer_type = 23;
+    }
+    else if(op_type == "Clip") {
+      l_hdr.layer_type = 24;
+    }
+    else if(op_type == "Mul") {
+      l_hdr.layer_type = 25;
+    }
+    else if(op_type == "Transpose") {
+      l_hdr.layer_type = 26;
+    }
+    else if(op_type == "Flatten") {
+      l_hdr.layer_type = 27;
+      node = std::dynamic_pointer_cast<op::Flatten>(node);
+    }
+    else if(op_type == "Gemm") {
+      l_hdr.layer_type = 28;
+      node = std::dynamic_pointer_cast<op::Gemm>(node);
+    }
+    else if(op_type == "Shape") {
+      l_hdr.layer_type = 29;
+    }
+    else if(op_type == "Gather") {
+      l_hdr.layer_type = 30;
+      node = std::dynamic_pointer_cast<op::Gather>(node);
+    }
+    else if(op_type == "Unsqueeze") {
+      l_hdr.layer_type = 31;
+      node = std::dynamic_pointer_cast<op::Unsqueeze>(node);
+    }
+    else if(op_type == "Mean") {
+      l_hdr.layer_type = 32;
+    }
+    else if(op_type == "FullyConnected") {
+      l_hdr.layer_type = 33;
+      node = std::dynamic_pointer_cast<op::FullyConnected>(node);
+    }
+    else if(op_type == "Split") {
+      l_hdr.layer_type = 34;
+      node = std::dynamic_pointer_cast<op::Split>(node);
+    }
+    else if(op_type == "Pad") {
+      l_hdr.layer_type = 35;
+    }
+    else if(op_type == "StridedSlice") {
+      l_hdr.layer_type = 36;
+      node = std::dynamic_pointer_cast<op::StridedSlice>(node);
+    }
     else {
-      std::cout << "\n UnSupported Layer!!!";
+      std::cout << "\n UnSupported Layer!!! " << op_type;
       exit(1);
     }
 
@@ -134,7 +231,7 @@ void fill_layer_serializer(DataSerialization &layer_serializer, std::vector<MWNN
       for (auto ch : ip) {
           layer_serializer.append(ch);
       }
-      if(const_names.count(ip)) {
+      if(const_names_var.count(ip)) {
         std::string ip_type = "Constant";
         auto len = ip_type.length();
         layer_serializer.append(static_cast<uint32_t>(len));
@@ -149,6 +246,7 @@ void fill_layer_serializer(DataSerialization &layer_serializer, std::vector<MWNN
         layer_serializer.append(static_cast<uint32_t>(const_offset));
         std::cout << "\n offset : " << const_offset;
         const_offset += offset;
+        const_names_var.erase(ip);
       }
       else {
         std::string ip_type = "Feature";
@@ -311,9 +409,265 @@ void parse_layer_info(char *exe_graph, uint32_t offset, uint32_t num_data, uint3
       }
       std::cout << "\n Activation : " << activation;
     }
-    else if(type == "BatchNorm") {
+    else if(type == "BatchNormalization") {
       auto epsilon = read_from_graph_data<float>(exe_graph, offset);
       std::cout << "\n Epsilon : " << epsilon;
+    }
+    else if(type == "MaxPool" || type == "AveragePool") {
+      auto psize_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> kernel_shape;
+      for (int j = 0; j < psize_len; j++) {
+        auto psize = read_from_graph_data<int32_t>(exe_graph, offset);
+        kernel_shape.push_back(psize);
+      }
+      auto str_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> strides;
+      for (int j = 0; j < str_len; j++) {
+        auto str = read_from_graph_data<int32_t>(exe_graph, offset);
+        strides.push_back(str);
+      }
+      auto p_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> pads;
+      for (int j = 0; j < p_len; j++) {
+        auto p = read_from_graph_data<int32_t>(exe_graph, offset);
+        pads.push_back(p);
+      }
+      std::cout << "\n Pool Size : ";
+      for (auto psize : kernel_shape) {
+        std::cout << psize << ", ";
+      }
+      std::cout << "\n Strides : ";
+      for (auto st : strides) {
+        std::cout << st << ", ";
+      }
+      std::cout << "\n Pads : ";
+      for (auto p : pads) {
+        std::cout << p << ", ";
+      }
+    }
+    else if(type == "LRN") {
+      auto alpha_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> alpha;
+      for (int j = 0; j < alpha_len; j++) {
+        auto alp = read_from_graph_data<int32_t>(exe_graph, offset);
+        alpha.push_back(alp);
+      }
+      auto beta_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> beta;
+      for (int j = 0; j < beta_len; j++) {
+        auto b = read_from_graph_data<int32_t>(exe_graph, offset);
+        beta.push_back(b);
+      }
+      auto axis_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> axis;
+      for (int j = 0; j < axis_len; j++) {
+        auto a = read_from_graph_data<int32_t>(exe_graph, offset);
+        axis.push_back(a);
+      }
+      auto size_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> size;
+      for (int j = 0; j < size_len; j++) {
+        auto s = read_from_graph_data<int32_t>(exe_graph, offset);
+        size.push_back(s);
+      }
+      auto bias_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> bias;
+      for (int j = 0; j < bias_len; j++) {
+        auto b = read_from_graph_data<int32_t>(exe_graph, offset);
+        bias.push_back(b);
+      }
+      std::cout << "\n Alpha : ";
+      for (auto a : alpha) {
+        std::cout << a << ", ";
+      }
+      std::cout << "\n Beta : ";
+      for (auto b : beta) {
+        std::cout << b << ", ";
+      }
+      std::cout << "\n Axis : ";
+      for (auto a : axis) {
+        std::cout << a << ", ";
+      }
+      std::cout << "\n Size : ";
+      for (auto s : size) {
+        std::cout << s << ", ";
+      }  std::cout << "\n Bias : ";
+      for (auto b : bias) {
+        std::cout << b << ", ";
+      }
+    }
+    else if(type == "Squeeze") {
+      auto axis_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> axis;
+      for (int j = 0; j < axis_len; j++) {
+        auto ax = read_from_graph_data<int32_t>(exe_graph, offset);
+        axis.push_back(ax);
+      }
+    }
+    else if(type == "Unsqueeze") {
+      auto axis_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> axis;
+      for (int j = 0; j < axis_len; j++) {
+        auto ax = read_from_graph_data<int32_t>(exe_graph, offset);
+        axis.push_back(ax);
+      }
+    }
+    else if(type == "Concat") {
+      auto axis_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> axis;
+      for (int j = 0; j < axis_len; j++) {
+        auto ax = read_from_graph_data<int32_t>(exe_graph, offset);
+        axis.push_back(ax);
+      }
+    }
+    else if(type == "Flatten") {
+      auto axis_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> axis;
+      for (int j = 0; j < axis_len; j++) {
+        auto ax = read_from_graph_data<int32_t>(exe_graph, offset);
+        axis.push_back(ax);
+      }
+    }
+    else if(type == "Gather") {
+      auto axis_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> axis;
+      for (int j = 0; j < axis_len; j++) {
+        auto ax = read_from_graph_data<int32_t>(exe_graph, offset);
+        axis.push_back(ax);
+      }
+    }
+    else if(type == "Gemm") {
+      auto ta_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> transA;
+      for (int j = 0; j < ta_len; j++) {
+        auto ta = read_from_graph_data<int32_t>(exe_graph, offset);
+        transA.push_back(ta);
+      }
+      auto tb_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> transB;
+      for (int j = 0; j < tb_len; j++) {
+        auto tb = read_from_graph_data<int32_t>(exe_graph, offset);
+        transB.push_back(tb);
+      }
+      auto alpha_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> alpha;
+      for (int j = 0; j < alpha_len; j++) {
+        auto alp = read_from_graph_data<int32_t>(exe_graph, offset);
+        alpha.push_back(alp);
+      }
+      auto beta_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> beta;
+      for (int j = 0; j < beta_len; j++) {
+        auto b = read_from_graph_data<int32_t>(exe_graph, offset);
+        beta.push_back(b);
+      }
+      for (auto t : transA) {
+        std::cout << t << ", ";
+      }
+      std::cout << "\n TransB : ";
+      for (auto t : transB) {
+        std::cout << t << ", ";
+      }
+      std::cout << "\n Alpha : ";
+      for (auto a : alpha) {
+        std::cout << a << ", ";
+      }
+      std::cout << "\n Beta : ";
+      for (auto b : beta) {
+        std::cout << b << ", ";
+      }
+    }
+    else if(type == "FullyConnected") {
+      auto asym_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> asymmetric_quantize_inputs;
+      for (int j = 0; j < asym_len; j++) {
+        auto asym = read_from_graph_data<int32_t>(exe_graph, offset);
+        asymmetric_quantize_inputs.push_back(asym);
+      }
+      auto kn_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> keep_num_dims;
+      for (int j = 0; j < kn_len; j++) {
+        auto kn = read_from_graph_data<int32_t>(exe_graph, offset);
+        keep_num_dims.push_back(kn);
+      }
+      auto wf_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> weights_format;
+      for (int j = 0; j < wf_len; j++) {
+        auto wf = read_from_graph_data<int32_t>(exe_graph, offset);
+        weights_format.push_back(wf);
+      }
+      std::cout << "\n Asymmetric quantization inputs : ";
+      for (auto asym : asymmetric_quantize_inputs) {
+        std::cout << asym << ", ";
+      }
+      std::cout << "\n Keep dims : ";
+      for (auto kn : keep_num_dims) {
+        std::cout << kn << ", ";
+      }
+      std::cout << "\n Weight format : ";
+      for (auto w : weights_format) {
+        std::cout << w << ", ";
+      }
+    }
+    else if(type == "Split") {
+      auto split_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> num_splits;
+      for (int j = 0; j < split_len; j++) {
+        auto ns = read_from_graph_data<int32_t>(exe_graph, offset);
+        num_splits.push_back(ns);
+      }
+    }
+    else if(type == "StridedSlice") {
+      auto bm_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> begin_mask;
+      for (int j = 0; j < bm_len; j++) {
+        auto bm = read_from_graph_data<int32_t>(exe_graph, offset);
+        begin_mask.push_back(bm);
+      }
+      auto e_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> ellipsis_mask;
+      for (int j = 0; j < e_len; j++) {
+        auto e = read_from_graph_data<int32_t>(exe_graph, offset);
+        ellipsis_mask.push_back(e);
+      }
+      auto em_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> end_mask;
+      for (int j = 0; j < em_len; j++) {
+        auto em = read_from_graph_data<int32_t>(exe_graph, offset);
+        end_mask.push_back(em);
+      }
+      auto na_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> new_axis_mask;
+      for (int j = 0; j < na_len; j++) {
+        auto na = read_from_graph_data<int32_t>(exe_graph, offset);
+        new_axis_mask.push_back(na);
+      }
+      auto sa_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> shrink_axis_mask;
+      for (int j = 0; j < sa_len; j++) {
+        auto sa = read_from_graph_data<int32_t>(exe_graph, offset);
+        shrink_axis_mask.push_back(sa);
+      }
+      std::cout << "\n Begin mask : ";
+      for (auto b : begin_mask) {
+        std::cout << b << ", ";
+      }
+      std::cout << "\n Ellipsis mask : ";
+      for (auto e : ellipsis_mask) {
+        std::cout << e << ", ";
+      }
+      std::cout << "\n End mask : ";
+      for (auto e : end_mask) {
+        std::cout << e << ", ";
+      }
+      std::cout << "\n New axis mask : ";
+      for (auto n : new_axis_mask) {
+        std::cout << n << ", ";
+      }
+      std::cout << "\n Shrink axis mask : ";
+      for (auto s : shrink_axis_mask) {
+        std::cout << s << ", ";
+      }
     }
   }
 }
@@ -321,7 +675,8 @@ void parse_layer_info(char *exe_graph, uint32_t offset, uint32_t num_data, uint3
 
 MWNNExecutableGraph::MWNNExecutableGraph(MWNNGraph mwnn_graph) {
   std::cout << "\n MWNNExecutableGraph Constructor mwnn_graph data!!! ";
-  std::cout << "\n Graph name : " << mwnn_graph.get_name();
+  auto graph_name = mwnn_graph.get_name();
+  std::cout << "\n Graph name : " << graph_name;
   DataSerialization input_serializer;
   DataSerialization output_serializer;
   DataSerialization constant_serializer;
@@ -398,9 +753,15 @@ MWNNExecutableGraph::MWNNExecutableGraph(MWNNGraph mwnn_graph) {
   //====================================================================================================//
 
   //Uncomment to Dump the MetaWareNN Binary File
-  std::ofstream writeFile("/Path/to/MWNNExecutableNetwork.bin", std::ios::out | std::ios::binary);
+  std::string bin_path = "/Path/to/store/ExecutableGraph/";
+  std::string mwnn_exec_bin = bin_path + graph_name + "_exec.bin";
+  std::ofstream writeFile(mwnn_exec_bin, std::ios::out | std::ios::binary);
   if (writeFile.is_open())
     writeFile.write(reinterpret_cast<char*>(&exe_graph[0]), b_hdr.file_size);
+  else {
+    std::cout << "\n Couldn't open the binary file in MWNNExecutableGraph! Please check the path";
+    exit(1);
+  }
   writeFile.close();
   free(exe_graph);
 }

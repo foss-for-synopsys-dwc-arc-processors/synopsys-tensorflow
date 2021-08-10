@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#define TOTAL_MEMORY_SIZE 15000000
+#define TOTAL_MEMORY_SIZE 580000000
 
 namespace metawarenn {
 

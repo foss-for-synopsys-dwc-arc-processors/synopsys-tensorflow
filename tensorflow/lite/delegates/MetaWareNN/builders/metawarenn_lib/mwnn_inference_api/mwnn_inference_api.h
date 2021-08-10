@@ -21,9 +21,8 @@ class MWNNInferenceApi {
     void getOutput(float* op_tensor, std::vector<int> shape);
 
     static int graph_count;
-    static unsigned long int available_bytes;
-    static unsigned long int used_bytes;
-
+    unsigned long int available_bytes;
+    unsigned long int used_bytes;
     char *input;
     char *output;
     char* exe_graph;

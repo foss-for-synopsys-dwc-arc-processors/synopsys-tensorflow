@@ -63,8 +63,8 @@
 Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the downloaded MobileNet v2 TFlite model path
 
 5. To Load MetaWareNN Executable Graph in Shared Memory[Default flow]
-   1. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/executable_network/metawarenn_executable_graph.cc" with path to store the MWNNExecutableNetwork.bin in line no: 401 & line no: 414
-   2. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnn_inference_api/mwnn_inference_api.cc" file with saved file path of MWNNExecutableNetwork.bin in line no: 51
+   1. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/executable_network/metawarenn_executable_graph.cc" with path to store the Executable network binary in line no: 756
+   2. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnn_inference_api/mwnn_inference_api.cc" file with saved file path of Executable network binary in line no: 51
 
    To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file
    1. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/model_builder.cc" file as follows:
@@ -118,17 +118,15 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
 `./inference`
 
 ## To run multiple TFLite models from model zoo
-   1. Create a directory to download tflite models and move to the directory
-      `cd /path/to/store/tflite_model_dir`
+   1. `cd /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
    2. Download the models from TFLite model zoo by running the below shell script
-      `sh /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/download_models.sh`
-   3. Set the path to downloaded tflite model directory in synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_regression.cpp file at line no: 19
-   4. `cd /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
-   5. Set CPLUS_INCLUDE_PATH and LD_LIBRARY_PATH environment variables as mentioned above in step 1 & 2
-   6. Compile the inference script
+      `sh download_models.sh`
+   3. Set the path to synopsys-tensorflow in synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_regression.cpp file at line no: 19
+   4. Set CPLUS_INCLUDE_PATH and LD_LIBRARY_PATH environment variables as mentioned above in step 1 & 2
+   5. Compile the inference script
       `g++ -o inference inference_regression.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lboost_serialization -L/usr/lib/x86_64-linux-gnu -lrt`
-   7. Run the executable
+   6. Run the executable
       `./inference`
 
    Note:
-      i. Invoke call from the inference script has been commented since the MLI kernel support need to be handled for added ops.
+      i. Invoke call from the inference script currently parses the MetaWareNN Executable graph from shared memory

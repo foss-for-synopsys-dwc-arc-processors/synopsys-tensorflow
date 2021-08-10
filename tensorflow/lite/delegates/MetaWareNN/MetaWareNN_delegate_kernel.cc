@@ -43,6 +43,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
   //Fills the graph_inputs with input data pointer using indexes
   std::unordered_map<std::string, float*> graph_inputs;
   std::unordered_map<std::string, float*> graph_outputs;
+  std::string output_tensor_name;
 
   for (int input_idx = 0; input_idx < node->inputs->size; ++input_idx) {
     const auto tensor_index = node->inputs->data[input_idx];
@@ -59,6 +60,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     TfLiteTensor* tensor = &context->tensors[tensor_index];
     if (tensor->allocation_type == kTfLiteArenaRw && tensor->data.f != nullptr) { //Output - Data
       graph_outputs[tensor->name] = tensor->data.f;
+      output_tensor_name = tensor->name;
     }
   }
 
@@ -72,7 +74,6 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     auto ip_shape = mwnn_graph_->get_graph_ip_tensor()[0].get_dims();
 
     mwapi.prepareInput(graph_inputs[ip_names[0]], ip_shape);
-    std::vector<std::string> op_names = mwnn_graph_->get_graph_op_names();
     auto op_shape = mwnn_graph_->get_graph_op_tensor()[0].get_dims();
 
     mwapi.prepareOutput(op_shape);
@@ -81,7 +82,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
 
     mwapi.runGraph();
 
-    mwapi.getOutput(graph_outputs[op_names[0]], op_shape);
+    mwapi.getOutput(graph_outputs[output_tensor_name], op_shape);
 
     // ******************************************* Call to invoke the local run function *****************************************
 

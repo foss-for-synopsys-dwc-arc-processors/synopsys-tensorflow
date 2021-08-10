@@ -16,7 +16,7 @@ int main(){
     while(getline(myfile, line))
     {
       std::cout << "\n\n\n===============================================================================================================================\n";
-      string tflite_model_path = "/path/to/tflite_model_dir/";
+      string tflite_model_path = "/Path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/tflite_models/";
       tflite_model_path.append(line);
       std::cout << "\nModel: " << tflite_model_path;
       std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(tflite_model_path.c_str());
@@ -29,13 +29,13 @@ int main(){
       std::unique_ptr<tflite::Interpreter> interpreter;
       tflite::InterpreterBuilder(*model.get(), resolver)(&interpreter);
 
-      TfLiteMetaWareNNDelegateOptions* options;
+      TfLiteMetaWareNNDelegateOptions* options = nullptr;
       // NEW: Prepare MetaWareNN delegate.
       auto* delegate = TfLiteMetaWareNNDelegateCreate(options);
       if (interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) return false;
       // Resize input tensors, if desired.
       interpreter->AllocateTensors();
-      
+
       int in = interpreter->inputs()[0];
       TfLiteIntArray* input_dims = interpreter->tensor(in)->dims;
       int img_size = 1;
@@ -63,8 +63,8 @@ int main(){
         //passing_input++;
         passing_input[i] = 125.8;
       }
-      // Invoke call has been commented since mli kernel support for many operators are not added currently.
-      /*
+      // Invoke call currently parses the Executable graph from Shared memory
+
       interpreter->Invoke();
       float* output = interpreter->typed_output_tensor<float>(0);
       vector<pair<float, int> > vp;
@@ -73,12 +73,12 @@ int main(){
         vp.push_back(make_pair(output[i], i));
       }
       sort(vp.begin(), vp.end());
-    
+
       for (int i = 1000; i >= 1000-10; i--)
       {
         printf("\n %f -- %d", vp[i].first, vp[i].second);
       }
-      */
+
     }
     myfile.close();
   }

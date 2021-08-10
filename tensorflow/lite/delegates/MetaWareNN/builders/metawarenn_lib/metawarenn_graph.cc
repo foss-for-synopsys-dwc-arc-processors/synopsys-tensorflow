@@ -961,7 +961,7 @@ MWNNGraph::MWNNGraph(std::vector<JSONGraphNode> graph_nodes_, std::string graph_
         node_name = node_op_type + std::to_string(layer_count++);
       }
       else if (node.GetOpName() == "nn.avg_pool2d" || node.GetOpName() == "nn.max_pool2d") {
-        node_op_type = node.GetOpName() == "AveragePool" ? "nn.avg_pool2d" : "MaxPool";
+        node_op_type = node.GetOpName() == "nn.avg_pool2d" ? "AveragePool" : "MaxPool";
         node_name = node_op_type + std::to_string(layer_count++);
         auto pool_size = node.GetAttr<std::vector<std::string>>("pool_size");
         auto padding = node.GetAttr<std::vector<std::string>>("padding");
