@@ -1,20 +1,20 @@
 ## Steps to build TensorFlow-MetaWareNN Delagate
 
-1. Check bazel version
-* `git clone https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
-* `git checkout metawarenn_dev`
+### For Docker Setup
+##### Check on the /synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md
+
+1. Install required bazel version
 * Check the bazel version using the command `bazel version`
-* If the version is older than 3.1.0, then download bazel version newer than 3.1.0 and install it
-* Download and Install bazel 3.6.0 using the following commands:
+* Download and Install bazel required 3.6.0 using the following commands:
 ```
     wget https://github.com/bazelbuild/bazel/releases/download/3.6.0/bazel-3.6.0-installer-linux-x86_64.sh
     chmod +x bazel-3.6.0-installer-linux-x86_64.sh
     ./bazel-3.6.0-installer-linux-x86_64.sh --user
     export PATH="$HOME/bin:$PATH"
 ```
-* Update the version number in `synopsys-tensorflow/.bazelversion` file
-
-2. Configure tensorflow build
+2. Download & Configure tensorflow build
+* `git clone https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
+* `git checkout metawarenn_dev`
 ```
     cd synopsys-tensorflow
     ./configure
