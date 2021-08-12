@@ -6,6 +6,10 @@
 #define GLOW 0
 #define TVM 0
 
+//Common headers
+#include <sys/stat.h>
+#include <sys/types.h>
+
 //ONNXRuntime
 #if ONNX
 #include "onnx/onnx-ml.pb.h"

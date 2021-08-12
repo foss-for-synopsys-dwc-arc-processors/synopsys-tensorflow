@@ -118,7 +118,9 @@ class MWNNNode {
                                                   get_attribute_value_int("beta"));
       }
       else if(op_type == "Clip") {
-        return std::make_shared<op::Clip>(name, inputs, outputs);
+        return std::make_shared<op::Clip>(name, inputs, outputs,
+                                                  get_attribute_value_float("min"),
+                                                  get_attribute_value_float("max"));
       }
       else if(op_type == "Mul") {
         return std::make_shared<op::Mul>(name, inputs, outputs);
@@ -158,7 +160,8 @@ class MWNNNode {
                                                   get_attribute_value_int("beta"),
                                                   get_attribute_value_int("axis"),
                                                   get_attribute_value_int("size"),
-                                                  get_attribute_value_int("bias"));
+                                                  get_attribute_value_int("bias"),
+                                                  get_attribute_value_int("half_window_size"));
       }
       else if(op_type == "Flatten") {
         return std::make_shared<op::Flatten>(name, inputs, outputs,
@@ -179,9 +182,10 @@ class MWNNNode {
       else if(op_type == "Shape") {
         return std::make_shared<op::Shape>(name, inputs, outputs);
       }
-      else if(op_type == "BatchNorm") {
+      else if(op_type == "BatchNormalization") {
           return std::make_shared<op::BatchNormalization>(name, inputs, outputs,
-                                                        get_attribute_value_float("epsilon")[0]);
+                                                        get_attribute_value_float("epsilon"),
+                                                        get_attribute_value_float("momentum"));
       }
       else if(op_type == "BiasAdd") {
           return std::make_shared<op::BiasAdd>(name, inputs, outputs);
@@ -216,14 +220,16 @@ class MWNNNode {
       }
       else if(op_type == "StridedSlice") {
         return std::make_shared<op::StridedSlice>(name, inputs, outputs,
-                                                        get_attribute_value_int("begin_mask"), 
+                                                        get_attribute_value_int("begin_mask"),
                                                         get_attribute_value_int("ellipsis_mask"),
                                                         get_attribute_value_int("end_mask"),
                                                         get_attribute_value_int("new_axis_mask"),
                                                         get_attribute_value_int("shrink_axis_mask"));
       }
       else if(op_type == "ChannelShuffle") {
-        return std::make_shared<op::ChannelShuffle>(name, inputs, outputs);
+        return std::make_shared<op::ChannelShuffle>(name, inputs, outputs,
+                                                        get_attribute_value_int("group"),
+                                                        get_attribute_value_int("kernel"));
       }
       else if(op_type == "FullyConnected") {
         return std::make_shared<op::FullyConnected>(name, inputs, outputs,

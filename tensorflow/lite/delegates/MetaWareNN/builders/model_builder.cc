@@ -34,6 +34,13 @@ void convert_CHWN_to_NHWC(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph, s
   }
   mwnn_graph->update_initializer_tensors(weight.get_name(), new_dims, new_wt_buf);
 }
+
+bool IsPathExist(const std::string &s)
+{
+  struct stat buffer;
+  return (stat (s.c_str(), &buffer) == 0);
+}
+
 /* TODO: High Level Graph to MetaWareNN Graph Representation,
          Apply Passes on MetaWareNN Graph,
          Generate Low Level Graph to run on devices*/
@@ -195,10 +202,17 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
       }
     }
 
-    std::cout << "\n Graph Name : " << mwnn_graph->get_name();
-    std::string g_name = mwnn_graph->get_name();
-    auto mwnn_op_path = "/Path/to/EV_DUMPS/";
-    auto mwnn_proto_bin = std::string(mwnn_op_path) + std::string(g_name) + ".bin";
+    std::string name = mwnn_graph->get_name();
+    auto mwnn_op_path = "/path/to/synopsys-tensorflow/EV_DUMPS/";
+    if(!IsPathExist(mwnn_op_path)) {
+      int check = mkdir(mwnn_op_path, 0777);
+      if(check != 0)
+      {
+        std::cout << "\nPlease check the directory path to store the serialized binary!!!!!";
+        exit(1);
+      }
+    }
+    auto mwnn_proto_bin = std::string(mwnn_op_path) + std::string(name) + ".bin";
 
     int fp = open(mwnn_proto_bin.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
     std::cout << fp;
@@ -206,7 +220,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
     close(fp);
 
     std::cout << "\n\n=================Initiating NNAC python script via shell script======================\n";
-    std::string cmd = "bash /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh " + mwnn_proto_bin + " " + mwnn_op_path + " " + g_name + " " + std::to_string(subgraph_counter);;
+    std::string cmd = "bash /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh " + mwnn_proto_bin + " " + mwnn_op_path + " " + name + " " + std::to_string(subgraph_counter);;
     const char *command = cmd.c_str();
     system(command);
   #endif

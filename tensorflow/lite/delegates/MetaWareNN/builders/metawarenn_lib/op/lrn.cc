@@ -12,7 +12,7 @@ LRN::LRN(std::string n_name, std::vector<std::string> n_inputs,
                   std::vector<int> n_beta,
                   std::vector<int> n_axis,
                   std::vector<int> n_size,
-                  std::vector<int> n_bias) : Node(n_name, "LRN") {
+                  std::vector<int> n_bias, std::vector<int> n_half_window_size) : Node(n_name, "LRN") {
   inputs = n_inputs;
   outputs = n_outputs;
   alpha = n_alpha;
@@ -20,6 +20,7 @@ LRN::LRN(std::string n_name, std::vector<std::string> n_inputs,
   axis = n_axis;
   size = n_size;
   bias = n_bias;
+  half_window_size = n_half_window_size;
   }
 
 void LRN::fill_attributes(DataSerialization &layer_serializer) {
@@ -43,6 +44,10 @@ void LRN::fill_attributes(DataSerialization &layer_serializer) {
   std::cout << "\n Bias : ";
   for (auto b : bias) {
     std::cout << b << ", ";
+  }
+  std::cout << "\n Half window size : ";
+  for (auto h : half_window_size) {
+    std::cout << h << ", ";
   }
   auto alpha_size = alpha.size();
   layer_serializer.append(static_cast<uint32_t>(alpha_size));
@@ -68,6 +73,11 @@ void LRN::fill_attributes(DataSerialization &layer_serializer) {
   layer_serializer.append(static_cast<uint32_t>(bias_len));
   for (auto b : bias) {
     layer_serializer.append(static_cast<int32_t>(b));
+  }
+  auto h_len = half_window_size.size();
+  layer_serializer.append(static_cast<uint32_t>(h_len));
+  for (auto h : half_window_size) {
+    layer_serializer.append(static_cast<int32_t>(h));
   }
   }
 } //namespace op

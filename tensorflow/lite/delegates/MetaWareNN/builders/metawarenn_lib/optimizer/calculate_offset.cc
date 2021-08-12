@@ -14,10 +14,11 @@ CalculateOffset::CalculateOffset(std::shared_ptr<MWNNGraph> mwnn_graph) {
 void CalculateOffset::RunPass() {
   int count = 0;
   auto initializertensors = graph->get_graph_initializers();
+  auto initializer_names = graph->mwnn_initializer_names;
   for (auto g_n : graph->get_graph_nodes()) {
     auto inputs = g_n.get_inputs();
     for (auto ip : inputs) {
-      if(graph->mwnn_initializer_names.count(ip)) {
+      if(initializer_names.count(ip)) {
         auto it = std::find_if(
         std::begin(initializertensors), std::end(initializertensors), [&](MWNNTensor& tensor) {
             return tensor.get_name() == ip;
@@ -39,6 +40,7 @@ void CalculateOffset::RunPass() {
         uint32_t total_byte_size = bytes_size + ip_name.length() + ip_dims.size() * 4 + total_size * 4;
         graph->update_initializer_index(ip, count);
         graph->update_initializer_offset(ip, total_byte_size);
+        initializer_names.erase(ip);
       }
     }
   }

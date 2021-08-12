@@ -95,7 +95,7 @@ void fill_layer_serializer(DataSerialization &layer_serializer, std::vector<MWNN
       l_hdr.layer_type = 6;
     else if(op_type == "Softmax")
       l_hdr.layer_type = 7;
-    else if(op_type == "BatchNorm") {
+    else if(op_type == "BatchNormalization") {
       l_hdr.layer_type = 8;
       node = std::dynamic_pointer_cast<op::BatchNormalization>(node);
     }
@@ -151,6 +151,7 @@ void fill_layer_serializer(DataSerialization &layer_serializer, std::vector<MWNN
     }
     else if(op_type == "Clip") {
       l_hdr.layer_type = 24;
+      node = std::dynamic_pointer_cast<op::Clip>(node);
     }
     else if(op_type == "Mul") {
       l_hdr.layer_type = 25;
@@ -195,8 +196,12 @@ void fill_layer_serializer(DataSerialization &layer_serializer, std::vector<MWNN
       l_hdr.layer_type = 36;
       node = std::dynamic_pointer_cast<op::StridedSlice>(node);
     }
+    else if(op_type == "ChannelShuffle") {
+      l_hdr.layer_type = 37;
+      node = std::dynamic_pointer_cast<op::ChannelShuffle>(node);
+    }
     else {
-      std::cout << "\n UnSupported Layer!!! " << op_type;
+      std::cout << "\n UnSupported Layer!!!";
       exit(1);
     }
 
@@ -410,8 +415,26 @@ void parse_layer_info(char *exe_graph, uint32_t offset, uint32_t num_data, uint3
       std::cout << "\n Activation : " << activation;
     }
     else if(type == "BatchNormalization") {
-      auto epsilon = read_from_graph_data<float>(exe_graph, offset);
-      std::cout << "\n Epsilon : " << epsilon;
+      auto e_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> epsilon;
+      for (int j = 0; j < e_len; j++) {
+        auto e = read_from_graph_data<int32_t>(exe_graph, offset);
+        epsilon.push_back(e);
+      }
+      auto m_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> momentum;
+      for (int j = 0; j < m_len; j++) {
+        auto m = read_from_graph_data<int32_t>(exe_graph, offset);
+        momentum.push_back(m);
+      }
+      std::cout << "\n Epsilon : ";
+      for (auto e : epsilon) {
+        std::cout << e << ", ";
+      }
+      std::cout << "\n Momentum : ";
+      for (auto m : momentum) {
+        std::cout << m << ", ";
+      }
     }
     else if(type == "MaxPool" || type == "AveragePool") {
       auto psize_len = read_from_graph_data<uint32_t>(exe_graph, offset);
@@ -476,6 +499,12 @@ void parse_layer_info(char *exe_graph, uint32_t offset, uint32_t num_data, uint3
         auto b = read_from_graph_data<int32_t>(exe_graph, offset);
         bias.push_back(b);
       }
+      auto h_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> half_window_size;
+      for (int j = 0; j < h_len; j++) {
+        auto h = read_from_graph_data<int32_t>(exe_graph, offset);
+        half_window_size.push_back(h);
+      }
       std::cout << "\n Alpha : ";
       for (auto a : alpha) {
         std::cout << a << ", ";
@@ -491,9 +520,14 @@ void parse_layer_info(char *exe_graph, uint32_t offset, uint32_t num_data, uint3
       std::cout << "\n Size : ";
       for (auto s : size) {
         std::cout << s << ", ";
-      }  std::cout << "\n Bias : ";
+      }
+      std::cout << "\n Bias : ";
       for (auto b : bias) {
         std::cout << b << ", ";
+      }
+      std::cout << "\n Half Window Size : ";
+      for (auto h : half_window_size) {
+        std::cout << h << ", ";
       }
     }
     else if(type == "Squeeze") {
@@ -667,6 +701,42 @@ void parse_layer_info(char *exe_graph, uint32_t offset, uint32_t num_data, uint3
       std::cout << "\n Shrink axis mask : ";
       for (auto s : shrink_axis_mask) {
         std::cout << s << ", ";
+      }
+    }
+    else if(type == "ChannelShuffle") {
+      auto grp_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> group;
+      for (int j = 0; j < grp_len; j++) {
+        auto g = read_from_graph_data<int32_t>(exe_graph, offset);
+        group.push_back(g);
+      }
+      auto ker_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<int32_t> kernel;
+      for (int j = 0; j < ker_len; j++) {
+        auto k = read_from_graph_data<int32_t>(exe_graph, offset);
+        kernel.push_back(k);
+      }
+      std::cout << "\n Group : ";
+      for (auto g : group) {
+        std::cout << g << ", ";
+      }
+      std::cout << "\n Kernel : ";
+      for (auto k : kernel) {
+        std::cout << k << ", ";
+      }
+    }
+    else if(type == "Clip") {
+      auto min_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<float> min;
+      for (int j = 0; j < min_len; j++) {
+        auto m = read_from_graph_data<float>(exe_graph, offset);
+        min.push_back(m);
+      }
+      auto max_len = read_from_graph_data<uint32_t>(exe_graph, offset);
+      std::vector<float> max;
+      for (int j = 0; j < max_len; j++) {
+        auto m = read_from_graph_data<float>(exe_graph, offset);
+        max.push_back(m);
       }
     }
   }

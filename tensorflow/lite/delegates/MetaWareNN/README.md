@@ -63,13 +63,12 @@
 Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the downloaded MobileNet v2 TFlite model path
 
 5. To Load MetaWareNN Executable Graph in Shared Memory[Default flow]
-   1. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/executable_network/metawarenn_executable_graph.cc" with path to store the Executable network binary in line no: 756
+   1. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/executable_network/metawarenn_executable_graph.cc" with path to store the Executable network binary in line no: 826
    2. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnn_inference_api/mwnn_inference_api.cc" file with saved file path of Executable network binary in line no: 51
 
    To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file
    1. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/model_builder.cc" file as follows:
-      i. Set the path to store the MWNN file dumps in line no: 200
-      ii. Set the path to synopsys-tensorflow in line no: 209
+      i. Set the path to synopsys-tensorflow in line no: 206 & 223
    2. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/model_builder.h" file as follows:
       i. Set the INVOKE_NNAC macro to 1 in line no: 17
    3. Update the "synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_convert.sh" file as follows:

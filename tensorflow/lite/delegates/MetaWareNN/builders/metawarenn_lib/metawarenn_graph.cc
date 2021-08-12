@@ -461,9 +461,10 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
             mwnn_initializer_tensors.emplace_back(mwnn_weight_tensor);
             auto bias_node_value = conv_node->getBias();
             auto bias_name = bias_node_value.generateNodeOutputName(true);
+            // Check to avoid redundant constants in mwnn initializers
+            if(!mwnn_initializer_names.count(bias_name))
+            {
             LOG(INFO) << "bias_name: " << bias_name;
-            node_inputs.emplace_back(bias_name);
-            mwnn_initializer_names.insert(bias_name);
             auto *bias_constant = llvm::dyn_cast<glow::Constant>(bias_node_value.getNode());
             glow::Tensor bias_tensor = bias_constant->getPayload().clone();
             auto handle1 = bias_tensor.getHandle<float>();
@@ -476,10 +477,13 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
             {
                 bias[i++] = elem;
             }
+            node_inputs.emplace_back(bias_name);
+            mwnn_initializer_names.insert(bias_name);
             type = bias_tensor.getType();
             data_type = type.getElementType();
             metawarenn::MWNNTensor mwnn_bias_tensor(bias_name, bias_dims, data_type, bias);
             mwnn_initializer_tensors.emplace_back(mwnn_bias_tensor);
+            }
             auto dilations = conv_node->getDilation();
             auto strides = conv_node->getStrides();
             auto pads = conv_node->getPads();
@@ -632,6 +636,8 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
             std::cout << "\n gemm inputs: " << gemm_node->getNumInputs();
             auto filter_node_value = gemm_node->getNthInput(1);
             auto filter_name = filter_node_value.generateNodeOutputName(true);
+            mwnn_initializer_names.insert(filter_name);
+            node_inputs.emplace_back(filter_name);
             auto *filter_constant = llvm::dyn_cast<glow::Constant>(filter_node_value.getNode());
             glow::Tensor filter_tensor = filter_constant->getPayload().clone();
             auto type = filter_tensor.getType();
@@ -700,7 +706,7 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
         }
         case Kinded::Kind::BatchNormalizationNodeKind:
         {
-            node_op_type = "BatchNorm";
+            node_op_type = "BatchNormalization";
             auto *batchnorm_node = llvm::cast<BatchNormalizationNode>(node);
             batchnorm_node->getEpsilon();
             batchnorm_node->getMomentum();
@@ -725,9 +731,9 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
             auto data_type = type.getElementType();
             metawarenn::MWNNTensor mwnn_bias_tensor(bias_name, bias_dims, data_type, bias);
             mwnn_initializer_tensors.emplace_back(mwnn_bias_tensor);
-            metawarenn::MWNNAttribute mwnn_attr_momentum("momentum", std::vector<int>{int(batchnorm_node->getMomentum())});
+            metawarenn::MWNNAttribute mwnn_attr_momentum("momentum", std::vector<float>{batchnorm_node->getMomentum()});
             node_attributes.emplace_back(mwnn_attr_momentum);
-            metawarenn::MWNNAttribute mwnn_attr_epsilon("epsilon", std::vector<int>{int(batchnorm_node->getEpsilon())});
+            metawarenn::MWNNAttribute mwnn_attr_epsilon("epsilon", std::vector<float>{batchnorm_node->getEpsilon()});
             node_attributes.emplace_back(mwnn_attr_epsilon);
             auto input_name = batchnorm_node->getInputName(0);
             node_inputs.emplace_back(input_name);
@@ -757,9 +763,9 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
             auto *clip_node = llvm::cast<ClipNode>(node);
             clip_node->getMax();
             clip_node->getMin();
-            metawarenn::MWNNAttribute mwnn_attr_max("max", std::vector<int>{int(clip_node->getMax())});
+            metawarenn::MWNNAttribute mwnn_attr_max("max", std::vector<float>{(clip_node->getMax())});
             node_attributes.emplace_back(mwnn_attr_max);
-            metawarenn::MWNNAttribute mwnn_attr_min("min", std::vector<int>{int(clip_node->getMax())});
+            metawarenn::MWNNAttribute mwnn_attr_min("min", std::vector<float>{(clip_node->getMax())});
             node_attributes.emplace_back(mwnn_attr_min);
             auto input_name = clip_node->getInputName(0);
             node_inputs.emplace_back(input_name);
@@ -790,6 +796,8 @@ MWNNGraph::MWNNGraph(Function *F, std::string subgraph_name) {
             {
                 weights[i++] = elem;
             }
+            mwnn_initializer_names.insert(filter_name);
+            node_inputs.emplace_back(filter_name);
             metawarenn::MWNNTensor mwnn_weight_tensor(filter_name, weight_dims, data_type, weights);
             mwnn_initializer_tensors.emplace_back(mwnn_weight_tensor);
             auto bias_node_value = fc_node->getBias();;
@@ -941,7 +949,7 @@ MWNNGraph::MWNNGraph(std::vector<JSONGraphNode> graph_nodes_, std::string graph_
         node_attributes.emplace_back(mwnn_attr_kernel_shape);
       }
       else if (node.GetOpName() == "nn.batch_norm") {
-        node_op_type = "BatchNorm";
+        node_op_type = "BatchNormalization";
         node_name = node_op_type + std::to_string(layer_count++);
 
         float epsilon = std::stof(node.GetAttr<std::vector<std::string>>("epsilon")[0]);
