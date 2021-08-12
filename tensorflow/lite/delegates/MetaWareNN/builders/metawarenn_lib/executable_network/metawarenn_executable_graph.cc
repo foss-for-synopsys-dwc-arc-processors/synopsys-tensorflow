@@ -418,13 +418,13 @@ void parse_layer_info(char *exe_graph, uint32_t offset, uint32_t num_data, uint3
       auto e_len = read_from_graph_data<uint32_t>(exe_graph, offset);
       std::vector<int32_t> epsilon;
       for (int j = 0; j < e_len; j++) {
-        auto e = read_from_graph_data<int32_t>(exe_graph, offset);
+        auto e = read_from_graph_data<float>(exe_graph, offset);
         epsilon.push_back(e);
       }
       auto m_len = read_from_graph_data<uint32_t>(exe_graph, offset);
       std::vector<int32_t> momentum;
       for (int j = 0; j < m_len; j++) {
-        auto m = read_from_graph_data<int32_t>(exe_graph, offset);
+        auto m = read_from_graph_data<float>(exe_graph, offset);
         momentum.push_back(m);
       }
       std::cout << "\n Epsilon : ";
