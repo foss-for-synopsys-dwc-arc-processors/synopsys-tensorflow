@@ -1,8 +1,9 @@
 ## Steps to build TensorFlow-MetaWareNN Delagate
 
 ### For Docker Setup
-##### Check on the /synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md
-
+##### Check on the [synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md](https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/metawarenn_dev/tensorflow/lite/delegates/MetaWareNN/Docker/README.md)
+  
+### Common Installation Process
 1. Install required bazel version
 * Check the bazel version using the command `bazel version`
 * Download and Install bazel required 3.6.0 using the following commands:
