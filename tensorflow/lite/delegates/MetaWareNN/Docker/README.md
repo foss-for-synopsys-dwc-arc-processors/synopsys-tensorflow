@@ -38,7 +38,7 @@ Changes in the TF source code needs the last command(`bazel build*`) of step-4, 
     *   wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz  
     *   tar -vzxf mobilenet_v2_1.0_224.tgz  
 * `scp uname@ip_address:/path/to/local/machine/mobilenet_v2_1.0_224.tflite /path/to/docker/folder/`  
-* `Update the docker path of mobilenet_v2_1.0_224.tflite in /path/to/docker/TFLite/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_metawarenn.cpp in line no: 13`  
+* Update the docker path of mobilenet_v2_1.0_224.tflite in `/path/to/docker/TFLite/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_metawarenn.cpp` in line no: 13  
 * `export CPLUS_INCLUDE_PATH=/path/to/docker/TFLite/synopsys-tensorflow:/path/to/docker/TFLite/flatbuffers/include`  
 * `export LD_LIBRARY_PATH=/path/to/docker/TFLite/synopsys-tensorflow/bazel-bin/tensorflow/lite:/path/to/docker/TFLite/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN:/path/to/docker/TFLite/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders:$LD_LIBRARY_PATH`  
 * `cd tensorflow/lite/delegates/MetaWareNN/inference/`  
