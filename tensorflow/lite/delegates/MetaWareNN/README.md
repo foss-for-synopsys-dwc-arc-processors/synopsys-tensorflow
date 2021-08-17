@@ -34,12 +34,13 @@
     # Note: 36 could be other numbers if you use other python version
 ```
 
-## Run the Inference using MetaWareNN Delegate
+#### Run the Inference using MetaWareNN Delegate
 
 1.  Install flatbuffers and set up the include path
 ```
     git clone https://github.com/google/flatbuffers.git
     cd flatbuffers
+    git checkout v1.12.0
     cmake -G "Unix Makefiles"
     make
 
@@ -102,23 +103,26 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
         export LD_LIBRARY_PATH=install_protobuf_folder/lib:${LD_LIBRARY_PATH} 
         export CPLUS_INCLUDE_PATH=install_protobuf_folder/include:${CPLUS_INCLUDE_PATH}
     ```
-7. Build TFLite with MetaWareNN Delegate Support
+7. Build TFLite with MetaWareNN Delegate Support  
     ```
-        bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
+    bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
     ```
 
-8. Compile the inference script
-  Note: we suggest to use g++ 7 to avoid possible errors.
-
-```
+8. Compile the inference script  
+  Note: we suggest to use g++ 7 to avoid possible errors.  
+    ```
+    cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference
     g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt
-```
+    ```
 
-9. Run the object file
-`./inference`
+9. Run the object file 
+  ```
+  ipcs # List the shared memory details along with shmid
+  ipcrm -m [shmid] # Adjust shared memory allocation size
+  ./inference  
+  ```
 
-
-### For Docker Setup
+### Use Docker for Installation (optional)
 ##### Check on the [synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md](https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/metawarenn_dev/tensorflow/lite/delegates/MetaWareNN/Docker/README.md)
 
 ## To run multiple TFLite models from model zoo
