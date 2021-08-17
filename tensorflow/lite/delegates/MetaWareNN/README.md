@@ -1,7 +1,4 @@
 ## Steps to build TensorFlow-MetaWareNN Delagate
-
-### For Docker Setup
-##### Check on the [synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md](https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/metawarenn_dev/tensorflow/lite/delegates/MetaWareNN/Docker/README.md)
   
 ### Common Installation Process
 1. Install required bazel version
@@ -26,7 +23,7 @@
     sudo pip install virtualenv
     virtualenv --python=/usr/bin/python3.6 /path/to/new/environment
     source /path/to/new/environment/bin/activate
-    pip install numpy
+    pip install numpy<1.19.0
 ```
 
 4. Build Tensorflow from scratch
@@ -116,6 +113,10 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
 
 9. Run the object file
 `./inference`
+
+
+### For Docker Setup
+##### Check on the [synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md](https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/metawarenn_dev/tensorflow/lite/delegates/MetaWareNN/Docker/README.md)
 
 ## To run multiple TFLite models from model zoo
    1. `cd /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
