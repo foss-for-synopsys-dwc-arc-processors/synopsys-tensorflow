@@ -1,5 +1,8 @@
 ## Steps to build TensorFlow-MetaWareNN Delagate
   
+### Use Docker for Installation (optional)
+##### Check on the [synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md](https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/metawarenn_dev/tensorflow/lite/delegates/MetaWareNN/Docker/README.md)  
+  
 ### Common Installation Process
 1. Install required bazel version
 * Check the bazel version using the command `bazel version`
@@ -122,19 +125,16 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
   ./inference  
   ```
 
-### Use Docker for Installation (optional)
-##### Check on the [synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md](https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/metawarenn_dev/tensorflow/lite/delegates/MetaWareNN/Docker/README.md)
-
 ## To run multiple TFLite models from model zoo
    1. `cd /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
-   2. Download the models from TFLite model zoo by running the below shell script
+   2. Download the models from TFLite model zoo by running the script
       `sh download_models.sh`
    3. Set the path to synopsys-tensorflow in synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_regression.cpp file at line no: 19
-   4. Set CPLUS_INCLUDE_PATH and LD_LIBRARY_PATH environment variables as mentioned above in step 1 & 2
+   4. Set CPLUS_INCLUDE_PATH and LD_LIBRARY_PATH environment variables as mentioned in previous step 1 & 2
    5. Compile the inference script
       `g++ -o inference inference_regression.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lboost_serialization -L/usr/lib/x86_64-linux-gnu -lrt`
    6. Run the executable
-      `./inference`
-
-   Note:
-      i. Invoke call from the inference script currently parses the MetaWareNN Executable graph from shared memory
+      `./inference`  
+      
+   Note:  
+      i. Invoke call from the inference script currently parses the MetaWareNN Executable graph from shared memory  
