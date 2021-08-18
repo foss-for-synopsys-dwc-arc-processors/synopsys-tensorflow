@@ -69,7 +69,9 @@
 Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the downloaded MobileNet v2 TFlite model path
 
 4. To Load MetaWareNN Executable Graph in Shared Memory [Default flow]
-   1.Set the path to synopsys-tensorflow in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no: 5
+   1. Update tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/metawarenn_common.h file
+        a. Set Macro ONNX to 0 and TFLITE to 1 in line number 4 and 5
+   2. Set the path to synopsys-tensorflow in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no: 5
 
    To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file
    1. Set the path to ARC/ directory in tensorflow/lite/delegates/MetaWareNN/inference/env.sh lino no: 11
