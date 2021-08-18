@@ -14,14 +14,24 @@
     export PATH="$HOME/bin:$PATH"
 ```
 2. Download & Configure tensorflow build
-* `git clone https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
+* `git clone --recursive https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
+* `cd synopsys-tensorflow`
 * `git checkout metawarenn_dev`
+
+3. MetaWareNN Library submodule setup
+* `git submodule update --init --recursive`
+*  Move to metawarenn_lib submodule and checkout to metawarenn_dev branch
+    a. `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
+    b. `git checkout metawarenn_dev`
+*  Once initial submodule setup is done with above commands, use this command to pull from the submodule in future
+    i.  `cd /path/to/synopsys-tensorflow`
+    ii. `git pull --recurse-submodules`
 ```
     cd synopsys-tensorflow
     ./configure
 ```
 
-3. Create virtual environment and install dependent packages
+4. Create virtual environment and install dependent packages
 ```
     sudo pip install virtualenv
     virtualenv --python=/usr/bin/python3.6 /path/to/new/environment
@@ -29,7 +39,7 @@
     pip install numpy<1.19.0
 ```
 
-4. Build Tensorflow from scratch
+5. Build Tensorflow from scratch
 ```
     bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
     ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg

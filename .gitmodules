@@ -1,0 +1,4 @@
+
+[submodule "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib"]
+	path = tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib
+	url = https://github.com/SowmyaDhanapal/metawarenn_lib.git
