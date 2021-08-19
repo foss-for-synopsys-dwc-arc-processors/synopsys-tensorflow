@@ -39,7 +39,7 @@ std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext*
   const auto& output_tensor = context->tensors[tensor_id];
   std::vector<int> dims_op_vec(output_tensor.dims->data, output_tensor.dims->data + output_tensor.dims->size);
   ::metawarenn::MWNNValueInfo mwnn_output(output_tensor.name, dims_op_vec, get_mwnn_type_tf(output_tensor.type));
-  mwnn_graph_ptr->set_graph_ip_names(output_tensor.name);
+  mwnn_graph_ptr->set_graph_op_names(output_tensor.name);
   //Fills Graph Output Tensor Details - Name, Dims
   ::metawarenn::MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_type(), mwnn_output.get_dims());
   mwnn_graph_ptr->set_graph_op_tensor(mwnn_op_tensor);
