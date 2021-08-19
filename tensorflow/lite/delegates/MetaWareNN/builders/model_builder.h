@@ -1,9 +1,15 @@
+#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/builtin_ops.h"
+#include "tensorflow/lite/c/builtin_op_data.h"
+#include "tensorflow/lite/schema/schema_generated.h"
+
 #include "metawarenn_lib/metawarenn_common.h"
 #include "metawarenn_lib/metawarenn_graph.h"
 #include "metawarenn_lib/metawarenn_tensor.h"
 #include "metawarenn_lib/metawarenn_node.h"
 #include "metawarenn_lib/metawarenn_attribute.h"
 #include "metawarenn_lib/metawarenn_utils.h"
+#include "metawarenn_lib/metawarenn_element.h"
 
 #include "metawarenn_lib/optimizer/pass_manager.h"
 #include "metawarenn_lib/optimizer/metawarenn_optimizer.h"
@@ -28,6 +34,38 @@ class ModelBuilder {
   ~ModelBuilder() = default;
   std::shared_ptr<::metawarenn::MWNNGraph> BuildGraph(TfLiteContext* context, std::string subgraph_name);
   TfLiteStatus MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph);
+
+  static ::metawarenn::ElementType::element_type get_mwnn_type_tf(int tf_type) {
+      switch (tf_type) {
+          case kTfLiteBool:
+              return ::metawarenn::ElementType::element_type::boolean_;
+          case kTfLiteFloat64:
+              return ::metawarenn::ElementType::element_type::double_;
+          case kTfLiteFloat16:
+              return ::metawarenn::ElementType::element_type::float16_;
+          case kTfLiteFloat32:
+              return ::metawarenn::ElementType::element_type::float_;
+          case kTfLiteInt8:
+              return ::metawarenn::ElementType::element_type::int8_;
+          case kTfLiteInt16:
+              return ::metawarenn::ElementType::element_type::int16_;
+          case kTfLiteInt32:
+              return ::metawarenn::ElementType::element_type::int32_;
+          case kTfLiteInt64:
+              return ::metawarenn::ElementType::element_type::int64_;
+          case kTfLiteUInt8:
+              return ::metawarenn::ElementType::element_type::uint8_;
+          case kTfLiteNoType:
+              return ::metawarenn::ElementType::element_type::dynamic_;
+          case kTfLiteString:
+              return ::metawarenn::ElementType::element_type::string_;
+          case kTfLiteComplex64:
+              return ::metawarenn::ElementType::element_type::complex64_;
+          default:
+              return ::metawarenn::ElementType::element_type::dynamic_;
+      }
+  }
+
 
  private:
   std::vector<int> subgraph_nodes_;
