@@ -24,12 +24,12 @@
   #### Install required bazel version
     * Check the bazel version using the command `bazel version`
     * Download and Install bazel required 3.6.0 using the following commands:
-    ```
+  ```
         wget https://github.com/bazelbuild/bazel/releases/download/3.6.0/bazel-3.6.0-installer-linux-x86_64.sh
         chmod +x bazel-3.6.0-installer-linux-x86_64.sh
         ./bazel-3.6.0-installer-linux-x86_64.sh --user
         export PATH="$HOME/bin:$PATH"
-    ```
+  ```
 
   #### Build Protobuf Library
     * Download protobuf library version 3.11.3 from the egnyte link https://multicorewareinc.egnyte.com/dl/FjljPlgjlI
@@ -37,7 +37,7 @@
     * Required Protobuf Version - 3.11.3, Check with the following command,
       $ protoc --version
     * Install Protobuf version 3.11.3 with below set of commands
-    ```
+  ```
         wget https://github.com/protocolbuffers/protobuf/releases/download/v3.11.3/protobuf-all-3.11.3.tar.gz
         tar -xf protobuf-all-3.11.3.tar.gz
         cd protobuf-3.11.3
@@ -54,23 +54,23 @@
         export PATH=install_protobuf_folder/bin:${PATH}
         export LD_LIBRARY_PATH=install_protobuf_folder/lib:${LD_LIBRARY_PATH}
         export CPLUS_INCLUDE_PATH=install_protobuf_folder/include:${CPLUS_INCLUDE_PATH}
-    ```
+  ```
   #### Install flatbuffers and set up the include path
-    ```
+  ```
         git clone https://github.com/google/flatbuffers.git
         cd flatbuffers
         git checkout v1.12.0
         cmake -G "Unix Makefiles"
         make
-    ```
+  ```
 
   #### Create virtual environment and install dependent packages
-    ```
+  ```
         sudo pip install virtualenv
         virtualenv --python=/usr/bin/python3.6 /path/to/new/environment
         source /path/to/new/environment/bin/activate
         pip install numpy<1.19.0
-    ```
+  ```
 #### Configure tensorflow
 * cd synopsys-tensorflow
 * ./configure
