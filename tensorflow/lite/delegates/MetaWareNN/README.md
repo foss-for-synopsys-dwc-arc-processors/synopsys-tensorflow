@@ -96,20 +96,20 @@
    [Note] : Generated EV Binary file for MetaWareNN SubGraph will store in evgencnn/scripts folder and all intermediate files will get stored in `/path/to/synopsys-tensorflow/NNAC_DUMPS` folder
 
 ### Build TFLite with MetaWareNN Delegate Support
-    ```
+```
     bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
-    ```
+```
 
 ### Compile and run the inference script
-  Note: we suggest to use g++ 7 to avoid possible errors.
-    1. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
-    2. Set the path to flatbuffers in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no:15
-    3. `source env.sh`
-    4. Set the path to downloaded MobileNet v2 TFlite model in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_metawarenn.cpp` line no: 13
-    5. `g++ -o inference inference_metawarenn.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
-    6. `ipcs` # List the shared memory details along with shmid
-    7. `ipcrm -m [shmid]` # Adjust shared memory allocation size
-    7. ./inference
+   Note: we suggest to use g++ 7 to avoid possible errors.
+   1. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
+   2. Set the path to flatbuffers in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no:15
+   3. `source env.sh`
+   4. Set the path to downloaded MobileNet v2 TFlite model in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_metawarenn.cpp` line no: 13
+   5. `g++ -o inference inference_metawarenn.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
+   6. `ipcs` # List the shared memory details along with shmid
+   7. `ipcrm -m [shmid]` # Adjust shared memory allocation size
+   8. `./inference`
 
 ### To run multiple TFLite models from model zoo
    1. `cd /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
