@@ -3,81 +3,35 @@
 ### Use Docker for Installation (optional)
 ##### Check on the [synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md](https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/metawarenn_dev/tensorflow/lite/delegates/MetaWareNN/Docker/README.md)
 
-### Common Installation Process
-1. Install required bazel version
-* Check the bazel version using the command `bazel version`
-* Download and Install bazel required 3.6.0 using the following commands:
-```
-    wget https://github.com/bazelbuild/bazel/releases/download/3.6.0/bazel-3.6.0-installer-linux-x86_64.sh
-    chmod +x bazel-3.6.0-installer-linux-x86_64.sh
-    ./bazel-3.6.0-installer-linux-x86_64.sh --user
-    export PATH="$HOME/bin:$PATH"
-```
-2. Download & Configure tensorflow build
-* `git clone --recursive https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
-* `cd synopsys-tensorflow`
-* `git checkout metawarenn_dev`
+### Prerequisites
+  #### Initial Setup
+    * `git clone --recursive https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
+    * `cd synopsys-tensorflow`
+    * `git checkout metawarenn_dev`
+    * In case if synopsys-tensorflow is cloned without metawarenn_lib submodule, use below commands to pull MetaWareNN Library Submodule for the first time
+        * `git pull`
+        * `git submodule update --init --recursive`
+        *  Move to metawarenn_lib submodule and checkout to metawarenn_dev branch
+            a. `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
+            b. `git checkout metawarenn_dev`
+  #### Using Existing Setup to pull submodule changes[Docker / Non-Docker]
+    * `cd synopsys-tensorflow`
+    * `git pull`
+    * `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
+    * `git checkout metawarenn_dev`
+    * `git pull`
 
-3. MetaWareNN Library submodule setup
-* `git submodule update --init --recursive`
-*  Move to metawarenn_lib submodule and checkout to metawarenn_dev branch
-    a. `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
-    b. `git checkout metawarenn_dev`
-*  Once initial submodule setup is done with above commands, use this command to pull from the submodule in future
-    i.  `cd /path/to/synopsys-tensorflow`
-    ii. `git pull --recurse-submodules`
-```
-    cd synopsys-tensorflow
-    ./configure
-```
+  #### Install required bazel version
+    * Check the bazel version using the command `bazel version`
+    * Download and Install bazel required 3.6.0 using the following commands:
+    ```
+        wget https://github.com/bazelbuild/bazel/releases/download/3.6.0/bazel-3.6.0-installer-linux-x86_64.sh
+        chmod +x bazel-3.6.0-installer-linux-x86_64.sh
+        ./bazel-3.6.0-installer-linux-x86_64.sh --user
+        export PATH="$HOME/bin:$PATH"
+    ```
 
-4. Create virtual environment and install dependent packages
-```
-    sudo pip install virtualenv
-    virtualenv --python=/usr/bin/python3.6 /path/to/new/environment
-    source /path/to/new/environment/bin/activate
-    pip install numpy<1.19.0
-```
-
-5. Build Tensorflow from scratch
-```
-    bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
-    ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
-    pip install /tmp/tensorflow_pkg/tensorflow-2.3.1-cp36-cp36m-linux_x86_64.whl
-    # Note: 36 could be other numbers if you use other python version
-```
-
-#### Run the Inference using MetaWareNN Delegate
-
-1.  Install flatbuffers and set up the include path
-```
-    git clone https://github.com/google/flatbuffers.git
-    cd flatbuffers
-    git checkout v1.12.0
-    cmake -G "Unix Makefiles"
-    make
-
-    Set the path to flatbuffers in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no:15
-
-2. Download MobileNet v2 TFlite model
-```
-    wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz
-    tar -vzxf mobilenet_v2_1.0_224.tgz
-```
-
-3. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
-Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the downloaded MobileNet v2 TFlite model path
-
-4. To Load MetaWareNN Executable Graph in Shared Memory [Default flow]
-   1. Update tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/metawarenn_common.h file
-        a. Set Macro ONNX to 0 and TFLITE to 1 in line number 4 and 5
-   2. Set the path to synopsys-tensorflow in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no: 5
-
-   To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file
-   1. Set the path to ARC/ directory in tensorflow/lite/delegates/MetaWareNN/inference/env.sh lino no: 11
-   [Note] : Generated EV Binary file for MetaWareNN SubGraph will store in evgencnn/scripts folder.
-
-5. Build MetaWareNN dependent libraries
+  #### Build Protobuf Library
     * Download protobuf library version 3.11.3 from the egnyte link https://multicorewareinc.egnyte.com/dl/FjljPlgjlI
     * Unzip and move the "libprotobuf.so" to "/path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/"
     * Required Protobuf Version - 3.11.3, Check with the following command,
@@ -101,35 +55,70 @@ Open `inference_metawarenn.cpp` and replace the path in line no. 13 with the dow
         export LD_LIBRARY_PATH=install_protobuf_folder/lib:${LD_LIBRARY_PATH}
         export CPLUS_INCLUDE_PATH=install_protobuf_folder/include:${CPLUS_INCLUDE_PATH}
     ```
-6. Build TFLite with MetaWareNN Delegate Support
+  #### Install flatbuffers and set up the include path
+    ```
+        git clone https://github.com/google/flatbuffers.git
+        cd flatbuffers
+        git checkout v1.12.0
+        cmake -G "Unix Makefiles"
+        make
+    ```
+
+  #### Create virtual environment and install dependent packages
+    ```
+        sudo pip install virtualenv
+        virtualenv --python=/usr/bin/python3.6 /path/to/new/environment
+        source /path/to/new/environment/bin/activate
+        pip install numpy<1.19.0
+    ```
+#### Configure tensorflow
+* cd synopsys-tensorflow
+* ./configure
+
+### Build Tensorflow from scratch
+```
+    bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
+    ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+    pip install /tmp/tensorflow_pkg/tensorflow-2.3.1-cp36-cp36m-linux_x86_64.whl
+    # Note: 36 could be other numbers if you use other python version
+```
+### Download MobileNet v2 TFlite model
+```
+    wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz
+    tar -vzxf mobilenet_v2_1.0_224.tgz
+```
+#### Modifications to make before build
+   ### To Load MetaWareNN Executable Graph in Shared Memory [Default flow]
+   1. Set the path to synopsys-tensorflow in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no: 5
+
+   ### To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file
+   1. Set the path to ARC/ directory in tensorflow/lite/delegates/MetaWareNN/inference/env.sh lino no: 11
+   [Note] : Generated EV Binary file for MetaWareNN SubGraph will store in evgencnn/scripts folder and all intermediate files will get stored in `/path/to/synopsys-tensorflow/NNAC_DUMPS` folder
+
+### Build TFLite with MetaWareNN Delegate Support
     ```
     bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
     ```
 
-7. Compile the inference script
+### Compile and run the inference script
   Note: we suggest to use g++ 7 to avoid possible errors.
-    ```
-    cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference
-    source env.sh
-    g++ -o inference inference_metawarenn.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt
-    ```
+    1. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
+    2. Set the path to flatbuffers in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no:15
+    3. `source env.sh`
+    4. Set the path to downloaded MobileNet v2 TFlite model in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_metawarenn.cpp` line no: 13
+    5. `g++ -o inference inference_metawarenn.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
+    6. `ipcs` # List the shared memory details along with shmid
+    7. `ipcrm -m [shmid]` # Adjust shared memory allocation size
+    7. ./inference
 
-8. Run the object file
-  ```
-  ipcs # List the shared memory details along with shmid
-  ipcrm -m [shmid] # Adjust shared memory allocation size
-  ./inference
-  ```
-
-## To run multiple TFLite models from model zoo
+### To run multiple TFLite models from model zoo
    1. `cd /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
-   2. Download the models from TFLite model zoo by running the script
+   2. `source env.sh`
+   3. Download the models from TFLite model zoo by running the script
       `sh download_models.sh`
-   3. Set the path to synopsys-tensorflow in synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_regression.cpp file at line no: 19
-   4. `source env.sh`
-   5. Compile the inference script
-      `g++ -o inference inference_regression.cpp -I/path/to/flatbuffers/include -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite -ltensorflowlite -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L/path/to/synopsys-tensorflow/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lboost_serialization -L/usr/lib/x86_64-linux-gnu -lrt`
-   6. Run the executable
+   4. Compile the inference script
+      `g++ -o inference inference_regression.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lboost_serialization -L/usr/lib/x86_64-linux-gnu -lrt`
+   5. Run the executable
       `./inference`
 
    Note:

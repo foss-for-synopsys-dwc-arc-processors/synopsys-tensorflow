@@ -10,13 +10,15 @@ using namespace std;
 
 int main(){
   string line;
+  char* model_directory = nullptr;
+  model_directory = getenv("FRAMEWORK_PATH");
   ifstream myfile ("models.txt");
   if (myfile.is_open())
   {
     while(getline(myfile, line))
     {
       std::cout << "\n\n\n===============================================================================================================================\n";
-      string tflite_model_path = "/Path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/tflite_models/";
+      string tflite_model_path = model_directory + std::string("/tflite_models/");
       tflite_model_path.append(line);
       std::cout << "\nModel: " << tflite_model_path;
       std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(tflite_model_path.c_str());

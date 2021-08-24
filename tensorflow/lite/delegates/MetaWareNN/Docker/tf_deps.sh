@@ -46,3 +46,6 @@ pip3 install numpy
 git clone https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git
 cd synopsys-tensorflow
 git checkout metawarenn_dev
+git submodule update --init --recursive
+cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib
+git checkout metawarenn_dev

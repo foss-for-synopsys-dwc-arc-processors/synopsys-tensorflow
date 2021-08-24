@@ -12,6 +12,7 @@ export ARC_PATH=/path/to/ARC/
 export NNAC_DUMPS_PATH=$FRAMEWORK_PATH"/NNAC_DUMPS/"
 
 ########### Common Library Path Settings ################
-export CPLUS_INCLUDE_PATH=$FRAMEWORK_PATH:/path/to/flatbuffers/include
+export FLATBUFFERS_PATH=/Path/to/flatbuffers/
+export CPLUS_INCLUDE_PATH=$FRAMEWORK_PATH:$FLATBUFFERS_PATH/include
 
 export LD_LIBRARY_PATH=$FRAMEWORK_PATH"/bazel-bin/tensorflow/lite":$FRAMEWORK_PATH"/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders":$FRAMEWORK_PATH"/bazel-bin/tensorflow/lite/delegates/MetaWareNN":$LD_LIBRARY_PATH
