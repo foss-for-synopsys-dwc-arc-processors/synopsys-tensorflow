@@ -8,7 +8,8 @@ export EXEC_DUMPS_PATH=$FRAMEWORK_PATH"/EXEC_DUMPS/"
 
 ########### NNAC - EV binary generation flow ##############
 #set the path to ARC directory
-export ARC_PATH=/path/to/ARC/
+export ARC_PATH=/Path/to/ARC/
+export EV_CNNMODELS_HOME=/Path/to/cnn_models/
 export NNAC_DUMPS_PATH=$FRAMEWORK_PATH"/NNAC_DUMPS/"
 
 ########### Common Library Path Settings ################

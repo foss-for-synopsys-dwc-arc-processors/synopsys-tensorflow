@@ -32,8 +32,6 @@
   ```
 
   #### Build Protobuf Library
-    * Download protobuf library version 3.11.3 from the egnyte link https://multicorewareinc.egnyte.com/dl/FjljPlgjlI
-    * Unzip and move the "libprotobuf.so" to "/path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/"
     * Required Protobuf Version - 3.11.3, Check with the following command,
       $ protoc --version
     * Install Protobuf version 3.11.3 with below set of commands
@@ -92,8 +90,17 @@
    1. Set the path to synopsys-tensorflow in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no: 5
 
    ### To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file
-   1. Set the path to ARC/ directory in tensorflow/lite/delegates/MetaWareNN/inference/env.sh lino no: 11
+   1. Enable INVOKE_NNAC in tensorflow/lite/delegates/MetaWareNN/builders/model_builder.h line no: 25
+   2. Update tensorflow/lite/delegates/MetaWareNN/inference/env.sh file
+      i. Set the path to ARC/ directory in lino no: 11
+      ii. Set the path to cnn_models/ directory in lino no: 12
    [Note] : Generated EV Binary file for MetaWareNN SubGraph will store in evgencnn/scripts folder and all intermediate files will get stored in `/path/to/synopsys-tensorflow/NNAC_DUMPS` folder
+
+   ### To Use metawarenn_lib as Shared Library
+   1. Rename tensorflow/lite/delegates/MetaWareNN/builders/BUILD to BUILD_original
+      `mv tensorflow/lite/delegates/MetaWareNN/builders/BUILD tensorflow/lite/delegates/MetaWareNN/builders/BUILD_original`
+   2. Rename tensorflow/lite/delegates/MetaWareNN/builders/BUILD_shared_lib to BUILD
+      `mv tensorflow/lite/delegates/MetaWareNN/builders/BUILD_shared_lib tensorflow/lite/delegates/MetaWareNN/builders/BUILD`
 
 ### Build TFLite with MetaWareNN Delegate Support
 ```
