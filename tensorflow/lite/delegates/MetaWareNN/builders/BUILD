@@ -23,6 +23,7 @@ cc_library(
     name = "model_builder_lib",
     srcs = [
         "model_builder.cc",
+        "metawarenn_lib/metawarenn_graph.cc",
         "metawarenn_lib/metawarenn_tensor.cc",
         "metawarenn_lib/metawarenn_node.cc",
         "metawarenn_lib/metawarenn_attribute.cc",
