@@ -25,12 +25,11 @@ std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext*
   int tensor_id = node->inputs->data[0];
   const auto& input_tensor = context->tensors[tensor_id];
   std::vector<int> dims_ip_vec(input_tensor.dims->data, input_tensor.dims->data + input_tensor.dims->size);
-  ::metawarenn::MWNNValueInfo mwnn_input(input_tensor.name, dims_ip_vec, get_mwnn_type_tf(input_tensor.type));
   mwnn_graph_ptr->set_graph_ip_names(input_tensor.name);
-  auto ip_node = mwnn_input.get_node();
-  mwnn_graph_ptr->mwnn_graph_nodes[mwnn_input.get_name()] = std::move(ip_node);
   //Fills Graph Input Tensor Details - Name, Dims
-  ::metawarenn::MWNNTensor mwnn_ip_tensor(mwnn_input.get_name(), mwnn_input.get_type(), mwnn_input.get_dims());
+  ::metawarenn::MWNNTensor mwnn_ip_tensor(input_tensor.name, get_mwnn_type_tf(input_tensor.type), dims_ip_vec);
+  auto ip_node = mwnn_ip_tensor.get_node();
+  mwnn_graph_ptr->mwnn_graph_nodes[mwnn_ip_tensor.get_name()] = std::move(ip_node);
   mwnn_graph_ptr->set_graph_ip_tensor(mwnn_ip_tensor);
 
   //Set Graph Output Node
@@ -38,10 +37,9 @@ std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext*
   tensor_id = node->outputs->data[0];
   const auto& output_tensor = context->tensors[tensor_id];
   std::vector<int> dims_op_vec(output_tensor.dims->data, output_tensor.dims->data + output_tensor.dims->size);
-  ::metawarenn::MWNNValueInfo mwnn_output(output_tensor.name, dims_op_vec, get_mwnn_type_tf(output_tensor.type));
   mwnn_graph_ptr->set_graph_op_names(output_tensor.name);
   //Fills Graph Output Tensor Details - Name, Dims
-  ::metawarenn::MWNNTensor mwnn_op_tensor(mwnn_output.get_name(), mwnn_output.get_type(), mwnn_output.get_dims());
+  ::metawarenn::MWNNTensor mwnn_op_tensor(output_tensor.name, get_mwnn_type_tf(output_tensor.type), dims_op_vec);
   mwnn_graph_ptr->set_graph_op_tensor(mwnn_op_tensor);
 
   for (size_t node_index = 0; node_index < subgraph_nodes_.size(); node_index++) {
@@ -354,7 +352,6 @@ std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext*
           auto const_node = mwnn_tensor.get_constant_node();
           mwnn_graph_ptr->mwnn_graph_nodes[mwnn_tensor.get_name()] = std::move(const_node);
 
-          ::metawarenn::MWNNValueInfo mwnn_input(input_tensor.name, dims_vec, get_mwnn_type_tf(input_tensor.type));
           mwnn_graph_ptr->mwnn_initializer_names.insert(input_tensor.name);
       }
     }
