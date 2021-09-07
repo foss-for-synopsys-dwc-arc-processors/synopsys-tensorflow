@@ -4,6 +4,15 @@
 ##### Check on the [synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/Docker/README.md](https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/metawarenn_dev/tensorflow/lite/delegates/MetaWareNN/Docker/README.md)
 
 ### Prerequisites
+
+  #### Install git lfs
+    * Check git lfs installation with this command `git lfs --version`
+    * If not installed, run below commands to install it.
+      * `wget https://github.com/git-lfs/git-lfs/releases/download/v2.13.3/git-lfs-linux-amd64-v2.13.3.tar.gz`
+      * `tar -xf git-lfs-linux-amd64-v2.13.3.tar.gz`
+      * `chmod 755 install.sh`
+      * `./install.sh`
+
   #### Initial Setup
     * `git clone --recursive https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
     * `cd synopsys-tensorflow`
@@ -14,12 +23,15 @@
         *  Move to metawarenn_lib submodule and checkout to metawarenn_dev branch
             a. `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
             b. `git checkout metawarenn_dev`
+            c. `git lfs install` #Initializes git lfs in metawarenn_lib submodule
+            d. `git lfs pull`
   #### Using Existing Setup to pull submodule changes[Docker / Non-Docker]
     * `cd synopsys-tensorflow`
     * `git pull`
     * `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
     * `git checkout metawarenn_dev`
     * `git pull`
+    * `git lfs pull`
 
   #### Install required bazel version
     * Check the bazel version using the command `bazel version`
