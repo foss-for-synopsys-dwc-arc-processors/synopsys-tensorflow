@@ -8,7 +8,7 @@ package(
 cc_import(
   name = "mwnn_protobuf",
   hdrs = ["metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h"],
-  shared_library = "libprotobuf.so",
+  shared_library = "metawarenn_lib/lib/libprotobuf.so",
 )
 
 cc_binary(

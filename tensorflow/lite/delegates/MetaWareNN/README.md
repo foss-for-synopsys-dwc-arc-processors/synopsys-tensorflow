@@ -73,13 +73,6 @@
 * cd synopsys-tensorflow
 * ./configure
 
-### Build Tensorflow from scratch
-```
-    bazel build --config=opt //tensorflow/tools/pip_package:build_pip_package
-    ./bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
-    pip install /tmp/tensorflow_pkg/tensorflow-2.3.1-cp36-cp36m-linux_x86_64.whl
-    # Note: 36 could be other numbers if you use other python version
-```
 ### Download MobileNet v2 TFlite model
 ```
     wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz
