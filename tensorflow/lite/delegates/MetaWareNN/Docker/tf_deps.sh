@@ -2,6 +2,8 @@ mkdir TFLite
 cd TFLite
 apt -y update
 apt -y install git
+apt-get install openssh-client
+apt-get install vim
 apt-get -y install wget
 apt-get -y install unzip
 apt-get -y install gedit
@@ -16,6 +18,10 @@ cd cmake-3.16.5
 ./configure
 make
 make install
+wget https://github.com/git-lfs/git-lfs/releases/download/v2.13.3/git-lfs-linux-amd64-v2.13.3.tar.gz
+tar -xf git-lfs-linux-amd64-v2.13.3.tar.gz
+chmod 755 install.sh
+./install.sh
 cd ..
 git clone https://github.com/google/flatbuffers.git
 cd flatbuffers
@@ -49,3 +55,5 @@ git checkout metawarenn_dev
 git submodule update --init --recursive
 cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib
 git checkout metawarenn_dev
+git lfs install
+git lfs pull
