@@ -2,11 +2,10 @@ mkdir TFLite
 cd TFLite
 apt -y update
 apt -y install git
-apt-get install openssh-client
-apt-get install vim
 apt-get -y install wget
 apt-get -y install unzip
-apt-get -y install gedit
+apt-get -y install openssh-client
+apt-get -y install gedit vim
 apt-get -y install build-essential
 apt-get -y install libssl-dev
 wget https://github.com/bazelbuild/bazel/releases/download/3.6.0/bazel-3.6.0-installer-linux-x86_64.sh
