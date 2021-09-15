@@ -5,14 +5,6 @@
 
 ### Prerequisites
 
-  #### Install git lfs
-    * Check git lfs installation with this command `git lfs --version`
-    * If not installed, run below commands to install it.
-      * `wget https://github.com/git-lfs/git-lfs/releases/download/v2.13.3/git-lfs-linux-amd64-v2.13.3.tar.gz`
-      * `tar -xf git-lfs-linux-amd64-v2.13.3.tar.gz`
-      * `chmod 755 install.sh`
-      * `./install.sh`
-
   #### Initial Setup
     * `git clone --recursive https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
     * `cd synopsys-tensorflow`
@@ -23,15 +15,12 @@
         *  Move to metawarenn_lib submodule and checkout to metawarenn_dev branch
             a. `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
             b. `git checkout metawarenn_dev`
-            c. `git lfs install` #Initializes git lfs in metawarenn_lib submodule
-            d. `git lfs pull`
   #### Using Existing Setup to pull submodule changes[Docker / Non-Docker]
     * `cd synopsys-tensorflow`
     * `git pull`
     * `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
     * `git checkout metawarenn_dev`
     * `git pull`
-    * `git lfs pull`
 
   #### Install required bazel version
     * Check the bazel version using the command `bazel version`
@@ -86,26 +75,33 @@
 * ./configure
 
 ### Download MobileNet v2 TFlite model
-```
+  ```
     wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz
     tar -vzxf mobilenet_v2_1.0_224.tgz
-```
+  ```
 #### Modifications to make before build
+  ```
+   1. Download the dependent protobuf library from egnyte link https://multicorewareinc.egnyte.com/dl/kpRzPTSFdx and place it in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/lib
+  ```
    ### To Load MetaWareNN Executable Graph in Shared Memory [Default flow]
+  ```
    1. Set the path to synopsys-tensorflow in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no: 5
-
+  ```
    ### To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file
+  ```
    1. Enable INVOKE_NNAC in tensorflow/lite/delegates/MetaWareNN/builders/model_builder.h line no: 25
    2. Update tensorflow/lite/delegates/MetaWareNN/inference/env.sh file
       i. Set the path to ARC/ directory in lino no: 11
       ii. Set the path to cnn_models/ directory in lino no: 12
    [Note] : Generated EV Binary file for MetaWareNN SubGraph will store in evgencnn/scripts folder and all intermediate files will get stored in `/path/to/synopsys-tensorflow/NNAC_DUMPS` folder
-
+  ```
    ### To Use metawarenn_lib as Shared Library
    1. Rename tensorflow/lite/delegates/MetaWareNN/builders/BUILD to BUILD_original
       `mv tensorflow/lite/delegates/MetaWareNN/builders/BUILD tensorflow/lite/delegates/MetaWareNN/builders/BUILD_original`
    2. Rename tensorflow/lite/delegates/MetaWareNN/builders/BUILD_shared_lib to BUILD
       `mv tensorflow/lite/delegates/MetaWareNN/builders/BUILD_shared_lib tensorflow/lite/delegates/MetaWareNN/builders/BUILD`
+   3. Download the metawarenn shared library from egnyte link https://multicorewareinc.egnyte.com/dl/n31afFTwP9 and place it in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/lib`
+   4. Also download the dependent protobuf library from egnyte link https://multicorewareinc.egnyte.com/dl/kpRzPTSFdx and place it in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/lib`
 
 ### Build TFLite with MetaWareNN Delegate Support
 ```
