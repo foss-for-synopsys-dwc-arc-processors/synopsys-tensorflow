@@ -473,7 +473,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
   #if INVOKE_NNAC
     std::cout << "\n ---------------------------Graph----------------------------- \n";
     std::cout << "\n Graph Name : " << graph->get_name();
-    ::MWNN::GraphProto graph_proto;
+    ::MWNN::MWNNGraphProto graph_proto;
     graph_proto.set_name(graph->get_name());
     for (auto g_ip : graph->get_graph_ip_names())
       graph_proto.add_ip_name((g_ip));
