@@ -18,20 +18,20 @@ TfLiteStatus MetaWareNNDelegateKernel::Init(TfLiteContext* context,
   }
   model_builder_ = std::unique_ptr<delegates::metawarenn::ModelBuilder>
                    (new delegates::metawarenn::ModelBuilder(nodes_));
-  mwnn_subgraph_counter_++;
-  std::string subgraph_name = "MetaWareNN_" + std::to_string(mwnn_subgraph_counter_);
-  mwnn_graph_ = model_builder_->BuildGraph(context, subgraph_name);
+  subgraph_counter_++;
+  std::string subgraph_name = "MetaWareNN_" + std::to_string(subgraph_counter_);
+  graph_ = model_builder_->BuildGraph(context, subgraph_name);
   return kTfLiteOk;
 }
 
 TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Prepare!!"<<std::endl;
-  if(model_builder_->MetaWareNNCompile(mwnn_graph_)) {
+  if(model_builder_->MetaWareNNCompile(graph_)) {
     graph_prepared_ = true;
   }
-  std::cout << "\n In MWNN Kernel Prepare : " << mwnn_graph_->get_graph_nodes().size() << "  Graph Name : " << mwnn_graph_->get_name();
-  mwnn_exe_graph_ = std::make_shared<metawarenn::MWNNExecutableGraph>(*mwnn_graph_);
+  std::cout << "\n In MWNN Kernel Prepare : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
+  exe_graph_ = std::make_shared<metawarenn::ExecutableGraph>(*graph_);
   return kTfLiteOk;
 }
 
@@ -64,21 +64,21 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     }
   }
 
-  std::cout << "\n In MWNN Kernel Invoke : " << mwnn_graph_->get_graph_nodes().size() << "  Graph Name : " << mwnn_graph_->get_name();
+  std::cout << "\n In MWNN Kernel Invoke : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
 
     // **************************************** Calls to invoke the MetaWareNN Inference API ************************************
 
-    metawarenn::MWNNInferenceApi mwapi;
+    metawarenn::InferenceApi mwapi;
 
-    std::vector<std::string> ip_names = mwnn_graph_->get_graph_ip_names();
-    auto ip_shape = mwnn_graph_->get_graph_ip_tensor()[0].get_dims();
+    std::vector<std::string> ip_names = graph_->get_graph_ip_names();
+    auto ip_shape = graph_->get_graph_ip_tensor()[0].get_dims();
 
     mwapi.prepareInput(graph_inputs[ip_names[0]], ip_shape);
-    auto op_shape = mwnn_graph_->get_graph_op_tensor()[0].get_dims();
+    auto op_shape = graph_->get_graph_op_tensor()[0].get_dims();
 
     mwapi.prepareOutput(op_shape);
 
-    mwapi.prepareGraph(mwnn_graph_->get_name());
+    mwapi.prepareGraph(graph_->get_name());
 
     mwapi.runGraph();
 
@@ -86,8 +86,8 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
 
     // ******************************************* Call to invoke the local run function *****************************************
 
-    //convert_to_mwnn_format(*mwnn_graph_, graph_inputs, graph_outputs, is_HWC);
-    //mwnn_exe_graph_->runGraph();
+    //convert_to_mwnn_format(*graph_, graph_inputs, graph_outputs, is_HWC);
+    //exe_graph_->runGraph();
 
   return kTfLiteOk;
 }

@@ -34,8 +34,8 @@ class ModelBuilder {
  public:
   ModelBuilder(std::vector<int> nodes);
   ~ModelBuilder() = default;
-  std::shared_ptr<::metawarenn::MWNNGraph> BuildGraph(TfLiteContext* context, std::string subgraph_name);
-  TfLiteStatus MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph);
+  std::shared_ptr<::metawarenn::Graph> BuildGraph(TfLiteContext* context, std::string subgraph_name);
+  TfLiteStatus MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph> graph);
 
   static ::metawarenn::ElementType::element_type get_mwnn_type_tf(int tf_type) {
       switch (tf_type) {
