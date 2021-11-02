@@ -445,6 +445,31 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
   manager.register_pass(co);
   manager.run_passes();
 
+  auto graph_ip_names = mwnn_graph->get_graph_ip_names();
+  for (auto g_n : mwnn_graph->get_graph_nodes()) {
+    for (auto n_ip : g_n.get_inputs()) {
+      if(!(mwnn_graph->mwnn_initializer_names.count(n_ip)) && !(std::count(graph_ip_names.begin(), graph_ip_names.end(), n_ip))) {
+        if (mwnn_graph->get_node_producers().count(n_ip)) {
+          mwnn_graph->set_node_consumer(n_ip, g_n.get_name());
+        }
+      }
+    }
+    for (auto n_op : g_n.get_outputs()) {
+      mwnn_graph->set_node_producer(n_op, g_n.get_name());
+    }
+  }
+  for (auto itr : mwnn_graph->get_node_producers()) {
+    std::cout << "\n Produced Tensor : " << itr.first;
+    std::cout << "\n      Producer Node : " << itr.second;
+  }
+  for (auto itr : mwnn_graph->get_node_consumers()) {
+    std::cout << "\n Consumed Tensor : " << itr.first;
+    auto& vitr = itr.second;
+    for (auto node_name : vitr) {
+        std::cout << "\n      Consumer Node - " << node_name;
+    }
+  }
+
   #if INVOKE_NNAC
     std::cout << "\n ---------------------------Graph----------------------------- \n";
     std::cout << "\n Graph Name : " << mwnn_graph->get_name();
@@ -542,6 +567,26 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::MWNNG
         //std::cout << t_val << ",";
         initializer->add_float_data(t_val);
       }
+    }
+
+    std::cout << "\n -----------------------Graph Tensor Producers-------------------------- \n";
+    for (auto producer : mwnn_graph->get_node_producers()) {
+      std::cout << "\n Produced Tensor : " << producer.first;
+      std::cout << "\n      Producer Node : " << producer.second;
+      auto pnode = mwnn_graph_proto.add_producers();
+      pnode->set_tensor_name(producer.first);
+      pnode->add_node_name(producer.second);
+    }
+    std::cout << "\n -----------------------Graph Tensor Consumers-------------------------- \n";
+    for (auto consumer : mwnn_graph->get_node_consumers()) {
+      std::cout << "\n Consumed Tensor : " << consumer.first;
+      auto& consumer_nodes = consumer.second;
+      auto cnode = mwnn_graph_proto.add_consumers();
+      cnode->set_tensor_name(consumer.first);
+      for (auto node_name : consumer_nodes) {
+        std::cout << "\n      Consumer Node - " << node_name;
+        cnode->add_node_name(node_name);
+        }
     }
 
     std::cout << "\n Graph Name : " << mwnn_graph->get_name();
