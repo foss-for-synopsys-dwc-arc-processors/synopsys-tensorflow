@@ -93,8 +93,25 @@ bool IsNodeSupportedByMetaWareNN(const TfLiteRegistration* registration,
     case kTfLiteBuiltinReshape:
     case kTfLiteBuiltinSoftmax:
       return true;
+    case kTfLiteBuiltinHardSwish:
+    case kTfLiteBuiltinMaximum:
+    case kTfLiteBuiltinSpaceToDepth:
+    case kTfLiteBuiltinArgMax:
+    case kTfLiteBuiltinTransposeConv:
+    case kTfLiteBuiltinLogistic:
+    case kTfLiteBuiltinSum:
+    case kTfLiteBuiltinResizeNearestNeighbor:
+    case kTfLiteBuiltinResizeBilinear:
+    case kTfLiteBuiltinPrelu:
+    case kTfLiteBuiltinSpaceToBatchNd:
+      return true;
+    case kTfLiteBuiltinDequantize:
+      std::cout<< "\nWarning in MetaWareNN_delegate.cc: currently only support dequantizing float16->float32\n";
+      return true;
     default:
       std::cout<< "\nMetaWareNN unsupported node enum: " << registration->builtin_code;
+      std::cout<< "\nunsupported in MetaWareNN_delegate.cc\n"<<std::flush;
+      exit(-4);
       return false;
   }
   return false;
