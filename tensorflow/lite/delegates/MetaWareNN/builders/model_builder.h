@@ -5,21 +5,21 @@
 #include "tensorflow/lite/c/builtin_op_data.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 
-#include "metawarenn_lib/metawarenn_common.h"
-#include "metawarenn_lib/metawarenn_graph.h"
-#include "metawarenn_lib/metawarenn_tensor.h"
-#include "metawarenn_lib/metawarenn_node.h"
-#include "metawarenn_lib/metawarenn_attribute.h"
-#include "metawarenn_lib/metawarenn_utils.h"
-#include "metawarenn_lib/metawarenn_element.h"
+#include "metawarenn/metawarenn_common.h"
+#include "metawarenn/metawarenn_graph.h"
+#include "metawarenn/metawarenn_tensor.h"
+#include "metawarenn/metawarenn_node.h"
+#include "metawarenn/metawarenn_attribute.h"
+#include "metawarenn/metawarenn_utils.h"
+#include "metawarenn/metawarenn_element.h"
 
-#include "metawarenn_lib/optimizer/pass_manager.h"
-#include "metawarenn_lib/optimizer/metawarenn_optimizer.h"
-#include "metawarenn_lib/optimizer/remove_reshape.h"
-#include "metawarenn_lib/optimizer/convert_layout.h"
-#include "metawarenn_lib/optimizer/calculate_offset.h"
+#include "metawarenn/optimizer/pass_manager.h"
+#include "metawarenn/optimizer/metawarenn_optimizer.h"
+#include "metawarenn/optimizer/remove_reshape.h"
+#include "metawarenn/optimizer/convert_layout.h"
+#include "metawarenn/optimizer/calculate_offset.h"
 
-#include "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h"
+#include "metawarenn/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h"
 
 #define HWC_TO_CHW 1
 #define INVOKE_NNAC 0

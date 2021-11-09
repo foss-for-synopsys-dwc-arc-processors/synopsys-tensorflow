@@ -47,9 +47,9 @@ int main(int argc, char *argv[]){
     FILE *fp;
     fp = fopen("input_float_purse.bin", "rb");
 
-    float* passing_input = interpreter->typed_input_tensor<float>(0);
+    /*float* passing_input = interpreter->typed_input_tensor<float>(0);
 
-    /*float* input=(float*)malloc(sizeof(float)*224*224*3);
+    float* input=(float*)malloc(sizeof(float)*224*224*3);
     fread(input, 224*224*3, sizeof(float), fp);*/
     //std::cout<<"inference_metawarenn.cpp to feed input image\n";
     std::cout<<"\ninference_metawarenn.cpp don't feed input image now\nTODO:find flexible way to feed.\n";
