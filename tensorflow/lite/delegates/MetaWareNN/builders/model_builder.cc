@@ -4,17 +4,16 @@
 // helper function `GetTensorData` is defined in `tensor_ctypes.h`
 
 namespace tflite {
-  // TFLiteTensor{TfLiteType type, TfLitePtrUnion data, TfLiteIntArray* dims}
-  // contrib (minxinx)
-std::vector<int> ParseTfLiteTensorDims(const TfLiteTensor &_tensor) {
+std::vector<int> ParseTfLiteTensorDims(const TfLiteTensor &_tensor)
+{
   std::vector<int> _vec(_tensor.dims->data, _tensor.dims->data + _tensor.dims->size);
   return _vec;
 }
 
 std::vector<float> ParseTfLiteTensorVals(const TfLiteTensor &_tensor,
-                                         const std::vector<int> &_dims) {
+                                         const std::vector<int> &_dims)
+{
   const int _size = std::accumulate(std::begin(_dims), std::end(_dims), 1, std::multiplies<int>());
-  std::cout << "Parse Tensor vals, size="<<_size<<".\n";
   // TfLitePtrUnion data has no size, use _dims from ParseTfLiteTensorDims
   // To get data, https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/metawarenn_dev/tensorflow/lite/c/common.h#L310
   if (_tensor.type == kTfLiteFloat16) {
@@ -55,38 +54,87 @@ std::vector<float> ParseTfLiteTensorVals(const TfLiteTensor &_tensor,
     /*for (int i=0;i<5;i++) std::cout<<_data[i].data<<" => " << _fp32[i] << " " << _fpdata[i] << "\n";
     std::cout<<"\n";*/
     return _fp32;
-  } else {
+  }
+  else if (_tensor.type == kTfLiteFloat32) {
+    const float *_data = ::tflite::GetTensorData<float>(&_tensor);
+    std::vector<float> _fp32(_data, _data + _size);
+    for(int i=0;i<5;i++) printf("parsed v[%d] = %f\n", i, _fp32[i]);
+    return _fp32;
+  }
+  else {
     std::cout<< "Not supported TfLiteTensor.type <"<< _tensor.type << ">.\n";
     exit(-27);
   }
+}
+
+void parse_inputs_outputs_names(const TfLiteContext *context,
+                                const TfLiteNode *node, 
+                                std::vector<std::string> &inputs,
+                                std::vector<std::string> &outputs)
+{
+  inputs.clear(); outputs.clear();
+  for (int i = 0; i < node->inputs->size; ++i) {
+      const int tensor_id = node->inputs->data[i];
+      inputs.emplace_back(context->tensors[tensor_id].name);
+  }
+  for (int i = 0; i < node->outputs->size; ++i) {
+      const int tensor_id = node->outputs->data[i];
+      outputs.emplace_back(context->tensors[tensor_id].name);
+  }
+  // return inputs, outputs
 }
 
 namespace delegates {
 namespace metawarenn {
     
 void add_mwnn_initializer(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph,
-                     const std::string &_name,
-                     const ::metawarenn::ElementType::element_type &_type,
-                     const std::vector<int> &_dims,
-                     const std::vector<float> &_vals)
+                          const std::string &_name,
+                          const ::metawarenn::ElementType::element_type &_type,
+                          const std::vector<int> &_dims,
+                          const std::vector<float> &_vals)
 {
   ::metawarenn::MWNNTensor mwnn_tensor(_name, _dims, _type, _vals);
   mwnn_graph->set_graph_initializers(mwnn_tensor); // initializer_vector.emplace_back
   mwnn_graph->mwnn_initializer_names.insert(_name);
-  // Question: why fake an extra constant node?
+  // Question: why MCW::mwnn fake an extra constant node?
   // https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow/blob/06562faf7b21244ddfbbd49dff94efb423ecb810/tensorflow/lite/delegates/MetaWareNN/builders/model_builder.cc#L352-L353
-  
-  /*mwnn_graph_ptr->set_graph_initializers(mwnn_tensor);
+  std::cout<<_name<<"!!!!\n";
+  //exit(-5);
+}
 
-  auto const_node = mwnn_tensor.get_constant_node();
-  mwnn_graph_ptr->mwnn_graph_nodes[mwnn_tensor.get_name()] = std::move(const_node);
-  // std::cout<< "mwnn_tensor index =  "<<mwnn_tensor.get_index()<<"\n"; // initialized as 0, label starts from 1
+void add_mwnn_node(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph,
+                   const std::string &_node_name,
+                   const std::string &_op_type,
+                   const std::vector<std::string> &_node_inputs,
+                   const std::vector<std::string> &_node_outputs,
+                   const std::vector<::metawarenn::MWNNAttribute> &_attrs)
+{
+  // MWNNNode(std::string m_name, std::string m_op_type, std::vector<MWNNAttribute> m_mwnn_attributes, std::vector<std::string> m_inputs,  std::vector<std::string> m_outputs);
+  ::metawarenn::MWNNNode _node(_node_name, _op_type, _attrs, _node_inputs, _node_outputs);
+  mwnn_graph->set_graph_nodes(_node); // the abstract node is stored in a vector
+  // then the op_type-specific object is stored in map<string<NodeName>, shared_ptr<Node>>
+  // currently only `optimizer/convert_layout.cc` uses it
+  auto op_node = _node.get_node();
+  mwnn_graph->mwnn_graph_nodes[_node.get_name()] = std::move(op_node);
+  // trace: the MWNN-Node stores only high level info (op_type, mwnn_attributes, ...)
+  // mwnn_attribute is wrapped info, get_node() creates specific `op_type` object,
+  // i.e. mwnn_attributes("stride", {1,1}) is stored in ConvObject{member variable stride={1,1}}
+}
 
-  mwnn_graph_ptr->mwnn_initializer_names.insert(input_tensor.name);*/
+void write_TFLiteTensor_into_MWNNTensor(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph,
+                                        const TfLiteTensor &_tensor)
+{
+  std::vector<int> dims_vec = ParseTfLiteTensorDims(_tensor);
+  std::vector<float> vals_vec = ParseTfLiteTensorVals(_tensor, dims_vec);
+  ::metawarenn::ElementType::element_type _type;
+  _type = ::tflite::delegates::metawarenn::ModelBuilder::get_mwnn_type_tf(_tensor.type);
+  add_mwnn_initializer(mwnn_graph, _tensor.name, _type,
+                       dims_vec, vals_vec);
 }
 
 void convert_CHWN_to_NHWC(std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph, std::string initializer_name)
 {
+  // TODO: give `perm` as vector<int> as parameter to do Transpose
   std::cout<<"Converting DepthwiseConv weight IHWO to OHWI " << initializer_name << ".\n";
   auto weight = mwnn_graph->get_initializer_tensor(initializer_name);
   auto dims = weight.get_dims();
@@ -323,7 +371,6 @@ std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext*
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
     }
     else if (op_type == kTfLiteBuiltinMaxPool2d || op_type == kTfLiteBuiltinAveragePool2d) {
-      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
       const TfLitePoolParams* pool_params = reinterpret_cast<const TfLitePoolParams*>(node->builtin_data);
       if(op_type == kTfLiteBuiltinAveragePool2d) {
         const int input_tensor_id = node->inputs->data[0];
@@ -337,6 +384,7 @@ std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext*
       }
       else
         node_op_type = "MaxPool";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
 
       ::metawarenn::MWNNAttribute mwnn_attr_stride("strides", std::vector<int>{pool_params->stride_height, pool_params->stride_width});
       node_attributes.emplace_back(mwnn_attr_stride);
@@ -425,7 +473,7 @@ std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext*
       node->inputs->size -= 1; // TFLite Mean{data, axes} -> ONNX ReduceMean{data} + attr_axes.
     }
     else if (op_type == kTfLiteBuiltinFullyConnected) {
-      node_op_type = "FullyConnected";
+      /*node_op_type = "FullyConnected";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
       const TfLiteFullyConnectedParams* fc_params = reinterpret_cast<const TfLiteFullyConnectedParams*>(node->builtin_data);
       ::metawarenn::MWNNAttribute mwnn_attr_asymmetric_quantize_inputs("asymmetric_quantize_inputs",std::vector<int> {fc_params->asymmetric_quantize_inputs});
@@ -435,7 +483,77 @@ std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext*
       ::metawarenn::MWNNAttribute mwnn_attr_activation("activation", std::vector<int>{fc_params->activation});
       node_attributes.emplace_back(mwnn_attr_activation);
       ::metawarenn::MWNNAttribute mwnn_attr_weights_format("weights_format", std::vector<int>{fc_params->weights_format});
-      node_attributes.emplace_back(mwnn_attr_weights_format);
+      node_attributes.emplace_back(mwnn_attr_weights_format);*/
+      node_op_type = "Gemm";
+      node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
+      std::vector<std::string> inputs, outputs;
+      parse_inputs_outputs_names(context, node, inputs, outputs);
+
+      std::vector<int> input0_dims_vec = ParseTfLiteTensorDims(context->tensors[node->inputs->data[0]]);
+      if (input0_dims_vec.size() > 2) {
+        std::cout<< "Gemm input shape = ";
+        for(auto d : input0_dims_vec) std::cout<<d<<" ";
+        std::cout<<"\n";
+        // insert Reshape node to 2D
+        // mwnn_graph,_node_name,_op_type,_node_inputs,_node_outputs,_attrs
+        //add_mwnn_node(mwnn_graph_ptr, "Reshape", );
+        std::string rshp_name = inputs[0] + "/reshaped", param_name = rshp_name + "_param";
+        
+        add_mwnn_initializer(mwnn_graph_ptr, param_name,
+                             ::metawarenn::ElementType::element_type::int64_,
+                             std::vector<int>{2}, // dims_vec
+                             std::vector<float>{input0_dims_vec[0], -1}); // vals_vec
+        add_mwnn_node(mwnn_graph_ptr, rshp_name, "Reshape",
+                      std::vector<std::string>{inputs[0], param_name},
+                      std::vector<std::string>{rshp_name},
+                      std::vector<::metawarenn::MWNNAttribute>());
+        inputs[0] = rshp_name;
+      }
+      /*** write weight/bias into initializer ***/
+      for(int i = 1; i <= 2; ++i) {
+        const int in_tensor_id = node->inputs->data[i];
+        const auto& in_tensor = context->tensors[in_tensor_id];
+        assert(in_tensor.allocation_type == kTfLiteMmapRo && "FullyConnected->Gemm: weight/bias should be constant input");
+        assert(in_tensor.type == kTfLiteFloat32 && "FullyConnected->Gemm: Only supports fp32 weight/bias yet");
+        std::cout<<"\n tensor name = " << inputs[i] <<"\n";
+        write_TFLiteTensor_into_MWNNTensor(mwnn_graph_ptr, in_tensor);
+      }
+      /*** parse attributes ***/
+      const TfLiteFullyConnectedParams* fc_params = reinterpret_cast<const TfLiteFullyConnectedParams*>(node->builtin_data);
+      assert(fc_params->asymmetric_quantize_inputs == false); // bool
+      assert(fc_params->keep_num_dims == false); // bool
+      assert(fc_params->weights_format == 0); // TfLiteFullyConnectedWeightsFormat
+      TfLiteFusedActivation activation = fc_params->activation;
+      std::string act_out_name;
+      if(activation != kTfLiteActNone) {
+        // Will generate Gemm(input=inputs, output=[node_name]) +
+        //    Activaction(input=[node_name], output=outputs)
+        act_out_name = outputs[0];
+        outputs[0] = node_name;
+      }
+      // gemm_attr = dict(alpha=1.0, beta=1.0, transA=0, transB=1)
+      ::metawarenn::MWNNAttribute _transB("transB", std::vector<int>{1});
+      node_attributes.emplace_back(_transB);
+      /*** add node ***/
+      add_mwnn_node(mwnn_graph_ptr, node_name, "Gemm",
+                    inputs,
+                    outputs,
+                    node_attributes); // node_attributes is empty vector, or you can fill TransposeA/B, 
+      
+      if(activation != kTfLiteActNone) { // != 0
+        std::string act_type = "None";
+        std::vector<::metawarenn::MWNNAttribute> act_attrs;
+        if (activation == kTfLiteActRelu) act_type = "Relu";
+        else { // if (activation == kTfLiteActRelu6) act_type = "Clip";
+          std::cout<< "\n Unsupported activation: " << activation << "\n";
+          exit(-23);
+        }
+        add_mwnn_node(mwnn_graph_ptr, act_out_name, act_type,
+              std::vector<std::string>{outputs[0]}, // input is output0 of Gemm
+              std::vector<std::string>{act_out_name}, // output is FullyConnected output in TFLite
+              act_attrs);
+      }
+      continue;
     }
     else if (op_type == kTfLiteBuiltinSplit) {
       node_op_type = "Split";
@@ -467,6 +585,8 @@ std::shared_ptr<::metawarenn::MWNNGraph> ModelBuilder::BuildGraph(TfLiteContext*
       node_attributes.emplace_back(mwnn_attr_new_axis_mask);
       ::metawarenn::MWNNAttribute mwnn_attr_shrink_axis_mask("shrink_axis_mask", std::vector<int>{strided_slice_params->shrink_axis_mask});
       node_attributes.emplace_back(mwnn_attr_shrink_axis_mask);
+      /*::metawarenn::MWNNAttribute mwnn_attr_strides("strides", std::vector<int>{strided_slice_params->steps});
+      node_attributes.emplace_back(mwnn_attr_strides);*/
     }
     else if (op_type == kTfLiteBuiltinSqueeze) {
       node_op_type = "Squeeze";
