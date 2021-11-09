@@ -1,4 +1,5 @@
 
-[submodule "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib"]
-	path = tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib
-	url = https://gitsnps.internal.synopsys.com/dwc_ev/metawarenn_lib.git
+[submodule "metawarenn"]
+	path = tensorflow/lite/delegates/MetaWareNN/builders/metawarenn
+	url = https://gitsnps.internal.synopsys.com/dwc_ev/metawarenn.git
+
