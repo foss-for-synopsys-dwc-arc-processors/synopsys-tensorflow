@@ -30,16 +30,9 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
   if(model_builder_->MetaWareNNCompile(graph_)) {
     graph_prepared_ = true;
   }
-//<<<<<<< HEAD
- // std::cout << "\n In MWNN Kernel Prepare : " << mwnn_graph_->get_graph_nodes().size() << "  Graph Name : " << mwnn_graph_->get_name();
-//  std::cout<<"debug\n"<<std::flush;
-//  mwnn_exe_graph_ = std::make_shared<metawarenn::MWNNExecutableGraph>(*mwnn_graph_);
-//  std::cout << "\n After MWNN Kernel Prepare : " << mwnn_graph_->get_graph_nodes().size() << "  Graph Name : " << mwnn//_graph_->get_name();
-//=======
   std::cout << "\n In MWNN Kernel Prepare : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
   exe_graph_ = std::make_shared<metawarenn::ExecutableGraph>(*graph_);
 std::cout << "\n After MWNN Kernel Prepare : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
-//>>>>>>> 42c7cac69e710604d20d3eef2fe55323f988572e
   return kTfLiteOk;
 }
 
@@ -77,7 +70,6 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
       std::cout<<"D\n"<<std::flush;
     }
   }
-//<<<<<<< HEAD
   std::cout<<"E\n"<<std::flush;
   std::cout<<"graph name "<<graph_->get_name() << "\n"<<std::flush;
   std::cout<<"node size "<<graph_->get_graph_nodes().size() << "\n"<<std::flush;
@@ -95,22 +87,6 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     mwapi.prepareInput(graph_inputs[ip_names[0]], ip_shape);
     //auto op_shape = mwnn_graph_->get_graph_op_tensor()[0].get_dims();
     std::cout<<"Before mwapi.prepareOutput(op_shape);\n"<<std::flush;
-//=======
-/*
-  std::cout << "\n In MWNN Kernel Invoke : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
-
-    // **************************************** Calls to invoke the MetaWareNN Inference API ************************************
-
-    metawarenn::InferenceApi mwapi;
-
-    std::vector<std::string> ip_names = graph_->get_graph_ip_names();
-    auto ip_shape = graph_->get_graph_ip_tensor()[0].get_dims();
-
-    mwapi.prepareInput(graph_inputs[ip_names[0]], ip_shape);
-    auto op_shape = graph_->get_graph_op_tensor()[0].get_dims();
-
->>>>>>> 42c7cac69e710604d20d3eef2fe55323f988572e
-*/
 
     mwapi.prepareOutput(op_shape);
 
