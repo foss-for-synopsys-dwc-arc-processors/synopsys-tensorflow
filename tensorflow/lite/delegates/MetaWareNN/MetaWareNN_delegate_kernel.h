@@ -13,7 +13,7 @@
 
 namespace tflite {
 
-static int mwnn_subgraph_counter_ = 0;
+static int subgraph_counter_ = 0;
 
 class MetaWareNNDelegateKernel {
  public:
@@ -28,8 +28,8 @@ class MetaWareNNDelegateKernel {
   //Create model builder
   std::unique_ptr<delegates::metawarenn::ModelBuilder> model_builder_;
 
-  std::shared_ptr<::metawarenn::MWNNGraph> mwnn_graph_;
-  std::shared_ptr<metawarenn::MWNNExecutableGraph> mwnn_exe_graph_;
+  std::shared_ptr<::metawarenn::Graph> graph_;
+  std::shared_ptr<metawarenn::ExecutableGraph> exe_graph_;
 
   // Indices of nodes in the delegated TfLite subgraph.
   std::vector<int> nodes_;
