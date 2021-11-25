@@ -11,11 +11,17 @@ cc_import(
   shared_library = "metawarenn/lib/libprotobuf.so",
 )
 
+#cc_import(
+#  name = "onnx_protobuf",
+#  hdrs = ["metawarenn/onnx_protobufs/onnx-ml.pb.h"],
+#  shared_library = "metawarenn/lib/libprotobuf.so",
+#)
 cc_import(
   name = "onnx_protobuf",
-  hdrs = ["metawarenn/onnx_protobufs/onnx-ml.pb.h"],
+  hdrs = ["metawarenn/mwnnconvert/onnx_protobuf/onnx-ml.pb.h"],
   shared_library = "metawarenn/lib/libprotobuf.so",
 )
+
 
 cc_binary(
     name="model_builder",
@@ -123,6 +129,9 @@ cc_library(
         "metawarenn/op/and.cc",
         "metawarenn/op/floor.cc",
         "metawarenn/op/greater.cc",
+        "metawarenn/op/quantize_linear.cc",
+        "metawarenn/op/dequantize_linear.cc",
+        "metawarenn/op/dropout.cc",
         "metawarenn/optimizer/calculate_offset.cc",
         "metawarenn/optimizer/metawarenn_optimizer.cc",
         "metawarenn/optimizer/remove_reshape.cc",
@@ -131,7 +140,8 @@ cc_library(
         "metawarenn/optimizer/convert_layout.cc",
         "metawarenn/optimizer/remove_transpose.cc",
         "metawarenn/optimizer/pass_manager.cc",
-        "metawarenn/onnx_protobufs/onnx-ml.pb.cc",
+        #"metawarenn/onnx_protobufs/onnx-ml.pb.cc",
+        "metawarenn/mwnnconvert/onnx_protobuf/onnx-ml.pb.cc",
         "metawarenn/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.cc",
         "metawarenn/mwnn_inference_api/mwnn_inference_api.cc",
         "metawarenn/mwnn_inference_api/mwnn_inference_shm.cc",
@@ -268,6 +278,9 @@ cc_library(
         "metawarenn/op/and.h",
         "metawarenn/op/floor.h",
         "metawarenn/op/greater.h",
+        "metawarenn/op/quantize_linear.h",
+        "metawarenn/op/dequantize_linear.h",
+        "metawarenn/op/dropout.h",
         "metawarenn/optimizer/calculate_offset.h",
         "metawarenn/optimizer/metawarenn_optimizer.h",
         "metawarenn/optimizer/remove_reshape.h",
@@ -278,7 +291,8 @@ cc_library(
         "metawarenn/optimizer/fuse_batchnorm.h",
         "metawarenn/metawarenn_common.h",
         "metawarenn/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h",
-        "metawarenn/onnx_protobufs/onnx-ml.pb.h",
+        #"metawarenn/onnx_protobufs/onnx-ml.pb.h",
+        "metawarenn/mwnnconvert/onnx_protobuf/onnx-ml.pb.h",
         "metawarenn/mwnn_inference_api/mwnn_inference_api.h",
         "metawarenn/mwnn_inference_api/mwnn_inference_shm.h",
         "metawarenn/executable_network/metawarenn_executable_graph.h",
