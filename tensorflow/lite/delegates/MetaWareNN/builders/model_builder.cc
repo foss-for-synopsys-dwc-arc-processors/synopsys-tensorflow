@@ -1079,7 +1079,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
             /*std::cout << "\t Dims : ";
             for (auto dim : g_t.get_dims())
               std::cout << dim << ",";*/
-            ::metawarenn::optimizer::ConvertLayout cl(graph, g_t, 0, HWC_TO_CHW, true);
+            ::metawarenn::optimizer::ConvertLayout cl(graph, g_t, 0, HWC_TO_CHW, 0, true);
             manager.register_pass(cl);
           }
         }
@@ -1095,7 +1095,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
         std::cout << "\t Dims : ";
         for (auto dim : g_t.get_dims())
           std::cout << dim << ",";*/
-        ::metawarenn::optimizer::ConvertLayout cl(graph, g_t, 0, HWC_TO_CHW, false);
+        ::metawarenn::optimizer::ConvertLayout cl(graph, g_t, 0, HWC_TO_CHW, 0, false);
         manager.register_pass(cl);
       }
     }
