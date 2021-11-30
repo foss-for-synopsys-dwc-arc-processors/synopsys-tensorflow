@@ -8,9 +8,10 @@
 
 using namespace std;
 
-int main(){
+int main(int argc, char* argv[]){
 
-    std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile("/Path/to/mobilenet_v2_1.0_224.tflite");
+    const char* model_path = argv[1];
+    std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(model_path);
     if(!model){
         printf("Failed to mmap model\n");
         exit(0);

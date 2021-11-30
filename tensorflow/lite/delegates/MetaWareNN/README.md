@@ -105,12 +105,12 @@
 
 ### Build TFLite with MetaWareNN Delegate Support
 ```
-    bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
+bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate
 ```
 
 ### Compile and run the inference script
    Note: we suggest to use g++ 7 to avoid possible errors.
-   1. `cd synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
+   1. `cd tensorflow/lite/delegates/MetaWareNN/inference`
    2. Set the path to flatbuffers in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no:15
    3. `source env.sh`
    4. Set the path to downloaded MobileNet v2 TFlite model in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_metawarenn.cpp` line no: 13
@@ -126,6 +126,12 @@
       `g++ -o inference inference_regression.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
    5. Run the executable
       `./inference`
+
+### To Generate the ONNXProto from multiple TFLite models & Verify
+   1. `cd tensorflow/lite/delegates/MetaWareNN/inference`
+   2. `source env.sh`
+   3. `sh download_models.sh` # (For First time) - Creates tflite_models directory inside synopsys-tensorflow/ & downloads models into it
+   4. `python test_regression_tflite.py` # Creates a `op_tflite_models` directory and dump the generated ONNXProto files for all input models & `validation_result.txt` file which contains the comparison of original tflite & generated onnx model
 
    Note:
       i. Invoke call from the inference script currently parses the MetaWareNN Executable graph from shared memory
