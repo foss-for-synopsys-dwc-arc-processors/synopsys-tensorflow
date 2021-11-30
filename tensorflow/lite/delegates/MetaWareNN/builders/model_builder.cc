@@ -380,31 +380,112 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
       node_op_type = "Split";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
       const TfLiteSplitParams* split_params = reinterpret_cast<const TfLiteSplitParams*>(node->builtin_data);
-      ::metawarenn::Attribute attr_num_splits("num_splits  ", std::vector<int>{split_params->num_splits});
-      node_attributes.emplace_back(attr_num_splits);
+
+      //Parse the Input Axis and convert to Attribute
+      const int input_tensor_id0 = node->inputs->data[0];
+      const auto& input_tensor0 = context->tensors[input_tensor_id0];
+      int axis = input_tensor0.data.i32[0] - 2; //HWC to CHW conversion
+      ::metawarenn::Attribute attr_axis("axis", axis);
+      node_attributes.emplace_back(attr_axis);
+      //Get the Input Tensor details
+      const int input_tensor_id1 = node->inputs->data[1];
+      const auto& input_tensor1 = context->tensors[input_tensor_id1];
+      //Removes the existing inputs and updates the tensor input in 0th position
+      node_inputs.pop_back();
+      node_inputs.pop_back();
+      node_inputs.emplace_back(input_tensor1.name);
     }
     else if (op_type == kTfLiteBuiltinPad) {
       node_op_type = "Pad";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
-      std::cout<< "Hits PAD !!!\n";
-      std::string s("constant");
-      ::metawarenn::Attribute attr_mode("mode", std::vector<std::string>{s});
-      node_attributes.emplace_back(attr_mode);
+
+      //Parse the Input 1 value and do the CHW conversion along with int type handling
+      std::string pad_ip_name = node_name + "_ip";
+      const int pad_tensor_id = node->inputs->data[1];
+      const auto& pad_tensor = context->tensors[pad_tensor_id];
+      std::vector<int> dims_vec(pad_tensor.dims->data, pad_tensor.dims->data + pad_tensor.dims->size);
+      auto num_tensor_elements = std::accumulate(begin(dims_vec), end(dims_vec), 1, std::multiplies<int>());
+      std::vector<int> tensor_vec(pad_tensor.data.i32, pad_tensor.data.i32 + num_tensor_elements);
+
+      std::vector<int> dims{num_tensor_elements};
+      std::vector<float> new_tensor_vec;
+
+      std::vector<int> NDimValue{tensor_vec[0], tensor_vec[1]};
+      std::vector<int> HDimValue{tensor_vec[2], tensor_vec[3]};
+      std::vector<int> WDimValue{tensor_vec[4], tensor_vec[5]};
+      std::vector<int> CDimValue{tensor_vec[7], tensor_vec[7]};
+      //Pad layer NHWC --> NCHW
+      //TFLite Format (NStart, NEnd, HStart, HEnd, WStart, WEnd, CStart, CEnd) (0, 1, 2, 3, 4, 5, 6, 7)
+      //ONNX Format   (NStart, CStart, HStart, WStart, NEnd, CEnd, HEnd, WEnd) (0, 6, 2, 4, 1, 7, 3, 5)
+      new_tensor_vec.emplace_back(NDimValue[0]);
+      new_tensor_vec.emplace_back(CDimValue[0]);
+      new_tensor_vec.emplace_back(HDimValue[0]);
+      new_tensor_vec.emplace_back(WDimValue[0]);
+      new_tensor_vec.emplace_back(NDimValue[1]);
+      new_tensor_vec.emplace_back(CDimValue[1]);
+      new_tensor_vec.emplace_back(HDimValue[1]);
+      new_tensor_vec.emplace_back(WDimValue[1]);
+
+      ::metawarenn::Tensor pad_ip_tensor(pad_ip_name, dims, ::metawarenn::ElementType::element_type::int64_, new_tensor_vec);
+      graph_ptr->set_graph_initializers(pad_ip_tensor);
+      graph_ptr->initializer_names.insert(pad_ip_name);
+      auto const_node = pad_ip_tensor.get_constant_node();
+      graph_ptr->graph_nodes[pad_ip_tensor.get_name()] = std::move(const_node);
+      node_inputs[1] = pad_ip_name;
     }
     else if (op_type == kTfLiteBuiltinStridedSlice) {
-      node_op_type = "StridedSlice";
+      node_op_type = "Slice";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
-      const TfLiteStridedSliceParams* strided_slice_params = reinterpret_cast<const TfLiteStridedSliceParams*>(node->builtin_data);
+      /*const TfLiteStridedSliceParams* strided_slice_params = reinterpret_cast<const TfLiteStridedSliceParams*>(node->builtin_data);
       ::metawarenn::Attribute attr_begin_mask("begin_mask", std::vector<int>{strided_slice_params->begin_mask});
-      node_attributes.emplace_back(attr_begin_mask);
       ::metawarenn::Attribute attr_ellipsis_mask("ellipsis_mask", std::vector<int>{strided_slice_params->ellipsis_mask});
-      node_attributes.emplace_back(attr_ellipsis_mask);
       ::metawarenn::Attribute attr_end_mask("end_mask", std::vector<int>{strided_slice_params->end_mask});
-      node_attributes.emplace_back(attr_end_mask);
       ::metawarenn::Attribute attr_new_axis_mask("new_axis_mask", std::vector<int>{strided_slice_params->new_axis_mask});
-      node_attributes.emplace_back(attr_new_axis_mask);
-      ::metawarenn::Attribute attr_shrink_axis_mask("shrink_axis_mask", std::vector<int>{strided_slice_params->shrink_axis_mask});
-      node_attributes.emplace_back(attr_shrink_axis_mask);
+      ::metawarenn::Attribute attr_shrink_axis_mask("shrink_axis_mask", std::vector<int>{strided_slice_params->shrink_axis_mask});*/
+
+      const int ip_tensor_id = node->inputs->data[0];
+      const auto& ip_tensor = context->tensors[ip_tensor_id];
+      std::vector<int> ip_dims_vec(ip_tensor.dims->data, ip_tensor.dims->data + ip_tensor.dims->size);
+
+      node_inputs.pop_back(); //Removes the TFLite strides Input
+      //Parse the Input 1(begin) & 2(end) value and do the CHW conversion along with int type handling
+      //Begin Tensor Input
+      std::string begin_ip_name = node_name + "_ip_begin";
+      const int begin_tensor_id = node->inputs->data[1];
+      const auto& begin_tensor = context->tensors[begin_tensor_id];
+      std::vector<int> begin_dims_vec(begin_tensor.dims->data, begin_tensor.dims->data + begin_tensor.dims->size);
+      auto num_elements_begin = std::accumulate(begin(begin_dims_vec), end(begin_dims_vec), 1, std::multiplies<int>());
+      std::vector<int> tensor_begin(begin_tensor.data.i32, begin_tensor.data.i32 + num_elements_begin);
+
+      std::vector<float> begin_tensor_vec(num_elements_begin);
+      begin_tensor_vec[0] = tensor_begin[0]; begin_tensor_vec[1] = tensor_begin[3];
+      begin_tensor_vec[2] = tensor_begin[1]; begin_tensor_vec[3] = tensor_begin[2];
+
+      ::metawarenn::Tensor begin_tensor_ip(begin_ip_name, std::vector<int>({begin_tensor_vec.size()}), ::metawarenn::ElementType::element_type::int64_, begin_tensor_vec);
+      graph_ptr->set_graph_initializers(begin_tensor_ip);
+      graph_ptr->initializer_names.insert(begin_ip_name);
+      auto const_node_begin = begin_tensor_ip.get_constant_node();
+      graph_ptr->graph_nodes[begin_tensor_ip.get_name()] = std::move(const_node_begin);
+      node_inputs[1] = begin_ip_name; //Replace the existing unordered(HWC) float data with CHW int data
+
+      //End Tensor Input
+      std::string end_ip_name = node_name + "_ip_end";
+      const int end_tensor_id = node->inputs->data[2];
+      const auto& end_tensor = context->tensors[end_tensor_id];
+      std::vector<int> end_dims_vec(end_tensor.dims->data, end_tensor.dims->data + end_tensor.dims->size);
+      auto num_elements_end = std::accumulate(begin(end_dims_vec), end(end_dims_vec), 1, std::multiplies<int>());
+      //std::vector<int> tensor_end(end_tensor.data.i32, end_tensor.data.i32 + num_elements_end);
+
+      std::vector<float> end_tensor_vec(num_elements_end);
+      end_tensor_vec[0] = ip_dims_vec[0]; end_tensor_vec[1] = ip_dims_vec[3];
+      end_tensor_vec[2] = ip_dims_vec[1]; end_tensor_vec[3] = ip_dims_vec[2];
+
+      ::metawarenn::Tensor end_tensor_ip(end_ip_name, std::vector<int>({end_tensor_vec.size()}), ::metawarenn::ElementType::element_type::int64_, end_tensor_vec);
+      graph_ptr->set_graph_initializers(end_tensor_ip);
+      graph_ptr->initializer_names.insert(end_ip_name);
+      auto const_node_end = end_tensor_ip.get_constant_node();
+      graph_ptr->graph_nodes[end_tensor_ip.get_name()] = std::move(const_node_end);
+      node_inputs[2] = end_ip_name; //Replace the existing unordered(HWC) float data with CHW int data
     }
     else if (op_type == kTfLiteBuiltinSqueeze) {
       node_op_type = "Squeeze";
@@ -630,8 +711,12 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
       std::cout << "\n Unsupported op_type: " << op_type;
       exit(1);
     }
-
-    if(!(activation_node_name.empty())) {//kTfLiteBuiltinDepthwiseConv2d & kTfLiteBuiltinConv2d Node's Fused Activation Handling
+    /* Node's Fused Activation Handling
+      - kTfLiteBuiltinDepthwiseConv2d
+      - kTfLiteBuiltinConv2d
+      - kTfLiteBuiltinAdd
+    */
+    if(!(activation_node_name.empty())) {
       std::vector<std::string> activation_node_inputs;
       std::vector<std::string> activation_node_outputs;
       std::vector<::metawarenn::Attribute> activation_node_attributes;
@@ -677,11 +762,6 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
   std::cout << "\n In MetaWareNNCompile !!! ";
   static int subgraph_counter = 0;
   subgraph_counter++;
-  //Call Passes
-  // 1st goal: align convolutional weight data-format
-  // onnx: OIHW, Conv2D: OHWI, DepthwiseConv2D: IHWO
-  // In BuildGraph let's map DepthwiseConv2D to Conv2D (so transpose there),
-  // and both will be Conv here. 
   ::metawarenn::optimizer::PassManager manager;
   if(HWC_TO_CHW)
   {
@@ -710,6 +790,20 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
                   std::cout << dim << ",";
                 ::metawarenn::optimizer::ExpandDimension ed(graph, g_t);
                 manager.register_pass(ed);
+              }
+            }
+          }
+          if(node.get_op_type() == "Pad") {
+            for (auto n_ip : node.get_inputs()) {
+              if(g_t.get_name() == n_ip) {
+                std::cout << "\n Padd Input Name : " << g_t.get_name();
+                std::cout << "\t Dims : ";
+                for (auto dim : g_t.get_dims())
+                  std::cout << dim << ",";
+                std::cout << "\n Tensor values : ";
+                for (auto t_val : g_t.get_tensor()) {
+                  std::cout << t_val << ",";
+                }
               }
             }
           }
@@ -922,7 +1016,6 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
   #endif
 
   return kTfLiteOk;
-  
   }
 
 } // namespace metawarenn
