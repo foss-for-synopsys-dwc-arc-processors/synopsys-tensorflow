@@ -30,7 +30,9 @@ class MetaWareNNDelegateKernel {
   std::unique_ptr<delegates::metawarenn::ModelBuilder> model_builder_;
 
   std::shared_ptr<::metawarenn::Graph> graph_;
+  #if EXECUTABLE_GRAPH_SERIALIZATION
   std::shared_ptr<metawarenn::ExecutableGraph> exe_graph_;
+  #endif
 
   // Indices of nodes in the delegated TfLite subgraph.
   std::vector<int> nodes_;

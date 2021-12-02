@@ -31,8 +31,12 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
     graph_prepared_ = true;
   }
   std::cout << "\n In MWNN Kernel Prepare : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
+  #if !EXECUTABLE_GRAPH_SERIALIZATION
   write_onnx_proto(graph_);
-  //exe_graph_ = std::make_shared<metawarenn::ExecutableGraph>(*graph_);
+  #endif
+  #if EXECUTABLE_GRAPH_SERIALIZATION
+  exe_graph_ = std::make_shared<metawarenn::ExecutableGraph>(*graph_);
+  #endif
   return kTfLiteOk;
 }
 
@@ -69,7 +73,8 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
 
     // **************************************** Calls to invoke the MetaWareNN Inference API ************************************
 
-    /*metawarenn::InferenceApi mwapi;
+    #if EXECUTABLE_GRAPH_SERIALIZATION
+    metawarenn::InferenceApi mwapi;
     std::vector<std::string> ip_names = graph_->get_graph_ip_names();
     auto ip_shape = graph_->get_graph_ip_tensor()[0].get_dims();
 
@@ -82,7 +87,8 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
 
     mwapi.runGraph();
 
-    mwapi.getOutput(graph_outputs[output_tensor_name], op_shape);*/
+    mwapi.getOutput(graph_outputs[output_tensor_name], op_shape);
+    #endif
 
     // ******************************************* Call to invoke the local run function *****************************************
 
