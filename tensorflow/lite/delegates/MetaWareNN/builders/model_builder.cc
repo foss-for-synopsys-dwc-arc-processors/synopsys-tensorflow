@@ -7,12 +7,12 @@ namespace tflite {
 namespace delegates {
 namespace metawarenn {
 
-void CreateMWNNNode(std::shared_ptr<::metawarenn::Graph> graph_ptr_,
-                   const std::string &node_name_,
-                   const std::string &node_op_type_,
-                   const std::vector<::metawarenn::Attribute> &node_attributes_,
-                   const std::vector<std::string> &node_inputs_,
-                   const std::vector<std::string> &node_outputs_) {
+void ModelBuilder::CreateMWNNNode(std::shared_ptr<::metawarenn::Graph> graph_ptr_,
+                                  const std::string &node_name_,
+                                  const std::string &node_op_type_,
+                                  const std::vector<::metawarenn::Attribute> &node_attributes_,
+                                  const std::vector<std::string> &node_inputs_,
+                                  const std::vector<std::string> &node_outputs_) {
   ::metawarenn::Node m_node(node_name_, node_op_type_, node_attributes_, node_inputs_, node_outputs_);
   graph_ptr_->set_graph_nodes(m_node);
 
@@ -23,6 +23,21 @@ void CreateMWNNNode(std::shared_ptr<::metawarenn::Graph> graph_ptr_,
     std::cout << "\n Inputs : " << nip;
   for (auto nop: node_outputs_)
     std::cout << "\n Outputs : " << nop;
+}
+
+void ModelBuilder::CreateMWNNQuantParams(std::shared_ptr<::metawarenn::Graph> graph_ptr_,
+                                         TfLiteTensor tensor) {
+  std::string scale_name = tensor.name + std::string("_scale");
+  std::vector<float> tensor_vec_scale = {tensor.params.scale};
+  ::metawarenn::Tensor scale_tensor(scale_name, std::vector<int>({tensor_vec_scale.size()}), ::metawarenn::ElementType::element_type::float_, tensor_vec_scale);
+  graph_ptr_->set_graph_initializers(scale_tensor);
+  graph_ptr_->initializer_names.insert(scale_name);
+
+  std::string zp_name = tensor.name + std::string("_zero_point");
+  std::vector<float> tensor_vec_zp = {tensor.params.zero_point};
+  ::metawarenn::Tensor zp_tensor(zp_name, std::vector<int>({tensor_vec_zp.size()}), get_mwnn_type_tf(tensor.type), tensor_vec_zp);
+  graph_ptr_->set_graph_initializers(zp_tensor);
+  graph_ptr_->initializer_names.insert(zp_name);
 }
 
 ModelBuilder::ModelBuilder(std::vector<int> nodes)
@@ -40,26 +55,69 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
 
   TfLiteNode* node;
   TfLiteRegistration* reg;
+  std::string node_name;
+  std::string node_op_type;
+  std::string activation_node_name;
+  std::string activation_node_op_type;
+  std::vector<std::string> node_inputs;
+  std::vector<std::string> node_outputs;
+  std::vector<::metawarenn::Attribute> node_attributes;
+  std::map<std::string, std::string> quant_ip_mapper;
+  std::map<std::string, std::string> quant_op_mapper;
 
   //Set Graph Input Node
   context->GetNodeAndRegistration(context, subgraph_nodes_[0], &node, &reg);
   int tensor_id = node->inputs->data[0];
-  const auto& input_tensor = context->tensors[tensor_id];
+  TfLiteTensor input_tensor = context->tensors[tensor_id];
   std::vector<int> dims_ip_vec(input_tensor.dims->data, input_tensor.dims->data + input_tensor.dims->size);
   graph_ptr->set_graph_ip_names(input_tensor.name);
   //Fills Graph Input Tensor Details - Name, Dims
   ::metawarenn::Tensor m_ip_tensor(input_tensor.name, get_mwnn_type_tf(input_tensor.type), dims_ip_vec);
   graph_ptr->set_graph_ip_tensor(m_ip_tensor);
 
+  if(input_tensor.type == kTfLiteUInt8) {
+    CreateMWNNQuantParams(graph_ptr, input_tensor);
+    node_inputs.clear(); node_outputs.clear();
+    node_op_type = "DequantizeLinear";
+    node_name = node_op_type + "_" + input_tensor.name;
+    node_inputs.push_back(input_tensor.name);
+    node_inputs.push_back(input_tensor.name + std::string("_scale"));
+    node_inputs.push_back(input_tensor.name + std::string("_zero_point"));
+    node_outputs.push_back(node_name);
+    CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, node_inputs, node_outputs);
+    quant_ip_mapper[input_tensor.name] = node_outputs[0];
+  }
+
   //Set Graph Output Node
   context->GetNodeAndRegistration(context, subgraph_nodes_[subgraph_nodes_.size()-1], &node, &reg);
   tensor_id = node->outputs->data[0];
-  const auto& output_tensor = context->tensors[tensor_id];
+  TfLiteTensor output_tensor = context->tensors[tensor_id];
   std::vector<int> dims_op_vec(output_tensor.dims->data, output_tensor.dims->data + output_tensor.dims->size);
-  graph_ptr->set_graph_op_names(output_tensor.name);
-  //Fills Graph Output Tensor Details - Name, Dims
-  ::metawarenn::Tensor m_op_tensor(output_tensor.name, get_mwnn_type_tf(output_tensor.type), dims_op_vec);
-  graph_ptr->set_graph_op_tensor(m_op_tensor);
+
+  if(output_tensor.type == kTfLiteUInt8) {
+    CreateMWNNQuantParams(graph_ptr, output_tensor);
+    node_inputs.clear(); node_outputs.clear();
+    node_op_type = "QuantizeLinear";
+    node_name = node_op_type + "_" + input_tensor.name;
+    node_inputs.push_back(output_tensor.name);
+    node_inputs.push_back(output_tensor.name + std::string("_scale"));
+    node_inputs.push_back(output_tensor.name + std::string("_zero_point"));
+    node_outputs.push_back(node_name);
+    CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, node_inputs, node_outputs);
+    quant_op_mapper[output_tensor.name] = node_outputs[0];
+
+    graph_ptr->set_graph_op_names(node_outputs[0]);
+    //Fills Graph Output Tensor Details - Name, Dims
+    ::metawarenn::Tensor m_op_tensor(node_outputs[0], ::metawarenn::ElementType::element_type::uint8_, dims_op_vec);
+     graph_ptr->set_graph_op_tensor(m_op_tensor);
+  }
+  else {
+    graph_ptr->set_graph_op_names(output_tensor.name);
+    //Fills Graph Output Tensor Details - Name, Dims
+    ::metawarenn::Tensor m_op_tensor(output_tensor.name, get_mwnn_type_tf(output_tensor.type), dims_op_vec);
+    graph_ptr->set_graph_op_tensor(m_op_tensor);
+  }
+
 
   // If multiple layers share the constant tensor, we only keep one copy in MWNN
   //auto const_names = map<string, int>();
@@ -71,36 +129,115 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
     TfLiteRegistration* reg;
     const auto status = context->GetNodeAndRegistration(context, subgraph_nodes_[node_index], &node, &reg);
     auto op_type = reg->builtin_code;
-    std::string node_name;
-    std::string node_op_type;
-    std::string activation_node_name;
-    std::string activation_node_op_type;
-    std::vector<std::string> node_inputs;
-    std::vector<std::string> node_outputs;
-    std::vector<::metawarenn::Attribute> node_attributes;
+    node_name = "";
+    node_op_type = "";
+    activation_node_name = "";
+    activation_node_op_type = "";
+    node_inputs.clear();
+    node_outputs.clear();
+    node_attributes.clear();
 
     for (int i = 0; i < node->inputs->size; ++i) {
       const int tensor_id = node->inputs->data[i];
-      node_inputs.emplace_back(context->tensors[tensor_id].name);
+      TfLiteTensor input_tensor = context->tensors[tensor_id];
+      if (input_tensor.allocation_type == kTfLiteMmapRo) {
+        std::vector<int> dims_vec(input_tensor.dims->data, input_tensor.dims->data + input_tensor.dims->size);
+        auto num_tensor_elements = std::accumulate(begin(dims_vec), end(dims_vec), 1, std::multiplies<int>());
+        std::vector<float> tensor_vec;
+        if(input_tensor.type == kTfLiteFloat32) {
+          auto *ip_data = GetTensorData<float>(&input_tensor);
+          tensor_vec = {ip_data, ip_data+num_tensor_elements};
+        }
+        else if(input_tensor.type == kTfLiteUInt8) {
+          auto *ip_data = GetTensorData<uint8_t>(&input_tensor);
+          tensor_vec = {ip_data, ip_data+num_tensor_elements};
+          auto q_params = input_tensor.params;
+
+          if(q_params.scale || q_params.zero_point) {
+            CreateMWNNQuantParams(graph_ptr, input_tensor);
+            node_inputs.clear(); node_outputs.clear();
+            node_op_type = "DequantizeLinear";
+            node_name = node_op_type + "_" + input_tensor.name;
+            node_inputs.push_back(input_tensor.name);
+            node_inputs.push_back(input_tensor.name + std::string("_scale"));
+            node_inputs.push_back(input_tensor.name + std::string("_zero_point"));
+            node_outputs.push_back(node_name);
+            CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, node_inputs, node_outputs);
+            quant_ip_mapper[input_tensor.name] = node_outputs[0];
+          }
+        }
+        else if(input_tensor.type == kTfLiteInt32) {
+          auto *ip_data = GetTensorData<int32_t>(&input_tensor);
+          tensor_vec = {ip_data, ip_data+num_tensor_elements};
+          auto q_params = input_tensor.params;
+
+          if(q_params.scale || q_params.zero_point) {
+            CreateMWNNQuantParams(graph_ptr, input_tensor);
+            node_inputs.clear(); node_outputs.clear();
+            node_op_type = "DequantizeLinear";
+            node_name = node_op_type + "_" + input_tensor.name;
+            node_inputs.push_back(input_tensor.name);
+            node_inputs.push_back(input_tensor.name + std::string("_scale"));
+            node_inputs.push_back(input_tensor.name + std::string("_zero_point"));
+            node_outputs.push_back(node_name);
+            CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, node_inputs, node_outputs);
+            quant_ip_mapper[input_tensor.name] = node_outputs[0];
+          }
+        }
+        else {
+          std::cout << "\n Unhandled Type " << (int)get_mwnn_type_tf(input_tensor.type);
+          exit(1);
+        }
+        ::metawarenn::Tensor m_tensor(input_tensor.name, dims_vec, get_mwnn_type_tf(input_tensor.type), tensor_vec);
+        graph_ptr->set_graph_initializers(m_tensor);
+        graph_ptr->initializer_names.insert(input_tensor.name);
+      }
+    }
+    node_inputs.clear(); node_outputs.clear();
+    for (int i = 0; i < node->outputs->size; ++i) {
+      const int tensor_id = node->outputs->data[i];
+      TfLiteTensor output_tensor = context->tensors[tensor_id];
+      auto itr = quant_op_mapper.find(output_tensor.name);
+      //Don't QDQ nodes for last op node - handled previously with Q node
+      if(output_tensor.type == kTfLiteUInt8 && itr == quant_op_mapper.end()) {
+        auto q_params = output_tensor.params;
+        if(q_params.scale || q_params.zero_point) {
+          CreateMWNNQuantParams(graph_ptr, output_tensor);
+          node_inputs.clear(); node_outputs.clear();
+          node_op_type = "QuantizeLinear";
+          node_name = node_op_type + "_" + output_tensor.name;
+          node_inputs.push_back(output_tensor.name);
+          node_inputs.push_back(output_tensor.name + std::string("_scale"));
+          node_inputs.push_back(output_tensor.name + std::string("_zero_point"));
+          node_outputs.push_back(node_name);
+          CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, node_inputs, node_outputs);
+
+          node_op_type = "DequantizeLinear";
+          node_name = node_op_type + "_" + output_tensor.name;
+          node_inputs.clear();
+          node_inputs.push_back(node_outputs[0]);
+          node_inputs.push_back(output_tensor.name + std::string("_scale"));
+          node_inputs.push_back(output_tensor.name + std::string("_zero_point"));
+          node_outputs.clear();
+          node_outputs.push_back(node_name);
+          CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, node_inputs, node_outputs);
+          quant_ip_mapper[output_tensor.name] = node_outputs[0];
+        }
+      }
+    }
+    node_inputs.clear(); node_outputs.clear();
+    for (int i = 0; i < node->inputs->size; ++i) {
+      const int tensor_id = node->inputs->data[i];
+       auto itr = quant_ip_mapper.find(context->tensors[tensor_id].name);
+       if(itr != quant_ip_mapper.end())
+         node_inputs.emplace_back(itr->second);
+       else
+         node_inputs.emplace_back(context->tensors[tensor_id].name);
     }
     for (int i = 0; i < node->outputs->size; ++i) {
       const int tensor_id = node->outputs->data[i];
       node_outputs.emplace_back(context->tensors[tensor_id].name);
     }
-    for (int i = 0; i < node->inputs->size; ++i) {
-      const int tensor_id = node->inputs->data[i];
-      const auto& input_tensor = context->tensors[tensor_id];
-      if (input_tensor.allocation_type == kTfLiteMmapRo) {
-          std::vector<int> dims_vec(input_tensor.dims->data, input_tensor.dims->data + input_tensor.dims->size);
-          auto num_tensor_elements = std::accumulate(begin(dims_vec), end(dims_vec), 1, std::multiplies<int>());
-          std::vector<float> tensor_vec;
-          tensor_vec = std::vector<float>(input_tensor.data.f, input_tensor.data.f + num_tensor_elements);
-          ::metawarenn::Tensor m_tensor(input_tensor.name, dims_vec, get_mwnn_type_tf(input_tensor.type), tensor_vec);
-          graph_ptr->set_graph_initializers(m_tensor);
-          graph_ptr->initializer_names.insert(input_tensor.name);
-      }
-    }
-
     //Op Names are added to follow the same pattern like in ONNX as of now.
     if (op_type == kTfLiteBuiltinConv2d) {
       node_op_type = "Conv";
@@ -495,7 +632,6 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
       std::vector<float> tensor_vec(reshape_params->num_dimensions, 0);
       for(int i=0; i<reshape_params->num_dimensions; i++)
           tensor_vec[i] = reshape_params->shape[i];
-
       ::metawarenn::Tensor reshape_tensor(reshape_ip_name, std::vector<int>({tensor_vec.size()}), ::metawarenn::ElementType::element_type::int64_, tensor_vec);
       graph_ptr->set_graph_initializers(reshape_tensor);
       graph_ptr->initializer_names.insert(reshape_ip_name);
@@ -747,7 +883,8 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
       if(g_t.get_dims().size() == 4) {
         //std::cout << "\n Name : " << g_t.get_name();
         for(auto node : graph->get_graph_nodes()) {
-          if(node.get_op_type() == "Conv" && g_t.get_name() == node.get_inputs()[1]) {
+          if((node.get_op_type() == "Conv" && g_t.get_name() == node.get_inputs()[1]) or
+             (node.get_op_type() == "DequantizeLinear" && g_t.get_name() == node.get_inputs()[0])) {
             //OHWI
             /*std::cout << "\t Dims : ";
             for (auto dim : g_t.get_dims())
@@ -768,20 +905,6 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
                   std::cout << dim << ",";
                 ::metawarenn::optimizer::ExpandDimension ed(graph, g_t);
                 manager.register_pass(ed);
-              }
-            }
-          }
-          if(node.get_op_type() == "Pad") {
-            for (auto n_ip : node.get_inputs()) {
-              if(g_t.get_name() == n_ip) {
-                std::cout << "\n Padd Input Name : " << g_t.get_name();
-                std::cout << "\t Dims : ";
-                for (auto dim : g_t.get_dims())
-                  std::cout << dim << ",";
-                std::cout << "\n Tensor values : ";
-                for (auto t_val : g_t.get_tensor()) {
-                  std::cout << t_val << ",";
-                }
               }
             }
           }
