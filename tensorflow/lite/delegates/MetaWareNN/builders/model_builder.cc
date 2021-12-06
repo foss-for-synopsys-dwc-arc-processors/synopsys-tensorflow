@@ -294,12 +294,15 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
       node_op_type = "Conv";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
       const TfLiteDepthwiseConvParams* depthwise_conv_params = reinterpret_cast<const TfLiteDepthwiseConvParams*>(node->builtin_data);
+      const int ip_tensor_id = node->inputs->data[0];
+      int group =  context->tensors[ip_tensor_id].dims->data[3];
       const int weight_tensor_id = node->inputs->data[1];
       const auto& weight_tensor = context->tensors[weight_tensor_id];
+      int depth_multiplier = depthwise_conv_params->depth_multiplier;
 
       ::metawarenn::Attribute attr_dilate("dilations", std::vector<int>{depthwise_conv_params->dilation_height_factor, depthwise_conv_params->dilation_width_factor});
       node_attributes.emplace_back(attr_dilate);
-      ::metawarenn::Attribute attr_group("group", weight_tensor.dims->data[3]);
+      ::metawarenn::Attribute attr_group("group", group);
       node_attributes.emplace_back(attr_group);
       ::metawarenn::Attribute attr_kernel_shape("kernel_shape", std::vector<int>{weight_tensor.dims->data[1], weight_tensor.dims->data[2]});
       node_attributes.emplace_back(attr_kernel_shape);

@@ -1,0 +1,6 @@
+mobilenet_v1_1.0_224_quant/mobilenet_v1_1.0_224_quant.tflite
+mobilenet_v2_1.0_224_quant/mobilenet_v2_1.0_224_quant.tflite
+inception_v1_224_quant_20181026/inception_v1_224_quant.tflite
+inception_v2_224_quant_20181026/inception_v2_224_quant.tflite
+inception_v3_quant/inception_v3_quant.tflite
+inception_v4_299_quant_20181026/inception_v4_299_quant.tflite
