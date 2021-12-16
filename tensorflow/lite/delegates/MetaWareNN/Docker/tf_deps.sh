@@ -43,6 +43,10 @@ export LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
 export CPLUS_INCLUDE_PATH=/usr/local/include:${CPLUS_INCLUDE_PATH}
 cd ../..
 pip3 install numpy
+pip3 install pillow
+pip3 install onnx
+pip3 install onnxruntime
+pip3 install tensorflow
  ln -s /usr/bin/python3 /usr/bin/python
 git clone https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git
 cd synopsys-tensorflow

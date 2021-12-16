@@ -17,5 +17,5 @@ wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_
 tar -xvf inception_v3_quant.tgz --one-top-level
 rm inception_v3_quant.tgz
 wget https://storage.googleapis.com/download.tensorflow.org/models/inception_v4_299_quant_20181026.tgz
-tar -xvf inception_v4_299_quant_20181026.tgz
-rm inception_v4_299_quant_20181026.tgz --one-top-level
+tar -xvf inception_v4_299_quant_20181026.tgz --one-top-level
+rm inception_v4_299_quant_20181026.tgz
