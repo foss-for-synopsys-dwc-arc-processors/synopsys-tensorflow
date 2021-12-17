@@ -11,6 +11,7 @@
     * Download the dependent protobuf library from egnyte link https://multicorewareinc.egnyte.com/dl/kpRzPTSFdx and place it in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/lib`
 5. To build the TensorFlow,
     * `cd /path/to/synopsys-tensorflow/`
+    * `./configure`
     * `bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/MetaWareNN/builders:model_builder //tensorflow/lite/delegates/MetaWareNN:MetaWareNN_delegate`
 
 ### To Run the Inference,
