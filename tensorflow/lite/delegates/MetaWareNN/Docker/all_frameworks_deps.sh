@@ -28,6 +28,7 @@ pip3 install onnx
 pip3 install onnxruntime
 pip3 install psutil xgboost cloudpickle
 pip3 install tflite==2.3.0
+pip3 install scipy
 pip3 install torch torchvision
 pip3 install tensorflow
 wget https://github.com/Kitware/CMake/releases/download/v3.16.5/cmake-3.16.5.tar.gz
