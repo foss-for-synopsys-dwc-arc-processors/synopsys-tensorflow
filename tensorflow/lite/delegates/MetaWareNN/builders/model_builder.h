@@ -46,6 +46,9 @@ class ModelBuilder {
                                                   std::string subgraph_name);
   TfLiteStatus MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph> graph);
 
+  template<class T>
+  void parse_input(TfLiteTensor input_tensor, std::shared_ptr<::metawarenn::Graph> graph_ptr);
+
   static ::metawarenn::ElementType::element_type get_mwnn_type_tf(int tf_type) {
       switch (tf_type) {
           case kTfLiteBool:
