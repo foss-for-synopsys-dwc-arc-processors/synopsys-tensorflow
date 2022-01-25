@@ -34,9 +34,12 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
   #if !EXECUTABLE_GRAPH_SERIALIZATION
   write_onnx_proto(graph_);
   #endif
-  #if EXECUTABLE_GRAPH_SERIALIZATION
+  inference_engine_ = inference_builder_->CreateInferenceEngine(*graph_);
+  inference_engine_->SerializeToFile();
+  execution_context_ = inference_engine_->CreateExecutionContext();
+  /*#if EXECUTABLE_GRAPH_SERIALIZATION
   exe_graph_ = std::make_shared<metawarenn::ExecutableGraph>(*graph_);
-  #endif
+  #endif*/
   return kTfLiteOk;
 }
 
@@ -71,9 +74,19 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
 
   std::cout << "\n In MWNN Kernel Invoke : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
 
+  auto graph_desc = inference_engine_->GetGraphDesc();
+  std::string ip_name = graph_desc.input_desc[0].tensor_name;
+  std::string op_name = graph_desc.output_desc[0].tensor_name;
+  std::cout << "\n Ip_name : " << ip_name << "\t Size : " << graph_desc.input_desc[0].size;
+  std::cout << "\n Op_name : " << op_name << "\t Size : " << graph_desc.output_desc[0].size;
+
+  execution_context_->CopyInputToDevice(graph_inputs[ip_name], graph_desc.input_desc[0].size);
+  execution_context_->Execute();
+  execution_context_->CopyOutputFromDevice(graph_outputs[op_name], graph_desc.output_desc[0].size);
+
     // **************************************** Calls to invoke the MetaWareNN Inference API ************************************
 
-    #if EXECUTABLE_GRAPH_SERIALIZATION
+    /*#if EXECUTABLE_GRAPH_SERIALIZATION
     metawarenn::InferenceApi mwapi;
     std::vector<std::string> ip_names = graph_->get_graph_ip_names();
     auto ip_shape = graph_->get_graph_ip_tensor()[0].get_dims();
@@ -88,7 +101,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     mwapi.runGraph();
 
     mwapi.getOutput(graph_outputs[output_tensor_name], op_shape);
-    #endif
+    #endif*/
 
     // ******************************************* Call to invoke the local run function *****************************************
 

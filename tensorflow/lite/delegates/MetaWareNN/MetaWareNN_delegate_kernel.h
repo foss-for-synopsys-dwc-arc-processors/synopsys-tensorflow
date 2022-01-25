@@ -11,6 +11,7 @@
 #include "tensorflow/lite/delegates/MetaWareNN/builders/model_builder.h"
 #include "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_to_onnx_proto.h"
 #include "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnn_inference_api/mwnn_inference_api.h"
+#include "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/inference_engine/mwnn_inference_engine.h"
 
 namespace tflite {
 
@@ -30,6 +31,9 @@ class MetaWareNNDelegateKernel {
   std::unique_ptr<delegates::metawarenn::ModelBuilder> model_builder_;
 
   std::shared_ptr<::metawarenn::Graph> graph_;
+  std::shared_ptr<metawarenn::Builder> inference_builder_ = std::make_shared<metawarenn::Builder>();
+  std::shared_ptr<metawarenn::InferenceEngine> inference_engine_;
+  std::shared_ptr<metawarenn::ExecutionContext> execution_context_;
   #if EXECUTABLE_GRAPH_SERIALIZATION
   std::shared_ptr<metawarenn::ExecutableGraph> exe_graph_;
   #endif

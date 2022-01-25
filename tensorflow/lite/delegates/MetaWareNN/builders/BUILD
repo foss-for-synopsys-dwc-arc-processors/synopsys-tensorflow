@@ -124,6 +124,8 @@ cc_library(
         "metawarenn_lib/mwnn_inference_api/mwnn_inference_shm.cc",
         "metawarenn_lib/executable_network/metawarenn_executable_graph.cc",
         "metawarenn_lib/executable_network/metawarenn_serialization.cc",
+        "metawarenn_lib/inference_engine/mwnn_execution_context.cc",
+        "metawarenn_lib/inference_engine/mwnn_inference_engine.cc",
     ],
     hdrs = [
         "model_builder.h",
@@ -265,6 +267,8 @@ cc_library(
         "metawarenn_lib/executable_network/metawarenn_executable_graph.h",
         "metawarenn_lib/executable_network/metawarenn_exe_utils.h",
         "metawarenn_lib/executable_network/metawarenn_serialization.h",
+        "metawarenn_lib/inference_engine/mwnn_execution_context.h",
+        "metawarenn_lib/inference_engine/mwnn_inference_engine.h",
     ],
     deps=[
         "//tensorflow/lite/c:common",
