@@ -36,13 +36,24 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
   #endif
 
   #if INFERENCE_ENGINE
-  inference_engine_ = inference_builder_->CreateInferenceEngine(*graph_);
-  inference_engine_->SerializeToFile();
-  execution_context_ = inference_engine_->CreateExecutionContext();
+  dynamic_shape_ = false;
+  auto ip_tensor = graph_->get_graph_ip_tensor()[0];
+  auto dims = ip_tensor.get_dims();
+  auto name = ip_tensor.get_name();
+  for(int i = 0; i < dims.size(); i++) {
+    if(dims[i] == -1) {
+      dynamic_shape_ = true;
+      input_shape_range_[name][i] = std::make_pair(INT_MAX, INT_MIN);
+    }
+  }
+  builder_config_ = inference_builder_->CreateBuilderConfig();
+  // dynamic_shape_ - yet to verify the flow
+  if(!dynamic_shape_) {
+    inference_engine_ = inference_builder_->CreateInferenceEngine(graph_, builder_config_, false);
+    inference_engine_->SerializeToFile(dynamic_shape_, optimization_profile_);
+    execution_context_ = inference_engine_->CreateExecutionContext();
+  }
   #endif
-  /*#if EXECUTABLE_GRAPH_SERIALIZATION
-  exe_graph_ = std::make_shared<metawarenn::ExecutableGraph>(*graph_);
-  #endif*/
   return kTfLiteOk;
 }
 
@@ -50,6 +61,19 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
                                            TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Invoke!!!"<<std::endl;
   int is_HWC = HWC_TO_CHW ? 0 : 1;
+
+  #if INFERENCE_ENGINE
+
+  bool update_engine = false;
+  if(dynamic_shape_) {
+    bool profile_file_exists = false;
+    //Creates a new optimization profile for dynamic input shapes
+    if(optimization_profile_ == nullptr)
+      optimization_profile_ = inference_builder_->CreateOptimizationProfile();
+    auto profile_path = inference_builder_->GetProfilePath(graph_->get_name(), &profile_file_exists);
+    if(profile_file_exists)
+      input_shape_range_ = optimization_profile_->DeserializeProfileInfo(profile_path);
+  }
 
   //Fills the graph_inputs with input data pointer using indexes
   std::unordered_map<std::string, float*> graph_inputs;
@@ -59,11 +83,33 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
   for (int input_idx = 0; input_idx < node->inputs->size; ++input_idx) {
     const auto tensor_index = node->inputs->data[input_idx];
     TfLiteTensor* tensor = &context->tensors[tensor_index];
+    std::vector<int> tensor_shapes(tensor->dims->data, tensor->dims->data + tensor->dims->size);
     if (tensor->allocation_type == kTfLiteArenaRw && tensor->data.f != nullptr) { //Input - Data
       graph_inputs[tensor->name] = tensor->data.f;
     }
     else if(tensor->allocation_type == kTfLiteMmapRo && tensor->data.f != nullptr) { //Weights, Biases etc.,
       graph_inputs[tensor->name] = tensor->data.f;
+    }
+    //If graph input contains dynamic shape then get the size at runtime & fill the optimization profile attributes
+    if(dynamic_shape_) {
+      if(input_shape_range_.find(tensor->name) != input_shape_range_.end()) {
+        auto& ip_shape_range_ = input_shape_range_[tensor->name];
+        for(int d = 0; d < tensor_shapes.size(); d++) {
+          if (ip_shape_range_.find(d) != ip_shape_range_.end()) {
+            // Update Minimum Dimension
+            if (tensor_shapes[d] < ip_shape_range_[d].first) {
+              ip_shape_range_[d].first = tensor_shapes[d];
+              update_engine = true;
+            }
+            // Update Maximum Dimension
+            if(tensor_shapes[d] > ip_shape_range_[d].second) {
+              ip_shape_range_[d].second = tensor_shapes[d];
+              update_engine = true;
+            }
+          }
+        }
+        optimization_profile_->SetInputDimensions(tensor->name, ip_shape_range_);
+      }
     }
   }
   for (int output_idx = 0; output_idx < node->outputs->size; ++output_idx) {
@@ -75,9 +121,30 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     }
   }
 
+  if (dynamic_shape_) {
+    std::cout << "\n Creating Engine, Context for Dynamic Input shapes";
+    builder_config_->AddOptimizationProfile(optimization_profile_);
+    inference_engine_ = inference_builder_->CreateInferenceEngine(graph_, builder_config_, update_engine);
+    auto graph_desc = inference_engine_->GetGraphDesc();
+    const auto tensor_index = node->inputs->data[0];
+    TfLiteTensor* tensor = &context->tensors[tensor_index];
+    std::vector<int> tensor_shapes(tensor->dims->data, tensor->dims->data + tensor->dims->size);
+    uint64_t size = 1;
+    std::cout << "\n ORT Input Shape: ";
+    for(auto dim: tensor_shapes) {
+      std::cout << dim << ", ";
+      size = size * dim;
+    }
+
+    graph_desc.UpdateInputDesc(0, size * sizeof(::metawarenn::data_type));
+    inference_engine_->SetGraphDesc(graph_desc);
+
+    inference_engine_->SerializeToFile(dynamic_shape_, optimization_profile_);
+    execution_context_ = inference_engine_->CreateExecutionContext();
+  }
+
   std::cout << "\n In MWNN Kernel Invoke : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
 
-  #if INFERENCE_ENGINE
   auto graph_desc = inference_engine_->GetGraphDesc();
   std::string ip_name = graph_desc.input_desc[0].tensor_name;
   std::string op_name = graph_desc.output_desc[0].tensor_name;

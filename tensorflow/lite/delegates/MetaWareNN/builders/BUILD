@@ -125,6 +125,9 @@ cc_library(
         "metawarenn_lib/inference_engine/mwnn_execution_context.cc",
         "metawarenn_lib/inference_engine/mwnn_inference_engine.cc",
         "metawarenn_lib/inference_engine/mwnn_device_memory.cc",
+        "metawarenn_lib/inference_engine/mwnn_builder.cc",
+        "metawarenn_lib/inference_engine/mwnn_optimization_profile.cc",
+        "metawarenn_lib/inference_engine/mwnn_encrypt_decrypt.cc",
     ],
     hdrs = [
         "model_builder.h",
@@ -267,6 +270,9 @@ cc_library(
         "metawarenn_lib/inference_engine/mwnn_execution_context.h",
         "metawarenn_lib/inference_engine/mwnn_inference_engine.h",
         "metawarenn_lib/inference_engine/mwnn_device_memory.h",
+        "metawarenn_lib/inference_engine/mwnn_builder.h",
+        "metawarenn_lib/inference_engine/mwnn_optimization_profile.h",
+        "metawarenn_lib/inference_engine/mwnn_encrypt_decrypt.h",
     ],
     deps=[
         "//tensorflow/lite/c:common",

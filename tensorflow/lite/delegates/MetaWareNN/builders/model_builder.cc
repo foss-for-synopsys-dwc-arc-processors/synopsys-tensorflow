@@ -941,9 +941,9 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
       manager.register_pass(fr);
     }*/
   }
-  ::metawarenn::optimizer::CalculateOffset co(graph);
+  /*::metawarenn::optimizer::CalculateOffset co(graph);
   manager.register_pass(co);
-  manager.run_passes();
+  manager.run_passes();*/
 
   auto graph_ip_names = graph->get_graph_ip_names();
   for (auto g_n : graph->get_graph_nodes()) {

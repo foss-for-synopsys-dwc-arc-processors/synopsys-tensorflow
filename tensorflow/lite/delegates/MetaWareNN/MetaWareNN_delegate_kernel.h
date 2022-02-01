@@ -11,6 +11,7 @@
 #include "tensorflow/lite/delegates/MetaWareNN/builders/model_builder.h"
 #include "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/mwnn_to_onnx_proto.h"
 #include "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/inference_engine/mwnn_inference_engine.h"
+#include "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/inference_engine/mwnn_builder.h"
 
 namespace tflite {
 
@@ -31,9 +32,13 @@ class MetaWareNNDelegateKernel {
 
   std::shared_ptr<::metawarenn::Graph> graph_;
   #if INFERENCE_ENGINE
+  std::shared_ptr<metawarenn::OptimizationProfile> optimization_profile_ = nullptr;
+  std::shared_ptr<metawarenn::BuilderConfig> builder_config_;
   std::shared_ptr<metawarenn::Builder> inference_builder_ = std::make_shared<metawarenn::Builder>();
   std::shared_ptr<metawarenn::InferenceEngine> inference_engine_;
   std::shared_ptr<metawarenn::ExecutionContext> execution_context_;
+  std::unordered_map<std::string, std::unordered_map<size_t, std::pair<int64_t, int64_t>>> input_shape_range_;
+  bool dynamic_shape_;
   #endif
 
   // Indices of nodes in the delegated TfLite subgraph.
