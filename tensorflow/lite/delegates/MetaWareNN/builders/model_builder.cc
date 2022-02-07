@@ -629,14 +629,16 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
       node_op_type = "Reshape";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
       const TfLiteReshapeParams* reshape_params = reinterpret_cast<const TfLiteReshapeParams*>(node->builtin_data);
-      std::string reshape_ip_name = node_name + "_ip";
-      std::vector<int64_t> tensor_vec(reshape_params->num_dimensions, 0);
-      for(int i=0; i<reshape_params->num_dimensions; i++)
-          tensor_vec[i] = reshape_params->shape[i];
-      ::metawarenn::Tensor reshape_tensor(reshape_ip_name, std::vector<int>({tensor_vec.size()}), ::metawarenn::ElementType::element_type::int64_, tensor_vec);
-      graph_ptr->set_graph_initializers(reshape_tensor);
-      graph_ptr->initializer_names.insert(reshape_ip_name);
-      node_inputs[1] = reshape_ip_name; //Replace correct new_shape tensor(created from attributes)
+      if(node_inputs.size() == 1) {
+        std::string reshape_ip_name = node_name + "_ip";
+        std::vector<int64_t> tensor_vec(reshape_params->num_dimensions, 0);
+        for(int i=0; i<reshape_params->num_dimensions; i++)
+            tensor_vec[i] = reshape_params->shape[i];
+        ::metawarenn::Tensor reshape_tensor(reshape_ip_name, std::vector<int>({tensor_vec.size()}), ::metawarenn::ElementType::element_type::int64_, tensor_vec);
+        graph_ptr->set_graph_initializers(reshape_tensor);
+        graph_ptr->initializer_names.insert(reshape_ip_name);
+        node_inputs[1] = reshape_ip_name; //Replace correct new_shape tensor(created from attributes)
+      }
     }
     else if (op_type == kTfLiteBuiltinSoftmax) {
       node_op_type = "Softmax";
@@ -973,122 +975,10 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
   #if INVOKE_NNAC
     std::cout << "\n ---------------------------Graph----------------------------- \n";
     std::cout << "\n Graph Name : " << graph->get_name();
-    ::MWNN::GraphProto graph_proto;
-    graph_proto.set_name(graph->get_name());
-    for (auto g_ip : graph->get_graph_ip_names())
-      graph_proto.add_ip_name((g_ip));
-    for (auto g_op : graph->get_graph_op_names())
-      graph_proto.add_op_name((g_op));
 
-    std::cout << "\n -----------------------Graph Inputs-------------------------- \n";
-    for (auto g_ip : graph->get_graph_ip_tensor()) {
-      std::cout << "\n Input Name : " << g_ip.get_name();
-      std::cout << "\n Data Type : " << g_ip.get_type();
-      std::cout << "\n Input Dims : ";
-      auto input = graph_proto.add_input();
-      input->set_name(g_ip.get_name());
-      input->set_type(g_ip.get_type());
-      for (auto dim : g_ip.get_dims()) {
-        std::cout << dim << ",";
-        input->add_dims(dim);
-      }
-    }
-    std::cout << "\n -----------------------Graph Outputs-------------------------- \n";
-    for (auto g_op : graph->get_graph_op_tensor()) {
-      std::cout << "\n Output Name : " << g_op.get_name();
-      std::cout << "\n Data Type : " << g_op.get_type();
-      std::cout << "\n Output Dims : ";
-      auto output = graph_proto.add_output();
-      output->set_name(g_op.get_name());
-      output->set_type(g_op.get_type());
-      for (auto dim : g_op.get_dims()) {
-        std::cout << dim << ",";
-        output->add_dims(dim);
-      }
-    }
-    std::cout << "\n -----------------------Graph Nodes-------------------------- \n";
-    for (auto g_n : graph->get_graph_nodes()) {
-      std::cout << "\n ================================================================ \n";
-      std::cout << "\n Node Name : " << g_n.get_name();
-      std::cout << "\n Op Type : " << g_n.get_op_type();
-      auto node = graph_proto.add_node();
-      node->set_name(g_n.get_name());
-      auto op_type = g_n.get_op_type();
-      node->set_op_type(op_type == "DepthwiseConv" ? "Conv" : op_type);
-      for (auto n_ip : g_n.get_inputs()) {
-        std::cout << "\n Input : n_ip : " << n_ip;
-        node->add_ip_name((n_ip));
-      }
-      for (auto n_op : g_n.get_outputs()) {
-        std::cout << "\n Output : n_op : " << n_op;
-        node->add_op_name((n_op));
-      }
-      std::cout << "\n ---------------------------------------------------------------- ";
-      for (auto attribute : g_n.get_attributes()) {
-        std::cout << "\n Attribute Name : " << attribute.get_name();
-        std::cout << "\n Attribute Data : ";
-        auto attr = node->add_attribute();
-        attr->set_name(attribute.get_name());
-        attr->set_type(attribute.get_type());
-        if(attribute.get_type() == 6) { //int data
-          for(int i = 0; i < attribute.get_int_data().size(); i++){
-            attr->add_int_data(attribute.get_int_data()[i]);
-            std::cout << attribute.get_int_data()[i] << ",";
-          }
-        }
-        else if(attribute.get_type() == 3) { //float data
-          for(int i = 0; i < attribute.get_float_data().size(); i++){
-            attr->add_float_data(attribute.get_float_data()[i]);
-            std::cout << attribute.get_float_data()[i] << ",";
-          }
-        }
-        else if(attribute.get_type() == 12) { //string data
-          for(int i = 0; i < attribute.get_string_data().size(); i++){
-            attr->add_string_data(attribute.get_string_data()[i]);
-            std::cout << attribute.get_string_data()[i] << ",";
-          }
-        }
-      }
-    }
-    std::cout << "\n -----------------------Graph Tensors-------------------------- \n";
-    for (auto g_t : graph->get_graph_initializers()) {
-      auto initializer = graph_proto.add_initializer();
-      initializer->set_name(g_t.get_name());
-      initializer->set_type(g_t.get_type());
-      std::cout << "\n Name : " << g_t.get_name();
-      std::cout << "\n Type : " << g_t.get_type();
-      std::cout << "\n Dims : ";
-      for (auto dim : g_t.get_dims()) {
-        std::cout << dim << ",";
-        initializer->add_dims(dim);
-      }
-      //std::cout << "\n Tensor values : ";
-      for (auto t_val : g_t.get_tensor()) {
-        //std::cout << t_val << ",";
-        initializer->add_float_data(t_val);
-      }
-    }
-
-    std::cout << "\n -----------------------Graph Tensor Producers-------------------------- \n";
-    for (auto producer : graph->get_node_producers()) {
-      std::cout << "\n Produced Tensor : " << producer.first;
-      std::cout << "\n      Producer Node : " << producer.second;
-      auto pnode = graph_proto.add_producers();
-      pnode->set_tensor_name(producer.first);
-      pnode->add_node_name(producer.second);
-    }
-    std::cout << "\n -----------------------Graph Tensor Consumers-------------------------- \n";
-    for (auto consumer : graph->get_node_consumers()) {
-      std::cout << "\n Consumed Tensor : " << consumer.first;
-      auto& consumer_nodes = consumer.second;
-      auto cnode = graph_proto.add_consumers();
-      cnode->set_tensor_name(consumer.first);
-      for (auto node_name : consumer_nodes) {
-        std::cout << "\n      Consumer Node - " << node_name;
-        cnode->add_node_name(node_name);
-        }
-    }
-
+    ::MWNN::MWNNGraphProto graph_proto;
+    // Creates MWNNProto from MWNN Graph
+    graph_proto = write_mwnn_proto(graph);
     std::cout << "\n Graph Name : " << graph->get_name();
     std::string name = graph->get_name();
     char* op_path = nullptr;
@@ -1114,7 +1004,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
     std::cout << "\n\n=================Initiating NNAC python script via shell script======================\n";
     std::string cmd = "bash " + std::string(lib_path) +"/mwnnconvert/mwnn_convert.sh " + proto_bin + " " + op_path + " " + name + " " + std::to_string(subgraph_counter);
     const char *command = cmd.c_str();
-    system(command);
+    //system(command);
   #endif
 
   return kTfLiteOk;

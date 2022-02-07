@@ -20,6 +20,7 @@
 #include "metawarenn_lib/optimizer/calculate_offset.h"
 
 #include "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h"
+#include "metawarenn_lib/mwnnconvert/mwnn_to_proto.h"
 
 #define HWC_TO_CHW 1
 #define INVOKE_NNAC 0

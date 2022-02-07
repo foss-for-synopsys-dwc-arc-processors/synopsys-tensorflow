@@ -50,7 +50,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
   // dynamic_shape_ - yet to verify the flow
   if(!dynamic_shape_) {
     inference_engine_ = inference_builder_->CreateInferenceEngine(graph_, builder_config_, false);
-    inference_engine_->SerializeToFile(dynamic_shape_, optimization_profile_);
+    inference_engine_->SerializeToFile();
     execution_context_ = inference_engine_->CreateExecutionContext();
   }
   #endif
@@ -65,6 +65,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
   #if INFERENCE_ENGINE
 
   bool update_engine = false;
+  builder_config_ = inference_builder_->CreateBuilderConfig();
   if(dynamic_shape_) {
     bool profile_file_exists = false;
     //Creates a new optimization profile for dynamic input shapes
@@ -72,7 +73,8 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
       optimization_profile_ = inference_builder_->CreateOptimizationProfile();
     auto profile_path = inference_builder_->GetProfilePath(graph_->get_name(), &profile_file_exists);
     if(profile_file_exists)
-      input_shape_range_ = optimization_profile_->DeserializeProfileInfo(profile_path);
+      inference_builder_->DeserializeProfileInfo(profile_path, builder_config_);
+    builder_config_->PrintOptimizationProfileInfo();
   }
 
   //Fills the graph_inputs with input data pointer using indexes
@@ -139,7 +141,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     graph_desc.UpdateInputDesc(0, size * sizeof(::metawarenn::data_type));
     inference_engine_->SetGraphDesc(graph_desc);
 
-    inference_engine_->SerializeToFile(dynamic_shape_, optimization_profile_);
+    inference_engine_->SerializeToFile();
     execution_context_ = inference_engine_->CreateExecutionContext();
   }
 

@@ -118,6 +118,7 @@ cc_library(
         "metawarenn_lib/optimizer/remove_transpose.cc",
         "metawarenn_lib/optimizer/pass_manager.cc",
         "metawarenn_lib/mwnnconvert/mwnn_to_onnx_proto.cc",
+        "metawarenn_lib/mwnnconvert/mwnn_to_proto.cc",
         "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.cc",
         "metawarenn_lib/mwnnconvert/onnx_protobuf/onnx-ml.pb.cc",
         "metawarenn_lib/executable_network/metawarenn_executable_graph.cc",
@@ -262,6 +263,7 @@ cc_library(
         "metawarenn_lib/optimizer/fuse_batchnorm.h",
         "metawarenn_lib/metawarenn_common.h",
         "metawarenn_lib/mwnnconvert/mwnn_to_onnx_proto.h",
+        "metawarenn_lib/mwnnconvert/mwnn_to_proto.h",
         "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h",
         "metawarenn_lib/mwnnconvert/onnx_protobuf/onnx-ml.pb.h",
         "metawarenn_lib/executable_network/metawarenn_executable_graph.h",
@@ -273,6 +275,7 @@ cc_library(
         "metawarenn_lib/inference_engine/mwnn_builder.h",
         "metawarenn_lib/inference_engine/mwnn_optimization_profile.h",
         "metawarenn_lib/inference_engine/mwnn_encrypt_decrypt.h",
+        "metawarenn_lib/logger/logger.h",
     ],
     deps=[
         "//tensorflow/lite/c:common",
