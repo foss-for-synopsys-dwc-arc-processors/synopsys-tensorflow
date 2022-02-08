@@ -629,16 +629,20 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
       node_op_type = "Reshape";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
       const TfLiteReshapeParams* reshape_params = reinterpret_cast<const TfLiteReshapeParams*>(node->builtin_data);
-      if(node_inputs.size() == 1) {
-        std::string reshape_ip_name = node_name + "_ip";
-        std::vector<int64_t> tensor_vec(reshape_params->num_dimensions, 0);
-        for(int i=0; i<reshape_params->num_dimensions; i++)
-            tensor_vec[i] = reshape_params->shape[i];
-        ::metawarenn::Tensor reshape_tensor(reshape_ip_name, std::vector<int>({tensor_vec.size()}), ::metawarenn::ElementType::element_type::int64_, tensor_vec);
-        graph_ptr->set_graph_initializers(reshape_tensor);
-        graph_ptr->initializer_names.insert(reshape_ip_name);
-        node_inputs[1] = reshape_ip_name; //Replace correct new_shape tensor(created from attributes)
-      }
+      std::string reshape_ip_name = node_name + "_ip";
+
+      // Before adding Reshape's shape tensor, remove the initializer added before in initializer parsing.
+      graph_ptr->remove_initializer_tensor(node_inputs[1]);
+      graph_ptr->initializer_names.erase(node_inputs[1]);
+
+      // Adding Reshape input to avoid TFLite Int32 - ONNX expected Int64 datatype issue.
+      std::vector<int64_t> tensor_vec(reshape_params->num_dimensions, 0);
+      for(int i=0; i<reshape_params->num_dimensions; i++)
+          tensor_vec[i] = reshape_params->shape[i];
+      ::metawarenn::Tensor reshape_tensor(reshape_ip_name, std::vector<int>({tensor_vec.size()}), ::metawarenn::ElementType::element_type::int64_, tensor_vec);
+      graph_ptr->set_graph_initializers(reshape_tensor);
+      graph_ptr->initializer_names.insert(reshape_ip_name);
+      node_inputs[1] = reshape_ip_name; //Replace correct new_shape tensor(created from attributes)
     }
     else if (op_type == kTfLiteBuiltinSoftmax) {
       node_op_type = "Softmax";
