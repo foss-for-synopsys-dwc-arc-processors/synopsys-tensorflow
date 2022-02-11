@@ -46,6 +46,11 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
       input_shape_range_[name][i] = std::make_pair(INT_MAX, INT_MIN);
     }
   }
+
+  metawarenn::Logger* logger = inference_builder_->GetLogger();
+  // Set Required LogLevel (DEBUG, INFO, WARNING, ERROR) in below line to change the Default INFO level
+  logger->SetLogLevel(metawarenn::LogLevel::DEBUG);
+
   builder_config_ = inference_builder_->CreateBuilderConfig();
 
   inference_builder_->FillGraphDesc(graph_);
