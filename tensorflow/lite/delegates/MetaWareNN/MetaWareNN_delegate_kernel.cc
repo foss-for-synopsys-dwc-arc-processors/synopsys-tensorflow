@@ -47,9 +47,15 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
     }
   }
   builder_config_ = inference_builder_->CreateBuilderConfig();
+
+  inference_builder_->FillGraphDesc(graph_);
+
+  // Create ExecutableGraph from MWNNGraph
+  exe_graph_ = inference_builder_->CacheOrCreateExeGraph(graph_, graph_->get_name(), false);
+
   // dynamic_shape_ - yet to verify the flow
   if(!dynamic_shape_) {
-    inference_engine_ = inference_builder_->CreateInferenceEngine(graph_, builder_config_, false);
+    inference_engine_ = inference_builder_->CreateInferenceEngine(exe_graph_, builder_config_, false);
     inference_engine_->SerializeToFile();
     execution_context_ = inference_engine_->CreateExecutionContext();
   }
@@ -126,7 +132,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
   if (dynamic_shape_) {
     std::cout << "\n Creating Engine, Context for Dynamic Input shapes";
     builder_config_->AddOptimizationProfile(optimization_profile_);
-    inference_engine_ = inference_builder_->CreateInferenceEngine(graph_, builder_config_, update_engine);
+    inference_engine_ = inference_builder_->CreateInferenceEngine(exe_graph_, builder_config_, update_engine);
     auto graph_desc = inference_engine_->GetGraphDesc();
     const auto tensor_index = node->inputs->data[0];
     TfLiteTensor* tensor = &context->tensors[tensor_index];

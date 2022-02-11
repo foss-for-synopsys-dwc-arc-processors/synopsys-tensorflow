@@ -35,6 +35,7 @@ class MetaWareNNDelegateKernel {
   std::shared_ptr<metawarenn::OptimizationProfile> optimization_profile_ = nullptr;
   std::shared_ptr<metawarenn::BuilderConfig> builder_config_;
   std::shared_ptr<metawarenn::Builder> inference_builder_ = std::make_shared<metawarenn::Builder>();
+  std::shared_ptr<metawarenn::ExecutableGraph> exe_graph_;
   std::shared_ptr<metawarenn::InferenceEngine> inference_engine_;
   std::shared_ptr<metawarenn::ExecutionContext> execution_context_;
   std::unordered_map<std::string, std::unordered_map<size_t, std::pair<int64_t, int64_t>>> input_shape_range_;
