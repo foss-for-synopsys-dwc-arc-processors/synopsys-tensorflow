@@ -100,9 +100,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     if (tensor->allocation_type == kTfLiteArenaRw && tensor->data.f != nullptr) { //Input - Data
       graph_inputs[tensor->name] = tensor->data.f;
     }
-    else if(tensor->allocation_type == kTfLiteMmapRo && tensor->data.f != nullptr) { //Weights, Biases etc.,
-      graph_inputs[tensor->name] = tensor->data.f;
-    }
+
     //If graph input contains dynamic shape then get the size at runtime & fill the optimization profile attributes
     if(dynamic_shape_) {
       if(input_shape_range_.find(tensor->name) != input_shape_range_.end()) {
@@ -159,14 +157,26 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
   std::cout << "\n In MWNN Kernel Invoke : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
 
   auto graph_desc = inference_engine_->GetGraphDesc();
-  std::string ip_name = graph_desc.input_desc[0].tensor_name;
-  std::string op_name = graph_desc.output_desc[0].tensor_name;
-  std::cout << "\n Ip_name : " << ip_name << "\t Size : " << graph_desc.input_desc[0].size;
-  std::cout << "\n Op_name : " << op_name << "\t Size : " << graph_desc.output_desc[0].size;
 
-  execution_context_->CopyInputToDevice(graph_inputs[ip_name], graph_desc.input_desc[0].size);
+  std::vector<float*> ip_tensors(graph_desc.input_desc.size());
+  std::vector<uint32_t> ip_sizes(graph_desc.input_desc.size());
+  std::vector<float*> op_tensors(graph_desc.output_desc.size());
+  std::vector<uint32_t> op_sizes(graph_desc.output_desc.size());
+
+  for(int ip = 0; ip < graph_desc.input_desc.size(); ip++) {
+    std::string ip_name = graph_desc.input_desc[ip].tensor_name;
+    ip_tensors[ip] = graph_inputs[ip_name];
+    ip_sizes[ip] = graph_desc.input_desc[ip].size;
+  }
+
+  for(int op = 0; op < graph_desc.output_desc.size(); op++) {
+    std::string op_name = graph_desc.output_desc[op].tensor_name;
+    op_tensors[op] = graph_outputs[op_name];
+    op_sizes[op] = graph_desc.output_desc[op].size;
+  }
+  execution_context_->CopyInputToDevice(ip_tensors, ip_sizes);
   execution_context_->Execute();
-  execution_context_->CopyOutputFromDevice(graph_outputs[op_name], graph_desc.output_desc[0].size);
+  execution_context_->CopyOutputFromDevice(op_tensors, op_sizes);
   #endif
 
     // ******************************************* Call to invoke the local run function *****************************************
