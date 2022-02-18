@@ -31,14 +31,14 @@ void ModelBuilder::CreateMWNNQuantParams(std::shared_ptr<::metawarenn::Graph> gr
   std::vector<float> tensor_vec_scale = {tensor.params.scale};
   ::metawarenn::Tensor scale_tensor(scale_name, std::vector<int>({tensor_vec_scale.size()}), ::metawarenn::Element::ElementType::kFloat, tensor_vec_scale);
   graph_ptr_->set_graph_initializers(scale_tensor);
-  graph_ptr_->initializer_names.insert(scale_name);
+  graph_ptr_->initializer_names_.insert(scale_name);
 
   std::string zp_name = tensor.name + std::string("_zero_point");
   std::vector<int32_t> tensor_vec_zp = {tensor.params.zero_point};
   std::cout << "\n get_mwnn_type_tf(tensor.type): " << (int)get_mwnn_type_tf(tensor.type);
   ::metawarenn::Tensor zp_tensor(zp_name, std::vector<int>({tensor_vec_zp.size()}), get_mwnn_type_tf(tensor.type), tensor_vec_zp);
   graph_ptr_->set_graph_initializers(zp_tensor);
-  graph_ptr_->initializer_names.insert(zp_name);
+  graph_ptr_->initializer_names_.insert(zp_name);
 }
 
 template<class T>
@@ -61,7 +61,7 @@ void ModelBuilder::parse_input(TfLiteTensor input_tensor, std::shared_ptr<::meta
     }
     ::metawarenn::Tensor m_tensor(input_tensor.name, dims_vec, get_mwnn_type_tf(input_tensor.type), tensor_vec);
     graph_ptr->set_graph_initializers(m_tensor);
-    graph_ptr->initializer_names.insert(input_tensor.name);
+    graph_ptr->initializer_names_.insert(input_tensor.name);
   }
 }
 
@@ -494,7 +494,7 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
 
       ::metawarenn::Tensor reshape_tensor(reshape_ip_name, std::vector<int>({tensor_vec.size()}), ::metawarenn::Element::ElementType::kInt64, tensor_vec);
       graph_ptr->set_graph_initializers(reshape_tensor);
-      graph_ptr->initializer_names.insert(reshape_ip_name);
+      graph_ptr->initializer_names_.insert(reshape_ip_name);
 
       reshape_node_inputs.emplace_back(node_inputs[0]);
       reshape_node_inputs.emplace_back(reshape_ip_name);
@@ -558,7 +558,7 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
 
       ::metawarenn::Tensor pad_ip_tensor(pad_ip_name, dims, ::metawarenn::Element::ElementType::kInt64, new_tensor_vec);
       graph_ptr->set_graph_initializers(pad_ip_tensor);
-      graph_ptr->initializer_names.insert(pad_ip_name);
+      graph_ptr->initializer_names_.insert(pad_ip_name);
       node_inputs[1] = pad_ip_name;
     }
     else if (op_type == kTfLiteBuiltinStridedSlice) {
@@ -591,7 +591,7 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
 
       ::metawarenn::Tensor begin_tensor_ip(begin_ip_name, std::vector<int>({begin_tensor_vec.size()}), ::metawarenn::Element::ElementType::kInt64, begin_tensor_vec);
       graph_ptr->set_graph_initializers(begin_tensor_ip);
-      graph_ptr->initializer_names.insert(begin_ip_name);
+      graph_ptr->initializer_names_.insert(begin_ip_name);
       node_inputs[1] = begin_ip_name; //Replace the existing unordered(HWC) float data with CHW int data
 
       //End Tensor Input
@@ -608,7 +608,7 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
 
       ::metawarenn::Tensor end_tensor_ip(end_ip_name, std::vector<int>({end_tensor_vec.size()}), ::metawarenn::Element::ElementType::kInt64, end_tensor_vec);
       graph_ptr->set_graph_initializers(end_tensor_ip);
-      graph_ptr->initializer_names.insert(end_ip_name);
+      graph_ptr->initializer_names_.insert(end_ip_name);
       node_inputs[2] = end_ip_name; //Replace the existing unordered(HWC) float data with CHW int data
     }
     else if (op_type == kTfLiteBuiltinSqueeze) {
@@ -622,7 +622,7 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
 
       ::metawarenn::Tensor squeeze_tensor(squeeze_ip_name, std::vector<int>({tensor_vec.size()}), ::metawarenn::Element::ElementType::kInt64, tensor_vec);
       graph_ptr->set_graph_initializers(squeeze_tensor);
-      graph_ptr->initializer_names.insert(squeeze_ip_name);
+      graph_ptr->initializer_names_.insert(squeeze_ip_name);
       node_inputs.emplace_back(squeeze_ip_name); //Add Axes Input Tensor
     }
     else if (op_type == kTfLiteBuiltinReshape) {
@@ -633,7 +633,7 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
 
       // Before adding Reshape's shape tensor, remove the initializer added before in initializer parsing.
       graph_ptr->remove_initializer_tensor(node_inputs[1]);
-      graph_ptr->initializer_names.erase(node_inputs[1]);
+      graph_ptr->initializer_names_.erase(node_inputs[1]);
 
       // Adding Reshape input to avoid TFLite Int32 - ONNX expected Int64 datatype issue.
       std::vector<int64_t> tensor_vec(reshape_params->num_dimensions, 0);
@@ -641,7 +641,7 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
           tensor_vec[i] = reshape_params->shape[i];
       ::metawarenn::Tensor reshape_tensor(reshape_ip_name, std::vector<int>({tensor_vec.size()}), ::metawarenn::Element::ElementType::kInt64, tensor_vec);
       graph_ptr->set_graph_initializers(reshape_tensor);
-      graph_ptr->initializer_names.insert(reshape_ip_name);
+      graph_ptr->initializer_names_.insert(reshape_ip_name);
       node_inputs[1] = reshape_ip_name; //Replace correct new_shape tensor(created from attributes)
     }
     else if (op_type == kTfLiteBuiltinSoftmax) {
@@ -856,13 +856,13 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(TfLiteContext* con
         std::string clip_ip_min = activation_node_name + "_min";
         ::metawarenn::Tensor min_tensor(clip_ip_min, std::vector<int>({1}), ::metawarenn::Element::ElementType::kFloat, std::vector<float>({0}));
         graph_ptr->set_graph_initializers(min_tensor);
-        graph_ptr->initializer_names.insert(clip_ip_min);
+        graph_ptr->initializer_names_.insert(clip_ip_min);
         activation_node_inputs.emplace_back(clip_ip_min);
 
         std::string clip_ip_max = activation_node_name + "_max";
         ::metawarenn::Tensor max_tensor(clip_ip_max, std::vector<int>({1}), ::metawarenn::Element::ElementType::kFloat, std::vector<float>({6}));
         graph_ptr->set_graph_initializers(max_tensor);
-        graph_ptr->initializer_names.insert(clip_ip_max);
+        graph_ptr->initializer_names_.insert(clip_ip_max);
         activation_node_inputs.emplace_back(clip_ip_max);
       }
         CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, node_inputs, node_outputs);
@@ -954,7 +954,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
   auto graph_ip_names = graph->get_graph_ip_names();
   for (auto g_n : graph->get_graph_nodes()) {
     for (auto n_ip : g_n.get_inputs()) {
-      if(!(graph->initializer_names.count(n_ip)) && !(std::count(graph_ip_names.begin(), graph_ip_names.end(), n_ip))) {
+      if(!(graph->initializer_names_.count(n_ip)) && !(std::count(graph_ip_names.begin(), graph_ip_names.end(), n_ip))) {
         if (graph->get_node_producers().count(n_ip)) {
           graph->set_node_consumer(n_ip, g_n.get_name());
         }

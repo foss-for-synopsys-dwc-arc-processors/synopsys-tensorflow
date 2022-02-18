@@ -33,8 +33,8 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
     graph_prepared_ = true;
   }
   std::cout << "\n In MWNN Kernel Prepare : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
-  #if !EXECUTABLE_GRAPH_SERIALIZATION
-  write_onnx_proto(graph_);
+  #if !INFERENCE_ENGINE
+  WriteONNXProto(graph_);
   #endif
 
   #if INFERENCE_ENGINE
@@ -65,6 +65,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
     inference_engine_ = inference_builder_->CreateInferenceEngine(exe_graph_, builder_config_, false);
     inference_engine_->SerializeToFile();
     execution_context_ = inference_engine_->CreateExecutionContext();
+    execution_context_->PrintDeviceInformation();
   }
   #endif
   return kTfLiteOk;
@@ -179,6 +180,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
   execution_context_->CopyInputToDevice(ip_tensors, ip_sizes);
   execution_context_->Execute();
   execution_context_->CopyOutputFromDevice(op_tensors, op_sizes);
+  execution_context_->PrintDeviceInformation();
   #endif
 
     // ******************************************* Call to invoke the local run function *****************************************
