@@ -16,6 +16,17 @@ int main(int argc, char* argv[]){
         printf("Failed to mmap model\n");
         exit(0);
     }
+    
+    char* char_path = const_cast<char*>(model_path);
+    char* model_name = strtok(char_path, "/");
+    std::string final_name = "";
+    while (model_name != NULL) {
+      final_name = std::string(model_name);
+      model_name = strtok(NULL, "/");
+    }
+    std::string modelname="MODELNAME="+final_name;
+    // Set the MODELNAME Environmental variable
+    putenv(const_cast<char*>(modelname.c_str()));
 
     tflite::ops::builtin::BuiltinOpResolver resolver;
     std::unique_ptr<tflite::Interpreter> interpreter;

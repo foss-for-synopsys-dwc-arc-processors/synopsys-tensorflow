@@ -10,7 +10,6 @@
 #include "metawarenn_lib/metawarenn_tensor.h"
 #include "metawarenn_lib/metawarenn_node.h"
 #include "metawarenn_lib/metawarenn_attribute.h"
-#include "metawarenn_lib/metawarenn_utils.h"
 #include "metawarenn_lib/metawarenn_element.h"
 
 #include "metawarenn_lib/optimizer/pass_manager.h"
@@ -50,34 +49,34 @@ class ModelBuilder {
   template<class T>
   void parse_input(TfLiteTensor input_tensor, std::shared_ptr<::metawarenn::Graph> graph_ptr);
 
-  static ::metawarenn::ElementType::element_type get_mwnn_type_tf(int tf_type) {
+  static ::metawarenn::Element::ElementType get_mwnn_type_tf(int tf_type) {
       switch (tf_type) {
           case kTfLiteBool:
-              return ::metawarenn::ElementType::element_type::boolean_;
+              return ::metawarenn::Element::ElementType::kBoolean;
           case kTfLiteFloat64:
-              return ::metawarenn::ElementType::element_type::double_;
+              return ::metawarenn::Element::ElementType::kDouble;
           case kTfLiteFloat16:
-              return ::metawarenn::ElementType::element_type::float16_;
+              return ::metawarenn::Element::ElementType::kFloat16;
           case kTfLiteFloat32:
-              return ::metawarenn::ElementType::element_type::float_;
+              return ::metawarenn::Element::ElementType::kFloat;
           case kTfLiteInt8:
-              return ::metawarenn::ElementType::element_type::int8_;
+              return ::metawarenn::Element::ElementType::kInt8;
           case kTfLiteInt16:
-              return ::metawarenn::ElementType::element_type::int16_;
+              return ::metawarenn::Element::ElementType::kInt16;
           case kTfLiteInt32:
-              return ::metawarenn::ElementType::element_type::int32_;
+              return ::metawarenn::Element::ElementType::kInt32;
           case kTfLiteInt64:
-              return ::metawarenn::ElementType::element_type::int64_;
+              return ::metawarenn::Element::ElementType::kInt64;
           case kTfLiteUInt8:
-              return ::metawarenn::ElementType::element_type::uint8_;
+              return ::metawarenn::Element::ElementType::kUint8;
           case kTfLiteNoType:
-              return ::metawarenn::ElementType::element_type::dynamic_;
+              return ::metawarenn::Element::ElementType::kDynamic;
           case kTfLiteString:
-              return ::metawarenn::ElementType::element_type::string_;
+              return ::metawarenn::Element::ElementType::kString;
           case kTfLiteComplex64:
-              return ::metawarenn::ElementType::element_type::complex64_;
+              return ::metawarenn::Element::ElementType::kComplex64;
           default:
-              return ::metawarenn::ElementType::element_type::dynamic_;
+              return ::metawarenn::Element::ElementType::kDynamic;
       }
   }
 

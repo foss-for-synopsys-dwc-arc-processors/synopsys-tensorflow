@@ -79,7 +79,7 @@ bool IsNodeSupportedByMetaWareNN(const TfLiteRegistration* registration,
     case kTfLiteBuiltinAdd:
     case kTfLiteBuiltinConv2d:
     case kTfLiteBuiltinDepthwiseConv2d:
-    //case kTfLiteBuiltinAveragePool2d:
+    case kTfLiteBuiltinAveragePool2d:
     case kTfLiteBuiltinMaxPool2d:
     case kTfLiteBuiltinMul:
     case kTfLiteBuiltinConcatenation:

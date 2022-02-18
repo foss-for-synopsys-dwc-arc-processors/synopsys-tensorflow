@@ -19,7 +19,9 @@ TfLiteStatus MetaWareNNDelegateKernel::Init(TfLiteContext* context,
   model_builder_ = std::unique_ptr<delegates::metawarenn::ModelBuilder>
                    (new delegates::metawarenn::ModelBuilder(nodes_));
   subgraph_counter_++;
-  std::string subgraph_name = "MetaWareNN_" + std::to_string(subgraph_counter_);
+  char* bin_path = getenv("MODELNAME");
+  std::string subgraph_name = "MetaWareNN_" + std::to_string(subgraph_counter_) 
+                               + "_" + std::string(bin_path);
   graph_ = model_builder_->BuildGraph(context, subgraph_name);
   return kTfLiteOk;
 }
@@ -134,7 +136,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
 
   if (dynamic_shape_) {
     std::cout << "\n Creating Engine, Context for Dynamic Input shapes";
-    builder_config_->AddOptimizationProfile(optimization_profile_);
+    builder_config_->add_optimization_profile(optimization_profile_);
     inference_engine_ = inference_builder_->CreateInferenceEngine(exe_graph_, builder_config_, update_engine);
     auto graph_desc = inference_engine_->GetGraphDesc();
     const auto tensor_index = node->inputs->data[0];
