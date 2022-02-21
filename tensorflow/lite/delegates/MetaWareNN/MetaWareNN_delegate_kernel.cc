@@ -122,7 +122,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
             }
           }
         }
-        optimization_profile_->SetInputDimensions(tensor->name, ip_shape_range_);
+        optimization_profile_->set_input_dimensions(tensor->name, ip_shape_range_);
       }
     }
   }
@@ -139,7 +139,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
     std::cout << "\n Creating Engine, Context for Dynamic Input shapes";
     builder_config_->add_optimization_profile(optimization_profile_);
     inference_engine_ = inference_builder_->CreateInferenceEngine(exe_graph_, builder_config_, update_engine);
-    auto graph_desc = inference_engine_->GetGraphDesc();
+    auto graph_desc = inference_engine_->get_graph_desc();
     const auto tensor_index = node->inputs->data[0];
     TfLiteTensor* tensor = &context->tensors[tensor_index];
     std::vector<int> tensor_shapes(tensor->dims->data, tensor->dims->data + tensor->dims->size);
@@ -150,8 +150,8 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
       size = size * dim;
     }
 
-    graph_desc.UpdateInputDesc(0, size * sizeof(::metawarenn::data_type));
-    inference_engine_->SetGraphDesc(graph_desc);
+    graph_desc.UpdateInputDesc(0, size * sizeof(::metawarenn::DataType));
+    inference_engine_->set_graph_desc(graph_desc);
 
     inference_engine_->SerializeToFile();
     execution_context_ = inference_engine_->CreateExecutionContext();
@@ -159,7 +159,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
 
   std::cout << "\n In MWNN Kernel Invoke : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
 
-  auto graph_desc = inference_engine_->GetGraphDesc();
+  auto graph_desc = inference_engine_->get_graph_desc();
 
   std::vector<float*> ip_tensors(graph_desc.input_desc.size());
   std::vector<uint32_t> ip_sizes(graph_desc.input_desc.size());
