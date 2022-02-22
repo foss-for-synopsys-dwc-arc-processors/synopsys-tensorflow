@@ -50,8 +50,8 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
   }
 
   metawarenn::Logger* logger = inference_builder_->GetLogger();
-  // Set Required LogLevel (DEBUG, INFO, WARNING, ERROR) in below line to change the Default INFO level
-  logger->SetLogLevel(metawarenn::LogLevel::DEBUG);
+  // Set Required LogLevel (kInfo, kDebug, kWarning, kError) in below line to change the Default kInfo level
+  logger->set_log_level(metawarenn::LogLevel::kDebug);
 
   builder_config_ = inference_builder_->CreateBuilderConfig();
 
