@@ -11,6 +11,7 @@ using namespace std;
 int main(int argc, char* argv[]){
 
     const char* model_path = argv[1];
+    std::string data_type = argv[2];
     std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(model_path);
     if(!model){
         printf("Failed to mmap model\n");
@@ -45,19 +46,27 @@ int main(int argc, char* argv[]){
     TfLiteIntArray* output_dims = interpreter->tensor(out)->dims;
     auto output_size = output_dims->data[output_dims->size - 1];
     FILE *fp;
-    fp = fopen("input_float_purse.bin", "rb");
 
-    float* passing_input = interpreter->typed_input_tensor<float>(0);
 
-    float* input=(float*)malloc(sizeof(float)*224*224*3);
-    fread(input, 224*224*3, sizeof(float), fp);
-
-    for (int i = 0; i < 224*224*3; i++)
-    {
-      //*passing_input = input[i];
-      //passing_input++;
-      passing_input[i] = 125.8;
+    if (data_type == "float") {
+      // Uncomment to read float input from binary file
+      //fp = fopen("input_float_purse.bin", "rb");
+      //float* input=(float*)malloc(sizeof(float)*224*224*3);
+      //fread(input, 224*224*3, sizeof(float), fp);
+      float* passing_input = interpreter->typed_input_tensor<float>(0);
+      for (int i = 0; i < 224*224*3; i++) {
+        //*passing_input = input[i];
+        //passing_input++;
+        passing_input[i] = 125.8;
+      }
     }
+    else if (data_type == "uint8_t") {
+      uint8_t* passing_input = interpreter->typed_input_tensor<uint8_t>(0);
+      for (int i = 0; i < 224*224*3; i++) {
+        passing_input[i] = 125;
+      }
+    }
+
     interpreter->Invoke();
     float* output = interpreter->typed_output_tensor<float>(0);
     vector<pair<float, int> > vp;

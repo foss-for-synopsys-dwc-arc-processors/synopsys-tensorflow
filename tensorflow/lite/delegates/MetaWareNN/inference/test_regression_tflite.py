@@ -28,7 +28,7 @@ for line in f:
   if(not(os.path.exists(model_path))):
     print("Please check the model path")
     exit(1)
-  subprocess.run(["./inference", model_path])
+  subprocess.run(["./inference", model_path, "float"])
   gen_model_name = op_dump_folder + "/model_" + str(model_name.split("/")[-1]).split(".tflite")[0] + ".onnx"
   os.rename("model.onnx", gen_model_name)
 

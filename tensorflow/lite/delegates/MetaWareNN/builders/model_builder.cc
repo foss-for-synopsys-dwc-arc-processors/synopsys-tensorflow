@@ -897,7 +897,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
             for (auto dim : g_t.get_dims())
               std::cout << dim << ",";*/
             ::metawarenn::optimizer::ConvertLayout cl(graph, g_t, 0, HWC_TO_CHW, 0, true);
-            manager.register_pass(cl);
+            manager.RegisterPass(cl);
           }
         }
       }
@@ -911,7 +911,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
                 for (auto dim : g_t.get_dims())
                   std::cout << dim << ",";
                 ::metawarenn::optimizer::ExpandDimension ed(graph, g_t);
-                manager.register_pass(ed);
+                manager.RegisterPass(ed);
               }
             }
           }
@@ -927,7 +927,7 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
         for (auto dim : g_t.get_dims())
           std::cout << dim << ",";*/
         ::metawarenn::optimizer::ConvertLayout cl(graph, g_t, 0, HWC_TO_CHW, 0, false);
-        manager.register_pass(cl);
+        manager.RegisterPass(cl);
       }
     }
   }
@@ -938,18 +938,18 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(std::shared_ptr<::metawarenn::Graph
     if(g_n.get_op_type() == "Reshape") {
       ::metawarenn::optimizer::RemoveReshape rr(graph, g_n);
       std::cout << "\n MetaWareNNCC : " << rr.get_name();
-      manager.register_pass(rr);
+      manager.RegisterPass(rr);
     }
     else if(g_n.get_op_type() == "Relu") {
       // This should be done in shared (tflite,onnxruntime,tvm,glow) MWNN Graph
       ::metawarenn::optimizer::FuseRelu fr(graph, g_n);
       std::cout << "\n MetaWareNNCC : " << fr.get_name();
-      manager.register_pass(fr);
+      manager.RegisterPass(fr);
     }*/
   }
   /*::metawarenn::optimizer::CalculateOffset co(graph);
-  manager.register_pass(co);*/
-  manager.run_passes();
+  manager.RegisterPass(co);*/
+  manager.RunPasses();
 
   auto graph_ip_names = graph->get_graph_ip_names();
   for (auto g_n : graph->get_graph_nodes()) {

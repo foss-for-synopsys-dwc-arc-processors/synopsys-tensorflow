@@ -11,7 +11,7 @@
 namespace tflite {
 
 TfLiteStatus MetaWareNNDelegateKernel::Init(TfLiteContext* context,
-                                         const TfLiteDelegateParams* params) {
+                                            const TfLiteDelegateParams* params) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Init!!"<<std::endl;
   for (auto node_index : TfLiteIntArrayView(params->nodes_to_replace)) {
     nodes_.push_back(node_index);
@@ -27,7 +27,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Init(TfLiteContext* context,
 }
 
 TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
-                                           TfLiteNode* node) {
+                                               TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Prepare!!"<<std::endl;
   if(model_builder_->MetaWareNNCompile(graph_)) {
     graph_prepared_ = true;
@@ -72,7 +72,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
 }
 
 TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
-                                           TfLiteNode* node) {
+                                              TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Invoke!!!"<<std::endl;
   int is_HWC = HWC_TO_CHW ? 0 : 1;
 
@@ -150,7 +150,7 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
       size = size * dim;
     }
 
-    graph_desc.UpdateInputDesc(0, size * sizeof(::metawarenn::DataType));
+    graph_desc.UpdateInputDesc(0, size);
     inference_engine_->set_graph_desc(graph_desc);
 
     inference_engine_->SerializeToFile();
@@ -160,27 +160,35 @@ TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
   std::cout << "\n In MWNN Kernel Invoke : " << graph_->get_graph_nodes().size() << "  Graph Name : " << graph_->get_name();
 
   auto graph_desc = inference_engine_->get_graph_desc();
+  int batchsize = 1;
+  for(int i = 0; i < batchsize; i++) {
+    std::vector<float*> ip_tensors(graph_desc.input_desc.size());
+    std::vector<uint32_t> ip_sizes(graph_desc.input_desc.size());
+    std::vector<float*> op_tensors(graph_desc.output_desc.size());
+    std::vector<uint32_t> op_sizes(graph_desc.output_desc.size());
 
-  std::vector<float*> ip_tensors(graph_desc.input_desc.size());
-  std::vector<uint32_t> ip_sizes(graph_desc.input_desc.size());
-  std::vector<float*> op_tensors(graph_desc.output_desc.size());
-  std::vector<uint32_t> op_sizes(graph_desc.output_desc.size());
+    for(int ip = 0; ip < graph_desc.input_desc.size(); ip++) {
+      std::string ip_name = graph_desc.input_desc[ip].tensor_name;
+      std::cout << "\n Ip_name : " << ip_name << "Size : " << graph_desc.input_desc[ip].size;
+      int ip_index_offset = i * (graph_desc.input_desc[ip].size / graph_desc.GetDTypeSize(graph_desc.input_desc[ip].dtype));
+      std::cout << "\n ip_index_offset  : " << ip_index_offset;
+      ip_tensors[ip] = graph_inputs[ip_name] + ip_index_offset;
+      ip_sizes[ip] = graph_desc.input_desc[ip].size;
+    }
 
-  for(int ip = 0; ip < graph_desc.input_desc.size(); ip++) {
-    std::string ip_name = graph_desc.input_desc[ip].tensor_name;
-    ip_tensors[ip] = graph_inputs[ip_name];
-    ip_sizes[ip] = graph_desc.input_desc[ip].size;
+    for(int op = 0; op < graph_desc.output_desc.size(); op++) {
+      std::string op_name = graph_desc.output_desc[op].tensor_name;
+      std::cout << "\n Op_name : " << op_name << "Size : " << graph_desc.output_desc[op].size;
+      int op_index_offset = i * (graph_desc.output_desc[op].size / graph_desc.GetDTypeSize(graph_desc.output_desc[op].dtype));
+      std::cout << "\n op_index_offset  : " << op_index_offset;
+      op_tensors[op] = graph_outputs[op_name] + op_index_offset;
+      op_sizes[op] = graph_desc.output_desc[op].size;
+    }
+    execution_context_->CopyInputToDevice(ip_tensors, ip_sizes);
+    execution_context_->Execute();
+    execution_context_->CopyOutputFromDevice(op_tensors, op_sizes);
+    execution_context_->PrintDeviceInformation();
   }
-
-  for(int op = 0; op < graph_desc.output_desc.size(); op++) {
-    std::string op_name = graph_desc.output_desc[op].tensor_name;
-    op_tensors[op] = graph_outputs[op_name];
-    op_sizes[op] = graph_desc.output_desc[op].size;
-  }
-  execution_context_->CopyInputToDevice(ip_tensors, ip_sizes);
-  execution_context_->Execute();
-  execution_context_->CopyOutputFromDevice(op_tensors, op_sizes);
-  execution_context_->PrintDeviceInformation();
   #endif
 
     // ******************************************* Call to invoke the local run function *****************************************

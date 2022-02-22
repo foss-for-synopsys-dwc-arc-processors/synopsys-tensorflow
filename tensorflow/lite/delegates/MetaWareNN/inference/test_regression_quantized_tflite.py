@@ -33,10 +33,9 @@ for line in f:
   if(not(os.path.exists(model_path))):
     print("Please check the model path")
     exit(1)
-  subprocess.run(["./inference", model_path])
+  subprocess.run(["./inference", model_path, "uint8_t"])
   gen_model_name = op_dump_folder + "/model_" + str(model_name.split("/")[-1]).split(".tflite")[0] + ".onnx"
   os.rename("model.onnx", gen_model_name)
-
 #======================================================================================================
   interpreter = tf.lite.Interpreter(model_path=model_path)
   interpreter.allocate_tensors()
@@ -57,7 +56,6 @@ for line in f:
 
   interpreter.set_tensor(input_details[0]['index'], input_data)
   interpreter.invoke()
-
   # The function `get_tensor()` returns a copy of the tensor data.
   # Use `tensor()` in order to get a pointer to the tensor.
   output_data = interpreter.get_tensor(output_details[0]['index'])
