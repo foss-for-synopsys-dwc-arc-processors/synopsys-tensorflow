@@ -9,7 +9,8 @@ struct TfLiteMetaWareNNDelegateOptions {
   int min_nodes_per_partition;
 };
 
-TfLiteDelegate* TfLiteMetaWareNNDelegateCreate(const TfLiteMetaWareNNDelegateOptions* options);
+TfLiteDelegate* TfLiteMetaWareNNDelegateCreate(
+    const TfLiteMetaWareNNDelegateOptions* options);
 void TfLiteMetaWareNNDelegateDelete(TfLiteDelegate* delegate);
 
 #endif // TENSORFLOW_LITE_DELEGATES_METAWARENN_METAWARENN_DELEGATE_H_

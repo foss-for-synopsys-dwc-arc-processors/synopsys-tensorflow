@@ -14,7 +14,8 @@ namespace tflite {
 namespace {
 
 TfLiteRegistration GetMetaWareNNKernelRegistration() {
-  std::cout<<"\nInside GetMetaWareNNKernelRegistration"<<std::endl;
+  std::cout << "\nInside GetMetaWareNNKernelRegistration" << std::endl;
+
   TfLiteRegistration kernel_registration;
   kernel_registration.profiling_string = nullptr;
   kernel_registration.builtin_code = kTfLiteBuiltinDelegate;
@@ -44,6 +45,7 @@ TfLiteRegistration GetMetaWareNNKernelRegistration() {
     }
     return kernel->Invoke(context, node);
   };
+
   kernel_registration.prepare = [](TfLiteContext* context,
                                    TfLiteNode* node) -> TfLiteStatus {
     if (node->user_data == nullptr) {
@@ -73,8 +75,9 @@ class MetaWareNNDelegate: public TfLiteDelegate {
   TfLiteMetaWareNNDelegateOptions params_;
 };
 
-bool IsNodeSupportedByMetaWareNN(const TfLiteRegistration* registration,
-                              const TfLiteNode* node, TfLiteContext* context){
+bool IsNodeSupportedByMetaWareNN(const TfLiteRegistration* registration, 
+                                 const TfLiteNode* node, 
+                                 TfLiteContext* context) {
   switch (registration->builtin_code) {
     case kTfLiteBuiltinAdd:
     case kTfLiteBuiltinConv2d:
@@ -105,12 +108,12 @@ bool IsNodeSupportedByMetaWareNN(const TfLiteRegistration* registration,
     case kTfLiteBuiltinSpaceToBatchNd:
     case kTfLiteBuiltinDequantize:
       return true;
-      //std::cout<< "\nWarning in MetaWareNN_delegate.cc: currently only support dequantizing float16->float32\n";
-    default:
-      std::cout<< "\nMetaWareNN unsupported node enum: " << registration->builtin_code;
+    default: {
+      std::cout << "\nMetaWareNN unsupported node enum: " << 
+                   registration->builtin_code;
       return false;
+    }
   }
-  return false;
 }
 
 TfLiteStatus DelegatePrepare(TfLiteContext* context, TfLiteDelegate* delegate) {
@@ -121,14 +124,16 @@ TfLiteStatus DelegatePrepare(TfLiteContext* context, TfLiteDelegate* delegate) {
           std::string* unsupported_details) -> bool {
     return IsNodeSupportedByMetaWareNN(registration, node, context);
   };
+
   delegates::GraphPartitionHelper helper(context, node_supported_fn);
   TF_LITE_ENSURE_STATUS(helper.Partition(nullptr));
 
   TfLiteMetaWareNNDelegateOptions* params =
       static_cast<TfLiteMetaWareNNDelegateOptions*>(delegate->data_);
 
-  if (params->max_delegated_partitions <= 0)
+  if (params->max_delegated_partitions <= 0) {
     params->max_delegated_partitions = std::numeric_limits<int>::max();
+  }
 
   std::vector<int> supported_nodes = helper.GetNodesOfFirstNLargestPartitions(
       params->max_delegated_partitions, params->min_nodes_per_partition);

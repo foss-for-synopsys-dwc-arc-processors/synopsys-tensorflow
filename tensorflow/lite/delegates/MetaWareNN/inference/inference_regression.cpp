@@ -17,11 +17,13 @@ int main(){
   {
     while(getline(myfile, line))
     {
-      std::cout << "\n\n\n===============================================================================================================================\n";
-      string tflite_model_path = model_directory + std::string("/tflite_models/");
+      std::cout << "\n\n\n==================================================\n";
+      string tflite_model_path = model_directory + 
+                                 std::string("/tflite_models/");
       tflite_model_path.append(line);
       std::cout << "\nModel: " << tflite_model_path;
-      std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(tflite_model_path.c_str());
+      std::unique_ptr<tflite::FlatBufferModel> model = 
+          tflite::FlatBufferModel::BuildFromFile(tflite_model_path.c_str());
       if(!model){
           printf("Failed to mmap model\n");
           exit(0);
@@ -34,7 +36,9 @@ int main(){
       TfLiteMetaWareNNDelegateOptions* options = nullptr;
       // NEW: Prepare MetaWareNN delegate.
       auto* delegate = TfLiteMetaWareNNDelegateCreate(options);
-      if (interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) return false;
+      if (interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) {
+        return false;
+      }
       // Resize input tensors, if desired.
       interpreter->AllocateTensors();
 
@@ -42,25 +46,21 @@ int main(){
       TfLiteIntArray* input_dims = interpreter->tensor(in)->dims;
       int img_size = 1;
       std::cout << "\nImage dimension: ";
-      for(int i = 0; i < input_dims->size; i++)
-      {
+      for(int i = 0; i < input_dims->size; i++) {
           img_size = img_size * input_dims->data[i];
           std::cout << input_dims->data[i] << ",";
       }
       int out = interpreter->outputs()[0];
-
       TfLiteIntArray* output_dims = interpreter->tensor(out)->dims;
       auto output_size = output_dims->data[output_dims->size - 1];
       FILE *fp;
       fp = fopen("input_float_purse.bin", "rb");
-
       float* passing_input = interpreter->typed_input_tensor<float>(0);
 
       float* input=(float*)malloc(sizeof(float)*img_size);
       //fread(input, 224*224*3, sizeof(float), fp);
 
-      for (int i = 0; i < img_size; i++)
-      {
+      for (int i = 0; i < img_size; i++) {
         //*passing_input = input[i];
         //passing_input++;
         passing_input[i] = 125.8;
@@ -75,12 +75,9 @@ int main(){
         vp.push_back(make_pair(output[i], i));
       }
       sort(vp.begin(), vp.end());
-
-      for (int i = 1000; i >= 1000-10; i--)
-      {
+      for (int i = 1000; i >= 1000-10; i--) {
         printf("\n %f -- %d", vp[i].first, vp[i].second);
       }
-
     }
     myfile.close();
   }

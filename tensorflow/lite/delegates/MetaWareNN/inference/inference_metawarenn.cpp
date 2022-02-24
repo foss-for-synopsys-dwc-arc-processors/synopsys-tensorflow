@@ -9,75 +9,73 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
+  const char* model_path = argv[1];
+  std::string data_type = argv[2];
+  std::unique_ptr<tflite::FlatBufferModel> model = 
+      tflite::FlatBufferModel::BuildFromFile(model_path);
+  if (!model) {
+      printf("Failed to mmap model\n");
+      exit(0);
+  }
 
-    const char* model_path = argv[1];
-    std::string data_type = argv[2];
-    std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(model_path);
-    if(!model){
-        printf("Failed to mmap model\n");
-        exit(0);
+  char* char_path = const_cast<char*>(model_path);
+  char* model_name = strtok(char_path, "/");
+  std::string final_name = "";
+  while (model_name != NULL) {
+    final_name = std::string(model_name);
+    model_name = strtok(NULL, "/");
+  }
+  std::string modelname = "MODELNAME=" + final_name;
+  // Set the MODELNAME Environmental variable
+  putenv(const_cast<char*>(modelname.c_str()));
+
+  tflite::ops::builtin::BuiltinOpResolver resolver;
+  std::unique_ptr<tflite::Interpreter> interpreter;
+  tflite::InterpreterBuilder(*model.get(), resolver)(&interpreter);
+
+  TfLiteMetaWareNNDelegateOptions* options = nullptr;
+  // NEW: Prepare MetaWareNN delegate.
+  auto* delegate = TfLiteMetaWareNNDelegateCreate(options);
+  if (interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) {
+    return false;
+  }
+  // Resize input tensors, if desired.
+  interpreter->AllocateTensors();
+  
+  int in = interpreter->inputs()[0];
+  int out = interpreter->outputs()[0];
+
+  TfLiteIntArray* output_dims = interpreter->tensor(out)->dims;
+  auto output_size = output_dims->data[output_dims->size - 1];
+  FILE *fp;
+  if (data_type == "float") {
+    // Uncomment to read float input from binary file
+    //fp = fopen("input_float_purse.bin", "rb");
+    //float* input=(float*)malloc(sizeof(float)*224*224*3);
+    //fread(input, 224*224*3, sizeof(float), fp);
+    float* passing_input = interpreter->typed_input_tensor<float>(0);
+    for (int i = 0; i < 224*224*3; i++) {
+      //*passing_input = input[i];
+      //passing_input++;
+      passing_input[i] = 125.8;
     }
-    
-    char* char_path = const_cast<char*>(model_path);
-    char* model_name = strtok(char_path, "/");
-    std::string final_name = "";
-    while (model_name != NULL) {
-      final_name = std::string(model_name);
-      model_name = strtok(NULL, "/");
+  } else if (data_type == "uint8_t") {
+    uint8_t* passing_input = interpreter->typed_input_tensor<uint8_t>(0);
+    for (int i = 0; i < 224*224*3; i++) {
+      passing_input[i] = 125;
     }
-    std::string modelname="MODELNAME="+final_name;
-    // Set the MODELNAME Environmental variable
-    putenv(const_cast<char*>(modelname.c_str()));
+  }
 
-    tflite::ops::builtin::BuiltinOpResolver resolver;
-    std::unique_ptr<tflite::Interpreter> interpreter;
-    tflite::InterpreterBuilder(*model.get(), resolver)(&interpreter);
+  interpreter->Invoke();
+  float* output = interpreter->typed_output_tensor<float>(0);
+  vector<pair<float, int> > vp;
 
-    TfLiteMetaWareNNDelegateOptions* options = nullptr;
-    // NEW: Prepare MetaWareNN delegate.
-    auto* delegate = TfLiteMetaWareNNDelegateCreate(options);
-    if (interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) return false;
-    // Resize input tensors, if desired.
-    interpreter->AllocateTensors();
-    
-    int in = interpreter->inputs()[0];
-    int out = interpreter->outputs()[0];
-
-    TfLiteIntArray* output_dims = interpreter->tensor(out)->dims;
-    auto output_size = output_dims->data[output_dims->size - 1];
-    FILE *fp;
-
-
-    if (data_type == "float") {
-      // Uncomment to read float input from binary file
-      //fp = fopen("input_float_purse.bin", "rb");
-      //float* input=(float*)malloc(sizeof(float)*224*224*3);
-      //fread(input, 224*224*3, sizeof(float), fp);
-      float* passing_input = interpreter->typed_input_tensor<float>(0);
-      for (int i = 0; i < 224*224*3; i++) {
-        //*passing_input = input[i];
-        //passing_input++;
-        passing_input[i] = 125.8;
-      }
-    }
-    else if (data_type == "uint8_t") {
-      uint8_t* passing_input = interpreter->typed_input_tensor<uint8_t>(0);
-      for (int i = 0; i < 224*224*3; i++) {
-        passing_input[i] = 125;
-      }
-    }
-
-    interpreter->Invoke();
-    float* output = interpreter->typed_output_tensor<float>(0);
-    vector<pair<float, int> > vp;
-
-    for (int i = 0; i < output_size; ++i) {
-      vp.push_back(make_pair(output[i], i));
-    }
-    sort(vp.begin(), vp.end());
-    for (int i = 1000; i >= 1000-10; i--)
-    {
-      printf("\n %f -- %d", vp[i].first, vp[i].second);
-    }
-    return 0;
+  for (int i = 0; i < output_size; ++i) {
+    vp.push_back(make_pair(output[i], i));
+  }
+  sort(vp.begin(), vp.end());
+  for (int i = 1000; i >= 1000-10; i--) {
+    printf("\n %f -- %d", vp[i].first, vp[i].second);
+  }
+  return 0;
 }
