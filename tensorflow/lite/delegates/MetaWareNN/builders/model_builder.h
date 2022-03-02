@@ -15,12 +15,7 @@
 #include "metawarenn_lib/metawarenn_attribute.h"
 #include "metawarenn_lib/metawarenn_element.h"
 
-#include "metawarenn_lib/optimizer/pass_manager.h"
 #include "metawarenn_lib/optimizer/metawarenn_optimizer.h"
-#include "metawarenn_lib/optimizer/remove_reshape.h"
-#include "metawarenn_lib/optimizer/convert_layout.h"
-#include "metawarenn_lib/optimizer/calculate_offset.h"
-
 #include "metawarenn_lib/mwnnconvert/mwnn_protobuf/cpp_wrapper/MWNN.pb.h"
 #include "metawarenn_lib/mwnnconvert/mwnn_to_proto.h"
 

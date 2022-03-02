@@ -1043,76 +1043,8 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(
   std::cout << "\n In MetaWareNNCompile !!! ";
   static int subgraph_counter = 0;
   subgraph_counter++;
-  ::metawarenn::optimizer::PassManager manager;
-  if (HWC_TO_CHW) {
-    for (auto g_t : graph->get_graph_initializers()) {
-      if (g_t.get_dims().size() == 4) {
-        //std::cout << "\n Name : " << g_t.get_name();
-        for (auto node : graph->get_graph_nodes()) {
-          if ((node.get_op_type() == "Conv" && 
-               g_t.get_name() == node.get_inputs()[1]) or
-               (node.get_op_type() == "DequantizeLinear" && 
-               g_t.get_name() == node.get_inputs()[0])) {
-            //OHWI
-            /*std::cout << "\t Dims : ";
-            for (auto dim : g_t.get_dims())
-              std::cout << dim << ",";*/
-            ::metawarenn::optimizer::ConvertLayout cl(graph, g_t, 0, 
-                                                      HWC_TO_CHW, 0, true);
-            manager.RegisterPass(cl);
-          }
-        }
-      } else {
-        for (auto node : graph->get_graph_nodes()) {
-          if (node.get_op_type() == "Mul" || node.get_op_type() == "Add") {
-            for (auto n_ip : node.get_inputs()) {
-              if (g_t.get_name() == n_ip) {
-                std::cout << "\n Less Dimensiosna Name : " << g_t.get_name();
-                std::cout << "\t Dims : ";
-                for (auto dim : g_t.get_dims()) {
-                  std::cout << dim << ",";
-                }
-                ::metawarenn::optimizer::ExpandDimension ed(graph, g_t);
-                manager.RegisterPass(ed);
-              }
-            }
-          }
-        }
-      }
-    }
-    // (minxinx) TODO: validate this pass... if reshape receives 4D input, 
-    // should we maybe insert Transpose(NCHW2NHWC) ?
-    for (auto g_t : graph->get_graph_ip_tensor()) {
-      if (g_t.get_dims().size() == 4) {
-        /*std::cout << "\n Name : " << g_t.get_name();
-        std::cout << "\t Dims : ";
-        for (auto dim : g_t.get_dims())
-          std::cout << dim << ",";*/
-        ::metawarenn::optimizer::ConvertLayout cl(graph, g_t, 0, HWC_TO_CHW, 
-                                                  0, false);
-        manager.RegisterPass(cl);
-      }
-    }
-  }
-  auto node_list = graph->get_graph_nodes();
-  for (int node_idx = 0; node_idx < graph->get_graph_nodes().size(); node_idx++) {
-    auto g_n = node_list[node_idx];
-    /*if(g_n.get_op_type() == "Reshape") {
-    if(g_n.get_op_type() == "Reshape") {
-      ::metawarenn::optimizer::RemoveReshape rr(graph, g_n);
-      std::cout << "\n MetaWareNNCC : " << rr.get_name();
-      manager.RegisterPass(rr);
-    }
-    else if(g_n.get_op_type() == "Relu") {
-      // This should be done in shared (tflite,onnxruntime,tvm,glow) MWNN Graph
-      ::metawarenn::optimizer::FuseRelu fr(graph, g_n);
-      std::cout << "\n MetaWareNNCC : " << fr.get_name();
-      manager.RegisterPass(fr);
-    }*/
-  }
-  /*::metawarenn::optimizer::CalculateOffset co(graph);
-  manager.RegisterPass(co);*/
-  manager.RunPasses();
+
+  ::metawarenn::optimizer::NNOptimizer nn_optimizer(graph, 0/*CHW_TO_HWC*/, HWC_TO_CHW);
 
   auto graph_ip_names = graph->get_graph_ip_names();
   for (auto g_n : graph->get_graph_nodes()) {
