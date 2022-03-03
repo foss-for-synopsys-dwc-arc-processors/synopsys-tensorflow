@@ -96,7 +96,8 @@ TfLiteStatus DelegatePrepare(TfLiteContext* context, TfLiteDelegate* delegate) {
 
   std::ifstream ops_file{json_path};
   ops_file >> supported_ops;
-
+  // Supported ops Enum is entered in supported_ops.json based on below header
+  // https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/builtin_ops.h
   for(auto op : supported_ops["tflite"].items()) {
     supported_tflite_ops.insert(std::stoi(op.key()));
   }
