@@ -3,6 +3,8 @@
 
 #include "tensorflow/lite/c/common.h"
 #include <memory>
+#include "tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/mwnnconvert/json/include/json.hpp"
+using json = nlohmann::json;
 
 struct TfLiteMetaWareNNDelegateOptions {
   int32_t max_delegated_partitions;

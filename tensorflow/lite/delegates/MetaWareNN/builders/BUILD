@@ -82,6 +82,7 @@ cc_library(
         "metawarenn_lib/inference_engine/mwnn_optimization_profile.h",
         "metawarenn_lib/inference_engine/mwnn_encrypt_decrypt.h",
         "metawarenn_lib/logger/logger.h",
+        "metawarenn_lib/mwnnconvert/json/include/json.hpp",
     ],
     deps=[
         "//tensorflow/lite/c:common",

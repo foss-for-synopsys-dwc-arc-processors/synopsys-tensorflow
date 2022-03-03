@@ -75,54 +75,38 @@ class MetaWareNNDelegate: public TfLiteDelegate {
   TfLiteMetaWareNNDelegateOptions params_;
 };
 
-bool IsNodeSupportedByMetaWareNN(const TfLiteRegistration* registration, 
-                                 const TfLiteNode* node, 
-                                 TfLiteContext* context) {
-  switch (registration->builtin_code) {
-    case kTfLiteBuiltinAdd:
-    case kTfLiteBuiltinConv2d:
-    case kTfLiteBuiltinDepthwiseConv2d:
-    case kTfLiteBuiltinAveragePool2d:
-    case kTfLiteBuiltinMaxPool2d:
-    case kTfLiteBuiltinMul:
-    case kTfLiteBuiltinConcatenation:
-    case kTfLiteBuiltinFullyConnected:
-    case kTfLiteBuiltinMean:
-    case kTfLiteBuiltinSplit:
-    case kTfLiteBuiltinPad:
-    case kTfLiteBuiltinStridedSlice:
-    case kTfLiteBuiltinSqueeze:
-    case kTfLiteBuiltinRelu:
-    case kTfLiteBuiltinReshape:
-    case kTfLiteBuiltinSoftmax:
-    case kTfLiteBuiltinHardSwish:
-    case kTfLiteBuiltinMaximum:
-    case kTfLiteBuiltinSpaceToDepth:
-    case kTfLiteBuiltinArgMax:
-    case kTfLiteBuiltinTransposeConv:
-    case kTfLiteBuiltinLogistic:
-    case kTfLiteBuiltinSum:
-    case kTfLiteBuiltinResizeNearestNeighbor:
-    case kTfLiteBuiltinResizeBilinear:
-    case kTfLiteBuiltinPrelu:
-    case kTfLiteBuiltinSpaceToBatchNd:
-    case kTfLiteBuiltinDequantize:
-      return true;
-    default: {
-      std::cout << "\nMetaWareNN unsupported node enum: " << 
-                   registration->builtin_code;
-      return false;
-    }
+bool IsNodeSupportedByMetaWareNN(const TfLiteRegistration* registration,
+                                 const TfLiteNode* node,
+                                 TfLiteContext* context,
+                                 std::set<int32_t> supported_tflite_ops) {
+  if(supported_tflite_ops.count(registration->builtin_code)) {
+    return true;
+  } else {
+    return false;
   }
 }
 
 TfLiteStatus DelegatePrepare(TfLiteContext* context, TfLiteDelegate* delegate) {
   std::cout<<"\nIn DelegatePrepare"<<std::endl;
+  json supported_ops;
+  std::set<int32_t> supported_tflite_ops;
+
+  std::string json_path = std::string(std::getenv("METAWARENN_LIB_PATH")) +
+                          "mwnnconvert/json/supported_ops.json";
+
+  std::ifstream ops_file{json_path};
+  ops_file >> supported_ops;
+
+  for(auto op : supported_ops["tflite"].items()) {
+    supported_tflite_ops.insert(std::stoi(op.key()));
+  }
+
   delegates::IsNodeSupportedFn node_supported_fn =
       [=](TfLiteContext* context, TfLiteNode* node,
           TfLiteRegistration* registration,
           std::string* unsupported_details) -> bool {
-    return IsNodeSupportedByMetaWareNN(registration, node, context);
+    return IsNodeSupportedByMetaWareNN(registration, node, context,
+                                       supported_tflite_ops);
   };
 
   delegates::GraphPartitionHelper helper(context, node_supported_fn);

@@ -1044,33 +1044,10 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(
   static int subgraph_counter = 0;
   subgraph_counter++;
 
-  ::metawarenn::optimizer::NNOptimizer nn_optimizer(graph, 0/*CHW_TO_HWC*/, HWC_TO_CHW);
-
-  auto graph_ip_names = graph->get_graph_ip_names();
-  for (auto g_n : graph->get_graph_nodes()) {
-    for (auto n_ip : g_n.get_inputs()) {
-      if (!(graph->initializer_names_.count(n_ip)) && 
-          !(std::count(graph_ip_names.begin(), graph_ip_names.end(), n_ip))) {
-        if (graph->get_node_producers().count(n_ip)) {
-          graph->set_node_consumer(n_ip, g_n.get_name());
-        }
-      }
-    }
-    for (auto n_op : g_n.get_outputs()) {
-      graph->set_node_producer(n_op, g_n.get_name());
-    }
-  }
-  for (auto itr : graph->get_node_producers()) {
-    std::cout << "\n Produced Tensor : " << itr.first;
-    std::cout << "\n      Producer Node : " << itr.second;
-  }
-  for (auto itr : graph->get_node_consumers()) {
-    std::cout << "\n Consumed Tensor : " << itr.first;
-    auto& vitr = itr.second;
-    for (auto node_name : vitr) {
-        std::cout << "\n      Consumer Node - " << node_name;
-    }
-  }
+  // Optimize MetaWareNN Graph
+  ::metawarenn::optimizer::NNOptimizer nn_optimizer;
+  nn_optimizer.enable_hwc_to_chw_conversion();
+  nn_optimizer.OptimizeGraph(graph);
 
   #if INVOKE_NNAC
     std::cout << "\n ------------------------Graph------------------------ \n";
