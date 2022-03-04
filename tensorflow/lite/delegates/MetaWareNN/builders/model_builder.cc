@@ -1006,9 +1006,9 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(
 
   // Optimize MetaWareNN Graph
   ::metawarenn::optimizer::NNOptimizer nn_optimizer(graph);
+  nn_optimizer.enable_expand_dim_pass();
   nn_optimizer.enable_hwc_to_chw_conversion();
   nn_optimizer.TransformGraphLayout();
-  nn_optimizer.OptimizeGraph();
   std::cout << "\n MetaWareNN Graph Optimization - Done!!!";
 
   // Create Producer & Consumer Node's for Each Tensor
