@@ -17,14 +17,6 @@ void ModelBuilder::CreateMWNNNode(
   ::metawarenn::Node m_node(node_name_, node_op_type_, node_attributes_, 
                             node_inputs_, node_outputs_);
   graph_ptr_->set_graph_nodes(m_node);
-
-  std::cout << "\n ========================== Node =========================\n";
-  std::cout << "\n Name : " << node_name_;
-  std::cout << "\n Type : " << node_op_type_;
-  for (auto nip: node_inputs_)
-    std::cout << "\n Inputs : " << nip;
-  for (auto nop: node_outputs_)
-    std::cout << "\n Outputs : " << nop;
 }
 
 void ModelBuilder::CreateMWNNQuantParams(
@@ -41,8 +33,6 @@ void ModelBuilder::CreateMWNNQuantParams(
 
   std::string zp_name = tensor.name + std::string("_zero_point");
   std::vector<int32_t> tensor_vec_zp = {tensor.params.zero_point};
-  std::cout << "\n GetMWNNTypeTF(tensor.type): " << 
-               (int)GetMWNNTypeTF(tensor.type);
   ::metawarenn::Tensor zp_tensor(zp_name, 
                                  std::vector<int>({tensor_vec_zp.size()}),
                                  GetMWNNTypeTF(tensor.type), tensor_vec_zp);
@@ -81,17 +71,13 @@ ModelBuilder::ModelBuilder(std::vector<int> nodes)
 
 std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
     TfLiteContext* context, std::string subgraph_name) {
-  std::cout<<"\nBuildGraph!!"<<std::endl;
+  std::cout << "\nIn ModelBuilder BuildGraph!!";
 
   // Create MetaWareNN High Level Graph Representation from 
   // TFLite SubGraph Nodes using TFLite Context
   std::shared_ptr<::metawarenn::Graph> graph_ptr = 
       std::make_shared<::metawarenn::Graph>();
   graph_ptr->set_name(subgraph_name);
-
-  std::cout << "\n----------------------------------------------------------\n";
-  std::cout << "\n MWNN Graph Name : " << graph_ptr->get_name() 
-            << " with size as " << subgraph_nodes_.size() << " nodes";
 
   TfLiteNode* node;
   TfLiteRegistration* reg;
@@ -173,7 +159,6 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
   std::map<std::string, int> const_names;
   for (size_t node_index = 0; node_index < subgraph_nodes_.size(); 
        node_index++) {
-    std::cout << "\n ---------------------------------------------------------";
     TfLiteNode* node;
     TfLiteRegistration* reg;
     const auto status = context->GetNodeAndRegistration(context, 
@@ -780,7 +765,6 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
       ::metawarenn::Attribute attr_axis("axis", (int64_t)1);
       node_attributes.emplace_back(attr_axis);
     } else if (op_type == kTfLiteBuiltinHardSwish) {
-      std::cout << "\n Convert TfLiteHardSwish to MwnnHardSwish\n";
       node_op_type = "HardSwish";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
     } else if (op_type == kTfLiteBuiltinMaximum) {
@@ -788,7 +772,6 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
     }
     else if (op_type == kTfLiteBuiltinSpaceToDepth) {
-      std::cout << "\n Convert TfLiteSpaceToDepth to MwnnSpaceToDepth\n";
       // https://github.com/tensorflow/tensorflow/search?q=TfLiteDepthToSpaceParams
       node_op_type = "SpaceToDepth";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
@@ -799,9 +782,6 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
       node_attributes.emplace_back(attr_block_size);
     }
     else if (op_type == kTfLiteBuiltinArgMax) {
-      std::cout << "\n Convert TfLiteArgMax to MwnnArgMax"
-                   "\n(Comment: the converter needs to read rediced_axis from "
-                   "tflite-input and write to MWNN-attribute)\n";
       node_op_type = "ArgMax";
       node_name = node_op_type + std::to_string(subgraph_nodes_[node_index]);
       // To access a TFLite tensor, refer to
@@ -856,17 +836,12 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
       ::metawarenn::Attribute attr_auto_pad("auto_pad", 
                                             std::vector<std::string>{pad_mode});
       node_attributes.emplace_back(attr_auto_pad);
-      std::cout << "auto_pad: " << attr_auto_pad.get_string_data()[0] << "\n";
-
       ::metawarenn::Attribute attr_dilate("dilations", std::vector<int64_t>{1,1});
       node_attributes.emplace_back(attr_dilate);
       ::metawarenn::Attribute attr_kernel_shape("kernel_shape", 
           std::vector<int64_t>{weight_tensor.dims->data[1], 
           weight_tensor.dims->data[2]});
       node_attributes.emplace_back(attr_kernel_shape);
-      for (auto bbb : attr_kernel_shape.get_int_data()) {
-        std::cout<<"attr_kernel_shape " << bbb << "\n";
-      }
       ::metawarenn::Attribute attr_output_padding("output_padding", 
           std::vector<int64_t>{0, 0, 0, 0});
       node_attributes.emplace_back(attr_output_padding);
@@ -885,9 +860,6 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
                                                  std::multiplies<int>());
       std::vector<int64_t> tensor_vec(output_shape_tensor.data.i32,
           output_shape_tensor.data.i32 + num_tensor_elements);
-      for (int z = 0; z < tensor_vec.size(); ++z) {
-        std::cout << " output_shape [ " << z << "]=" << tensor_vec[z] << "\n";
-      }
       ::metawarenn::Attribute attr_output_shape("output_shape", tensor_vec);
       node_attributes.emplace_back(attr_output_shape);
       ::metawarenn::Attribute attr_stride("strides", 
@@ -970,15 +942,6 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
       /*std::vector<int> dims_vec = ParseTfLiteTensorDims(in_tensor);
       std::vector<float> vals_vec = ParseTfLiteTensorVals(in_tensor, dims_vec);
       const std::string fp32_name = context->tensors[node->outputs->data[0]].name;
-      std::cout<<"Tensor name "<<fp32_name << " dims = ";
-      for (auto _dim : dims_vec) {
-        std::cout << _dim << " ";
-      }
-      std::cout << "! \n"<<std::flush;
-      for (int _z = 0; _z < 5; ++_z) {
-        std::cout << vals_vec[_z] <<" ";
-      }
-      std::cout << "! \n"<<std::flush;
       add_mwnn_initializer(graph_ptr, fp32_name,
                            GetMWNNTypeTF(in_tensor.type),
                            dims_vec, vals_vec);
@@ -996,9 +959,6 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
       std::vector<std::string> activation_node_inputs;
       std::vector<std::string> activation_node_outputs;
       std::vector<::metawarenn::Attribute> activation_node_attributes;
-      std::cout << "\n activation_node_name : " << activation_node_name;
-      std::cout << "\n activation_node_op_type : "<< activation_node_op_type;
-
       activation_node_inputs.emplace_back(node_name+"_output");
       activation_node_outputs.emplace_back(node_outputs[0]);
       node_outputs[0] = node_name+"_output";
@@ -1021,16 +981,16 @@ std::shared_ptr<::metawarenn::Graph> ModelBuilder::BuildGraph(
         graph_ptr->initializer_names_.insert(clip_ip_max);
         activation_node_inputs.emplace_back(clip_ip_max);
       }
-        CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, 
-                       node_inputs, node_outputs);
-        CreateMWNNNode(graph_ptr, activation_node_name, activation_node_op_type,
-                       activation_node_attributes, activation_node_inputs, 
-                       activation_node_outputs);
-      } else {
-        CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, 
-                       node_inputs, node_outputs);
-      }
+      CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, 
+                     node_inputs, node_outputs);
+      CreateMWNNNode(graph_ptr, activation_node_name, activation_node_op_type,
+                     activation_node_attributes, activation_node_inputs, 
+                     activation_node_outputs);
+    } else {
+      CreateMWNNNode(graph_ptr, node_name, node_op_type, node_attributes, 
+                     node_inputs, node_outputs);
     }
+  }
   return graph_ptr;
 }
 
@@ -1045,14 +1005,19 @@ TfLiteStatus ModelBuilder::MetaWareNNCompile(
   subgraph_counter++;
 
   // Optimize MetaWareNN Graph
-  ::metawarenn::optimizer::NNOptimizer nn_optimizer;
+  ::metawarenn::optimizer::NNOptimizer nn_optimizer(graph);
   nn_optimizer.enable_hwc_to_chw_conversion();
-  nn_optimizer.OptimizeGraph(graph);
+  nn_optimizer.TransformGraphLayout();
+  nn_optimizer.OptimizeGraph();
+  std::cout << "\n MetaWareNN Graph Optimization - Done!!!";
+
+  // Create Producer & Consumer Node's for Each Tensor
+  graph->create_producer_consumer_map();
+
+  // Print the Graph Information
+  graph->PrintGraph();
 
   #if INVOKE_NNAC
-    std::cout << "\n ------------------------Graph------------------------ \n";
-    std::cout << "\n Graph Name : " << graph->get_name();
-
     ::MWNN::MWNNGraphProto graph_proto;
     // Creates MWNNProto from MWNN Graph
     graph_proto = write_mwnn_proto(graph);
