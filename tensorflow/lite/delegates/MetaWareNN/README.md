@@ -9,17 +9,16 @@
     * `git clone --recursive https://github.com/foss-for-synopsys-dwc-arc-processors/synopsys-tensorflow.git`
     * `cd synopsys-tensorflow`
     * `git checkout metawarenn_dev`
-    * In case if synopsys-tensorflow is cloned without metawarenn_lib submodule, use below commands to pull MetaWareNN Library Submodule for the first time
+    * Use below commands to pull MetaWareNN Library Submodule
         * `git pull`
         * `git submodule update --init --recursive`
-        *  Move to metawarenn_lib submodule and checkout to metawarenn_dev branch
+        *  Move to metawarenn_lib submodule and checkout to onnx_conversion branch
             a. `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
-            b. `git checkout metawarenn_dev`
+            b. `git checkout onnx_conversion`
   #### Using Existing Setup to pull submodule changes[Docker / Non-Docker]
-    * `cd synopsys-tensorflow`
-    * `git pull`
+    * `cd synopsys-tensorflow && git pull`
     * `cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib`
-    * `git checkout metawarenn_dev`
+    * `git checkout onnx_conversion`
     * `git pull`
 
   #### Install required bazel version
@@ -83,19 +82,18 @@
   ```
    1. Download the dependent protobuf library from egnyte link https://multicorewareinc.egnyte.com/dl/kpRzPTSFdx and place it in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/lib
   ```
-   ### To Load MetaWareNN Executable Graph in Shared Memory [Default flow]
-  ```
-   1. Set the path to synopsys-tensorflow in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no: 5
-  ```
-   ### To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file
-  ```
-   1. Enable INVOKE_NNAC in tensorflow/lite/delegates/MetaWareNN/builders/model_builder.h line no: 25
+#### To create ONNX Proto from MWNNGraph by loading TFLite Models[Default flow]
+   1. By default, `INFERENCE_ENGINE` flag is set to zero in metawarenn_lib/metawarenn_common.h, which will create ONNXProto directly from MWNNGraph and store it in inference/op_onnx_models
+   2. Enable `INFERENCE_ENGINE` flag in metawarenn_lib/metawarenn_common.h, to convert MWNNGraph to ExecutableGraph and then create Inference Engine & Execution Context and finally creates the output ONNXProto in inference/op_onnx_models for model verification
+   ### To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file - Outdated [Not tested after MWNNGraph update to ONNX format]
+   1. Enable INVOKE_NNAC in tensorflow/lite/delegates/MetaWareNN/builders/model_builder.h line no: 22
    2. Update tensorflow/lite/delegates/MetaWareNN/inference/env.sh file
       i. Set the path to ARC/ directory in lino no: 11
       ii. Set the path to cnn_models/ directory in lino no: 12
+  ```
    [Note] : Generated EV Binary file for MetaWareNN SubGraph will store in evgencnn/scripts folder and all intermediate files will get stored in `/path/to/synopsys-tensorflow/NNAC_DUMPS` folder
   ```
-   ### To Use metawarenn_lib as Shared Library
+   ### To Use metawarenn_lib as Shared Library - Outdated
    1. Rename tensorflow/lite/delegates/MetaWareNN/builders/BUILD to BUILD_original
       `mv tensorflow/lite/delegates/MetaWareNN/builders/BUILD tensorflow/lite/delegates/MetaWareNN/builders/BUILD_original`
    2. Rename tensorflow/lite/delegates/MetaWareNN/builders/BUILD_shared_lib to BUILD
@@ -115,17 +113,9 @@ bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/M
    3. `source env.sh`
    4. Set the path to downloaded MobileNet v2 TFlite model in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_metawarenn.cpp` line no: 13
    5. `g++ -o inference inference_metawarenn.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
-   6. `./inference`
-
-### To Run Multiple TFLite models from model zoo
-   1. `cd /path/to/synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference`
-   2. `source env.sh`
-   3. Download the models from TFLite model zoo by running the script
-      `sh download_models.sh`
-   4. Compile the inference script
-      `g++ -o inference inference_regression.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
-   5. Run the executable
-      `./inference`
+   6. Run the inference
+      i. To run Float model - `./inference /path/to/tflite/model float` 
+      ii. To run Quantized model - `./inference /path/to/tflite/model uint8_t` 
 
 ### To Generate the ONNXProto from multiple TFLite models & Verify
    1. `cd tensorflow/lite/delegates/MetaWareNN/inference`
@@ -142,5 +132,3 @@ bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/M
    4. Compile the inference script
       `g++ -o inference inference_metawarenn.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
    5. `python test_regression_quantized_tflite.py` # Creates a `op_tflite_quantized_models` directory and dump the generated ONNXProto files for all input models & `validation_result.txt` file which contains the comparison of original tflite & generated onnx model
-   Note:
-      i. Invoke call from the inference script currently parses the MetaWareNN Executable graph from shared memory
