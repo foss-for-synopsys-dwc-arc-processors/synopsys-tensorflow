@@ -40,3 +40,6 @@ wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_
 mkdir mobilenet_v2_1.0_224
 tar -xvf mobilenet_v2_1.0_224.tgz -C mobilenet_v2_1.0_224
 rm mobilenet_v2_1.0_224.tgz
+mkdir efficientnet_lite1
+wget -O efficientnet_lite1_fp32_2.tflite https://tfhub.dev/tensorflow/lite-model/efficientnet/lite1/fp32/2?lite-format=tflite
+mv efficientnet_lite1_fp32_2.tflite efficientnet_lite1

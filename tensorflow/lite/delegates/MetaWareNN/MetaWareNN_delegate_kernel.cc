@@ -79,7 +79,6 @@ TfLiteStatus MetaWareNNDelegateKernel::Prepare(TfLiteContext* context,
 TfLiteStatus MetaWareNNDelegateKernel::Invoke(TfLiteContext* context,
                                               TfLiteNode* node) {
   std::cout<<"\nInside MetaWareNNDelegateKernel's Invoke!!!"<<std::endl;
-  int is_HWC = HWC_TO_CHW ? 0 : 1;
 
   #if INFERENCE_ENGINE
   bool update_engine = false;

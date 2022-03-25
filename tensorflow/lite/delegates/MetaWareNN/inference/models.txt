@@ -8,3 +8,4 @@ inception_v3_2018_04_27/inception_v3.tflite
 inception_v4_2018_04_27/inception_v4.tflite
 mobilenet_v1_1.0_224/mobilenet_v1_1.0_224.tflite
 mobilenet_v2_1.0_224/mobilenet_v2_1.0_224.tflite
+efficientnet_lite1/efficientnet_lite1_fp32_2.tflite
