@@ -53,4 +53,4 @@ cd synopsys-tensorflow
 git checkout metawarenn_dev
 git submodule update --init --recursive
 cd tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib
-git checkout metawarenn_dev
+git checkout onnx_conversion

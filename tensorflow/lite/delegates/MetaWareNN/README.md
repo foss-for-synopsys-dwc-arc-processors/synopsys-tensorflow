@@ -75,8 +75,7 @@
 
 ### Download MobileNet v2 TFlite model
   ```
-    wget https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224.tgz
-    tar -vzxf mobilenet_v2_1.0_224.tgz
+    Download MobileNetV2 TFLite Model from Egnyte Link - https://multicorewareinc.egnyte.com/dl/USS5sw1FZG
   ```
 #### Modifications to make before build
   ```
@@ -85,7 +84,7 @@
 #### To create ONNX Proto from MWNNGraph by loading TFLite Models[Default flow]
    1. By default, `INFERENCE_ENGINE` flag is set to zero in metawarenn_lib/metawarenn_common.h, which will create ONNXProto directly from MWNNGraph and store it in inference/op_onnx_models
    2. Enable `INFERENCE_ENGINE` flag in metawarenn_lib/metawarenn_common.h, to convert MWNNGraph to ExecutableGraph and then create Inference Engine & Execution Context and finally creates the output ONNXProto in inference/op_onnx_models for model verification
-   ### To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file - Outdated [Not tested after MWNNGraph update to ONNX format]
+   ### To Invoke the NNAC & EVGENCNN Script to generate the EV Binary file - Outdated & Optional [Not tested after MWNNGraph update to ONNX format]
    1. Enable INVOKE_NNAC in tensorflow/lite/delegates/MetaWareNN/builders/model_builder.h line no: 22
    2. Update tensorflow/lite/delegates/MetaWareNN/inference/env.sh file
       i. Set the path to ARC/ directory in lino no: 11
@@ -93,11 +92,11 @@
   ```
    [Note] : Generated EV Binary file for MetaWareNN SubGraph will store in evgencnn/scripts folder and all intermediate files will get stored in `/path/to/synopsys-tensorflow/NNAC_DUMPS` folder
   ```
-   ### To Use metawarenn_lib as Shared Library - Outdated
+   ### To Use metawarenn_lib as Shared Library - Outdated & Optional
    1. Rename tensorflow/lite/delegates/MetaWareNN/builders/BUILD to BUILD_original
-      `mv tensorflow/lite/delegates/MetaWareNN/builders/BUILD tensorflow/lite/delegates/MetaWareNN/builders/BUILD_original`
+      * `mv tensorflow/lite/delegates/MetaWareNN/builders/BUILD tensorflow/lite/delegates/MetaWareNN/builders/BUILD_original`
    2. Rename tensorflow/lite/delegates/MetaWareNN/builders/BUILD_shared_lib to BUILD
-      `mv tensorflow/lite/delegates/MetaWareNN/builders/BUILD_shared_lib tensorflow/lite/delegates/MetaWareNN/builders/BUILD`
+      * `mv tensorflow/lite/delegates/MetaWareNN/builders/BUILD_shared_lib tensorflow/lite/delegates/MetaWareNN/builders/BUILD`
    3. Download the metawarenn shared library from egnyte link https://multicorewareinc.egnyte.com/dl/n31afFTwP9 and place it in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/lib`
    4. Also download the dependent protobuf library from egnyte link https://multicorewareinc.egnyte.com/dl/kpRzPTSFdx and place it in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/builders/metawarenn_lib/lib`
 
@@ -111,16 +110,15 @@ bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/M
    1. `cd tensorflow/lite/delegates/MetaWareNN/inference`
    2. Set the path to flatbuffers in tensorflow/lite/delegates/MetaWareNN/inference/env.sh line no:15
    3. `source env.sh`
-   4. Set the path to downloaded MobileNet v2 TFlite model in `synopsys-tensorflow/tensorflow/lite/delegates/MetaWareNN/inference/inference_metawarenn.cpp` line no: 13
-   5. `g++ -o inference inference_metawarenn.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
+   4. `g++ -o inference inference_metawarenn.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
    6. Run the inference
-      i. To run Float model - `./inference /path/to/tflite/model float` 
-      ii. To run Quantized model - `./inference /path/to/tflite/model uint8_t` 
+      i. To run Float model - `./inference /path/to/float/tflite/model float`
+      ii. To run Quantized model - `./inference /path/to/quant/tflite/model uint8_t`
 
-### To Generate the ONNXProto from multiple TFLite models & Verify
+### To Generate the ONNXProto from multiple Float TFLite models & Verify
    1. `cd tensorflow/lite/delegates/MetaWareNN/inference`
    2. `source env.sh`
-   3. `sh download_models.sh` # (For First time) - Creates tflite_models directory inside synopsys-tensorflow/ & downloads models into it
+   3. `sh download_models.sh` or Download float TFLite Models from Egnyte Link - https://multicorewareinc.egnyte.com/fl/k0wHUistvX # (For First time) - Creates tflite_models directory inside synopsys-tensorflow/ & downloads models into it
    4. Compile the inference script
       `g++ -o inference inference_metawarenn.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
    5. `python test_regression_tflite.py` # Creates a `op_tflite_models` directory and dump the generated ONNXProto files for all input models & `validation_result.txt` file which contains the comparison of original tflite & generated onnx model
@@ -128,7 +126,7 @@ bazel build //tensorflow/lite:libtensorflowlite.so //tensorflow/lite/delegates/M
 ### To Generate the ONNXProto from multiple Quantized TFLite models & Verify
    1. `cd tensorflow/lite/delegates/MetaWareNN/inference`
    2. `source env.sh`
-   3. `sh download_quantized_models.sh` # (For First time) - Creates tflite_quantized_models directory inside synopsys-tensorflow/ & downloads models into it
+   3. `sh download_quantized_models.sh` or Download Quantized TFLite Models from Egnyte Link - https://multicorewareinc.egnyte.com/fl/7uaWWI9PNi # (For First time) - Creates tflite_quantized_models directory inside synopsys-tensorflow/ & downloads models into it
    4. Compile the inference script
       `g++ -o inference inference_metawarenn.cpp -I$FLATBUFFERS_PATH/include -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite -ltensorflowlite -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN -lMetaWareNN_delegate -L$FRAMEWORK_PATH/bazel-bin/tensorflow/lite/delegates/MetaWareNN/builders -lmodel_builder -L/usr/lib/x86_64-linux-gnu -lrt`
    5. `python test_regression_quantized_tflite.py` # Creates a `op_tflite_quantized_models` directory and dump the generated ONNXProto files for all input models & `validation_result.txt` file which contains the comparison of original tflite & generated onnx model
